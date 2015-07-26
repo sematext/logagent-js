@@ -3,11 +3,13 @@
 Smart Log Parser written in Node.
 
 The parser detects log formats based on a pattern library (yaml file) and converts it to a JSON Object.
-It includes all extracted fields. Date and time is combined in special field named 'ts' - it is paresed by moment.js and converted to a Date object
-and stored in the field '@timestamp'. The object with the parsed fields can be manipulated after parsing using a 'transform' function,
+It includes all extracted fields. Date and time is combined in a special field named 'ts' - it is parsed by moment.js.
+The resulting Date object is stored in the field '@timestamp'. 
+All parsed fields can be manipulated using a 'transform' function,
 defined in the pattern definition.
 
-A command line tool 'logsene-parser' is provided. It reads from stdin and outputs line delemited JSON (or pretty JSON or YAML) to the console to test the patterns. 
+To test patterns or convert logs from text to JSON use the command line tool 'logsene-parser'. 
+It reads from stdin and outputs line delemited JSON (or pretty JSON or YAML) to the console. 
 In addtion it can forward the parsed objects directly to Logsene.
 
 # Installation 

@@ -3,7 +3,7 @@
 Smart Log Parser written in Node.
 
 The parser detects log formats based on a pattern library (yaml file).
-It includes a command line tool, which reads from stdin to test the patterns.
+It includes a command line tool 'logsene-parser', which reads from stdin to test the patterns. 
 
 # Installation 
 
@@ -65,5 +65,19 @@ patterns:
 ```
 
 The default patterns are [here](/patterns.yml) - contributions are welcome.
+
+# Use logparser-js in Node
+
+``` 
+var Logparser = require('logparser-js')
+var lp = new Logparser('./patterns.yml')
+lp.parseLine('log maessage goes here', 'test', function (err, data) {
+    if(err) {
+      console.log('line did not match with any pattern')
+    }
+    console.log(JSON.stringify(data))
+})
+```
+
 
 

@@ -8,7 +8,7 @@ The resulting Date object is stored in the field '@timestamp'.
 All parsed fields can be manipulated using a 'transform' function,
 defined in the pattern definition.
 
-To test patterns or convert logs from text to JSON use the command line tool 'logsene-parser'. 
+To test patterns or convert logs from text to JSON use the command line tool 'logparser'. 
 It reads from stdin and outputs line delemited JSON (or pretty JSON or YAML) to the console. 
 In addtion it can forward the parsed objects directly to Logsene.
 
@@ -25,15 +25,20 @@ Parameters:
 - -p pretty json output
 - -s silent, print only throughput
 - -t token [Logsene](http://sematext.com/logsene) App Token to insert parsed records into Logsene
+- list of files, watched by tail-forver starting at end of file to watch
 
 The default output is line delimited JSON.
 
 Example: 
 ```
-# pipe your logs to Logsene 1-Click ELK stack 
-tail -f /var/log/*.log | logsene-parser -f patterns.yml  -y --token LOGSENE_TOKEN
+# Be Evil: parse all logs 
+# stream it to Logsene 1-Click ELK stack 
+logparser -t LOGSENE_TOKEN /var/log/*.log 
+# Watch selective logs by passing logs via stdin and use your own pattern file
+tail -f /var/log/*.log | logparser -f patterns.yml  -y 
 # view apache access logs in yml format
-tail -f /var/log/access.log | logsene-parser -f patterns.yml -y 
+tail -f /var/log/access.log | logparser -y 
+
 ```
 
 # Pattern definitions file

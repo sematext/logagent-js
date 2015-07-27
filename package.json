@@ -4,7 +4,7 @@
   "description": "Smart log parser written in Node",
   "main": "lib/index.js",
   "bin": {
-    "logparser": "bin/logseneparser.js"
+    "logparser": "bin/logparser.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

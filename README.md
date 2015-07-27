@@ -61,7 +61,7 @@ The default patterns are [here](/patterns.yml) - contributions are welcome.
 npm i sematext/logagent-js
 ```
 
-## Use it in your source code
+## Use the Logparser module in your source code
 ``` 
 var Logparser = require('logagent-js')
 var lp = new Logparser('./patterns.yml')

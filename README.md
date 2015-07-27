@@ -119,5 +119,20 @@ tail -f /var/log/access.log | logagent -y
 
 ```
 
+# Related packages
+
+- [Logsene-CLI](https://github.com/sematext/logsene-cli) - Enables searching Logsene log entries from the command-line. 
+- [SPM Agent for Docker](https://github.com/sematext/spm-agent-docker) - collects metrics, events and logs from Docker API and CoreOS
+- [SPM Agent for Node.js](https://github.com/sematext/spm-agent-nodejs) - collects performance metrics for Node and io.js applications
+- [Custom Metrics](https://github.com/sematext/spm-metrics-js) - Custom Metrics for SPM 
+- [Winston-Logsene](https://github.com/sematext/winston-logsene) - Logging for Node.js - Winston transport layer for Logsene
+
+# Support 
+
+Twitter: [@sematext](http://www.twitter.com/sematext)
+Blog: [blog.sematext.com](http://blog.sematext.com)
+Homepage: [www.sematext.com](http://www.sematext.com)
+
+
 
 

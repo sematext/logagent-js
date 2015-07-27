@@ -1,6 +1,6 @@
 {
   "name": "logagent-js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Smart log parser written in Node",
   "main": "lib/index.js",
   "bin": {
@@ -20,6 +20,7 @@
   "author": "Stefan Thies <stefan.thies@sematext.com> (https://github.com/megastef) ",
   "license": "Apache-2.0",
   "dependencies": {
+    "glob": "^5.0.14",
     "js-yaml": "^3.3.1",
     "logsene-js": "^1.0.7",
     "minimist": "^1.1.2",

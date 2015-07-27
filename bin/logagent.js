@@ -23,6 +23,7 @@ var Logsene = require('logsene-js')
 var logger = null
 var Tail = require('tail-forever')
 var fs = require('fs')
+var glob = require('glob')
 
 function getFilesizeInBytes (filename) {
   var stats = fs.statSync(filename)
@@ -46,10 +47,15 @@ function tailFiles (fileList) {
   fileList.forEach(tailFile)
 }
 
-function tailFileFromEnvVar (envVar) {
-  if (process.env[envVar]) {
-    var files = process.env.LOGSENE_TAIL_FILES.split(' ')
-    tailFiles(files)
+function tailFilesFromGlob (globPattern) {
+  if (globPattern) {
+    glob(globPattern, function (err, files) {
+      if(!err) {
+        tailFiles(files)
+      } else {
+        console.error('Error in glob file patttern ' + envVar + ': ' + err)
+      }
+    })
   }
 }
 
@@ -103,8 +109,10 @@ if (argv.t) {
 if (argv._.length > 0) {
   // tail files
   tailFiles(argv._)
+} else if (process.env.GLOB_PATTERN || argv.g) {
+  // checks for file list and start tail for all files
+  console.log('using glob pattern:' + (process.env.GLOB_PATTERN || argv.g))
+  tailFilesFromGlob(process.env.GLOB_PATTERN || argv.g)
 } else {
   readStdIn()
 }
-// checks for file list and start tail for all files
-tailFileFromEnvVar('LOGSENE_TAIL_FILES')

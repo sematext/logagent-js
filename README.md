@@ -103,6 +103,7 @@ Parameters:
 - -p pretty json output
 - -s silent, print only throughput
 - -t token [Logsene](http://sematext.com/logsene) App Token to insert parsed records into Logsene
+- -g use a [glob](https://www.npmjs.com/package/glob) pattern to watch log files e.g. -g "{/var/log/*.log,/Users/stefan/*/*.log}" 
 - list of files, watched by tail-forver starting at end of file to watch
 
 The default output is line delimited JSON.
@@ -112,11 +113,19 @@ Examples:
 # Be Evil: parse all logs 
 # stream it to Logsene 1-Click ELK stack 
 logagent -t LOGSENE_TOKEN /var/log/*.log 
-# Watch selective logs by passing logs via stdin and use your own pattern file
-tail -f /var/log/*.log | logagent -f patterns.yml  -y 
-# view apache access logs in yml format
-tail -f /var/log/access.log | logagent -y 
+```
 
+Use a [glob](https://www.npmjs.com/package/glob) pattern to build the file list 
+
+```
+logagent -t LOGSENE_TOKEN -g "{/var/log/*.log,/opt/myapp/*.log}"" 
+```
+
+Watch selective log output on console by passing logs via stdin and format in YAML
+
+```
+tail -f /var/log/system.log | logagent -f patterns.yml  -y 
+tail -f /var/log/access.log | logagent -y 
 ```
 
 # Related packages

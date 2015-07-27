@@ -16,46 +16,6 @@ To test patterns or convert logs from text to JSON use the command line tool 'lo
 It reads from stdin and outputs line delemited JSON (or pretty JSON or YAML) to the console. 
 In addtion it can forward the parsed objects directly to [Logsene](http://sematext.com/logsene).
 
-# Installation 
-
-## Get Node.js (debina/ubuntu)
-
-```
-# Note the new setup script name for Node.js v0.12
-curl -sL https://deb.nodesource.com/setup_0.12 | sudo bash -
-# Then install with:
-sudo apt-get install -y nodejs
-```
-
-# Install logparser-js globally
-```
-npm i -g sematext/logparser-js
-# ship all your logs to logsene, parsed, timestamped - displyed on console in YAML format (-y)
-logparser -t LOGSENE_TOKEN -y /var/log/*.log
-```
-
-Parameters:
-
-- -f file with pattern definitions 
-- -y prints parsed messages in YAML format
-- -p pretty json output
-- -s silent, print only throughput
-- -t token [Logsene](http://sematext.com/logsene) App Token to insert parsed records into Logsene
-- list of files, watched by tail-forver starting at end of file to watch
-
-The default output is line delimited JSON.
-
-Examples: 
-```
-# Be Evil: parse all logs 
-# stream it to Logsene 1-Click ELK stack 
-logparser -t LOGSENE_TOKEN /var/log/*.log 
-# Watch selective logs by passing logs via stdin and use your own pattern file
-tail -f /var/log/*.log | logparser -f patterns.yml  -y 
-# view apache access logs in yml format
-tail -f /var/log/access.log | logparser -y 
-
-```
 
 # Pattern definitions file
 
@@ -111,6 +71,47 @@ lp.parseLine('log message', 'source name', function (err, data) {
     }
     console.log(JSON.stringify(data))
 })
+```
+
+# Installation 
+
+## Get Node.js (debina/ubuntu)
+
+```
+# Note the new setup script name for Node.js v0.12
+curl -sL https://deb.nodesource.com/setup_0.12 | sudo bash -
+# Then install with:
+sudo apt-get install -y nodejs
+```
+
+# Install logparser-js globally
+```
+npm i -g sematext/logparser-js
+# ship all your logs to logsene, parsed, timestamped - displyed on console in YAML format (-y)
+logparser -t LOGSENE_TOKEN -y /var/log/*.log
+```
+
+Parameters:
+
+- -f file with pattern definitions 
+- -y prints parsed messages in YAML format
+- -p pretty json output
+- -s silent, print only throughput
+- -t token [Logsene](http://sematext.com/logsene) App Token to insert parsed records into Logsene
+- list of files, watched by tail-forver starting at end of file to watch
+
+The default output is line delimited JSON.
+
+Examples: 
+```
+# Be Evil: parse all logs 
+# stream it to Logsene 1-Click ELK stack 
+logparser -t LOGSENE_TOKEN /var/log/*.log 
+# Watch selective logs by passing logs via stdin and use your own pattern file
+tail -f /var/log/*.log | logparser -f patterns.yml  -y 
+# view apache access logs in yml format
+tail -f /var/log/access.log | logparser -y 
+
 ```
 
 

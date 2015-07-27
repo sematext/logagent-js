@@ -1,20 +1,20 @@
 {
-  "name": "logparser-js",
+  "name": "logagent-js",
   "version": "1.0.0",
   "description": "Smart log parser written in Node",
   "main": "lib/index.js",
   "bin": {
-    "logparser": "bin/logparser.js"
+    "logagent": "bin/logagent.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/sematext/logparser-js.git"
+    "url": "https://github.com/sematext/logagent-js.git"
   },
   "bugs": {
-    "url": "https://github.com/sematext/logparser-js/issues"
+    "url": "https://github.com/sematext/logagent-js/issues"
   },
   "homepage": "https://www.sematext.com",
   "author": "Stefan Thies <stefan.thies@sematext.com> (https://github.com/megastef) ",

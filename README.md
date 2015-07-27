@@ -1,6 +1,6 @@
-# logparser-js
+# logagent-js
 
-Smart Log Parser written in Node.
+Smart Log Parser and Log Shipper written in Node. 
 
 The parser detects log formats based on a pattern library (yaml file) and converts it to a JSON Object:
 - find matching regex in pattern library
@@ -12,7 +12,7 @@ The parser detects log formats based on a pattern library (yaml file) and conver
 - transform function to manipulate parsed objects
 - unmatched lines end up with timestamp and original line in the message field
 
-To test patterns or convert logs from text to JSON use the command line tool 'logparser'. 
+To test patterns or convert logs from text to JSON use the command line tool 'logagent'. 
 It reads from stdin and outputs line delemited JSON (or pretty JSON or YAML) to the console. 
 In addtion it can forward the parsed objects directly to [Logsene](http://sematext.com/logsene).
 
@@ -54,16 +54,16 @@ patterns:
 
 The default patterns are [here](/patterns.yml) - contributions are welcome.
 
-# Use logparser-js in Node
+# Use logagent-js in Node
 
 ## Install it as local package
 ```
-npm i sematext/logparser-js
+npm i sematext/logagent-js
 ```
 
 ## Use it in your source code
 ``` 
-var Logparser = require('logparser-js')
+var Logparser = require('logagent-js')
 var lp = new Logparser('./patterns.yml')
 lp.parseLine('log message', 'source name', function (err, data) {
     if(err) {
@@ -75,12 +75,12 @@ lp.parseLine('log message', 'source name', function (err, data) {
 
 Test your patterns:
 ```
-cat some.log | bin/logparser -y -f mypatterns.yml
+cat some.log | bin/logagent -y -f mypatterns.yml
 ```
 
 # Installation for the command line tool 
 
-## Get Node.js (debina/ubuntu)
+## Get Node.js (debian/ubuntu)
 
 ```
 # Note the new setup script name for Node.js v0.12
@@ -89,11 +89,11 @@ curl -sL https://deb.nodesource.com/setup_0.12 | sudo bash -
 sudo apt-get install -y nodejs
 ```
 
-# Install logparser-js globally
+# Install logagent-js globally
 ```
-npm i -g sematext/logparser-js
+npm i -g sematext/logagent-js
 # ship all your logs to logsene, parsed, timestamped - displyed on console in YAML format (-y)
-logparser -t LOGSENE_TOKEN -y /var/log/*.log
+logagent -t LOGSENE_TOKEN -y /var/log/*.log
 ```
 
 Parameters:
@@ -111,11 +111,11 @@ Examples:
 ```
 # Be Evil: parse all logs 
 # stream it to Logsene 1-Click ELK stack 
-logparser -t LOGSENE_TOKEN /var/log/*.log 
+logagent -t LOGSENE_TOKEN /var/log/*.log 
 # Watch selective logs by passing logs via stdin and use your own pattern file
-tail -f /var/log/*.log | logparser -f patterns.yml  -y 
+tail -f /var/log/*.log | logagent -f patterns.yml  -y 
 # view apache access logs in yml format
-tail -f /var/log/access.log | logparser -y 
+tail -f /var/log/access.log | logagent -y 
 
 ```
 

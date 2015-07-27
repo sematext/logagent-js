@@ -34,7 +34,7 @@ function getFilesizeInBytes (filename) {
 function tailFile (file) {
   var tail = new Tail(file, {start: getFilesizeInBytes(file)})
   tail.on('line', function (line) {
-    parseLine (line, file, log)
+    parseLine(line, file, log)
   })
   tail.on('error', function (error) {
     console.log('ERROR: ', error)
@@ -50,10 +50,10 @@ function tailFiles (fileList) {
 function tailFilesFromGlob (globPattern) {
   if (globPattern) {
     glob(globPattern, function (err, files) {
-      if(!err) {
+      if (!err) {
         tailFiles(files)
       } else {
-        console.error('Error in glob file patttern ' + envVar + ': ' + err)
+        console.error('Error in glob file patttern ' + globPattern + ': ' + err)
       }
     })
   }

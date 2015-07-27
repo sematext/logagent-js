@@ -73,7 +73,12 @@ lp.parseLine('log message', 'source name', function (err, data) {
 })
 ```
 
-# Installation 
+Test your patterns:
+```
+cat some.log | bin/logparser -y -f mypatterns.yml
+```
+
+# Installation for the command line tool 
 
 ## Get Node.js (debina/ubuntu)
 

@@ -21,35 +21,31 @@ var emptyLines = 0
 var bytes = 0
 var Logsene = require('logsene-js')
 var logger = null
-Tail = require('tail-forever');
+var Tail = require('tail-forever')
 var fs = require('fs')
 
-function getFilesizeInBytes(filename) {
- var stats = fs.statSync(filename)
- var fileSizeInBytes = stats["size"]
- return fileSizeInBytes
+function getFilesizeInBytes (filename) {
+  var stats = fs.statSync(filename)
+  var fileSizeInBytes = stats['size']
+  return fileSizeInBytes
 }
 
-function tailFile (file)
-{
-  tail = new Tail(file, {start: getFilesizeInBytes(file)})
-  tail.on("line", parseLine)
-  tail.on("error", function(error) {
-    console.log('ERROR: ', error);
+function tailFile (file) {
+  var tail = new Tail(file, {start: getFilesizeInBytes(file)})
+  tail.on('line', parseLine)
+  tail.on('error', function (error) {
+    console.log('ERROR: ', error)
   })
   console.log('Watching file:' + file)
   return tail
 }
 
-function tailFiles(fileList)
-{
-  fileList.forEach (tailFile)
+function tailFiles (fileList) {
+  fileList.forEach(tailFile)
 }
 
-function tailFileFromEnvVar(envVar)
-{
-  if (process.env[envVar])
-  {
+function tailFileFromEnvVar (envVar) {
+  if (process.env[envVar]) {
     var files = process.env.LOGSENE_TAIL_FILES.split(' ')
     tailFiles(files)
   }
@@ -102,14 +98,11 @@ function terminate () {
 if (argv.t) {
   logger = new Logsene(argv.t, 'logs')
 }
-if (argv._.length > 0)
-{
-  // tail files 
-  tailFiles(argv._) 
+if (argv._.length > 0) {
+  // tail files
+  tailFiles(argv._)
 } else {
-  readStdIn() 
+  readStdIn()
 }
-// checks for file list and start tail for all files 
+// checks for file list and start tail for all files
 tailFileFromEnvVar('LOGSENE_TAIL_FILES')
-
-

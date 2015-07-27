@@ -17,6 +17,7 @@ It reads from stdin and outputs line delemited JSON (or pretty JSON or YAML) to 
 In addtion it can forward the parsed objects directly to [Logsene](http://sematext.com/logsene).
 
 # Installation 
+
 ## Get Node.js (debina/ubuntu)
 
 ```
@@ -104,7 +105,7 @@ npm i sematext/logparser-js
 ``` 
 var Logparser = require('logparser-js')
 var lp = new Logparser('./patterns.yml')
-lp.parseLine('log maessage goes here', 'test', function (err, data) {
+lp.parseLine('log message', 'source name', function (err, data) {
     if(err) {
       console.log('line did not match with any pattern')
     }

@@ -32,7 +32,9 @@ function getFilesizeInBytes (filename) {
 
 function tailFile (file) {
   var tail = new Tail(file, {start: getFilesizeInBytes(file)})
-  tail.on('line', parseLine)
+  tail.on('line', function (line) {
+    parseLine (line, file, log)
+  })
   tail.on('error', function (error) {
     console.log('ERROR: ', error)
   })
@@ -71,10 +73,10 @@ function log (err, data) {
   }
 }
 
-function parseLine (line) {
+function parseLine (line, sourceName) {
   bytes += line.length
   count++
-  la.parseLine(line, 'httpd', log)
+  la.parseLine(line, sourceName, log)
 }
 
 function readStdIn () {

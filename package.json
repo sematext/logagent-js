@@ -3,13 +3,15 @@
   "version": "1.0.0",
   "description": "Smart log parser written in Node",
   "main": "lib/index.js",
-  "bin": { "logsene-parser" : "bin/logseneparser.js" },
+  "bin": {
+    "logparser": "bin/logseneparser.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository" :{ 
-    "type" : "git", 
-    "url" : "https://github.com/sematext/logparser-js.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sematext/logparser-js.git"
   },
   "bugs": {
     "url": "https://github.com/sematext/logparser-js/issues"

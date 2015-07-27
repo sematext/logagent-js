@@ -21,9 +21,38 @@ var emptyLines = 0
 var bytes = 0
 var Logsene = require('logsene-js')
 var logger = null
+Tail = require('tail-forever');
+var fs = require('fs')
 
-if (argv.t) {
-  logger = new Logsene(argv.t, 'logs')
+function getFilesizeInBytes(filename) {
+ var stats = fs.statSync(filename)
+ var fileSizeInBytes = stats["size"]
+ return fileSizeInBytes
+}
+
+function tailFile (file)
+{
+  tail = new Tail(file, {start: getFilesizeInBytes(file)})
+  tail.on("line", parseLine)
+  tail.on("error", function(error) {
+    console.log('ERROR: ', error);
+  })
+  console.log('Watching file:' + file)
+  return tail
+}
+
+function tailFiles(fileList)
+{
+  fileList.forEach (tailFile)
+}
+
+function tailFileFromEnvVar(envVar)
+{
+  if (process.env[envVar])
+  {
+    var files = process.env.LOGSENE_TAIL_FILES.split(' ')
+    tailFiles(files)
+  }
 }
 
 function log (err, data) {
@@ -44,18 +73,21 @@ function log (err, data) {
   } else {
     console.log(JSON.stringify(data))
   }
-  
 }
 
-var rl = readline.createInterface({
-  input: process.stdin
-})
-
-rl.on('line', function (line) {
+function parseLine (line) {
   bytes += line.length
   count++
   la.parseLine(line, 'httpd', log)
-})
+}
+
+function readStdIn () {
+  var rl = readline.createInterface({
+    input: process.stdin
+  })
+  rl.on('line', parseLine)
+  rl.on('close', terminate)
+}
 
 function terminate () {
   var duration = new Date().getTime() - begin
@@ -67,5 +99,17 @@ function terminate () {
   }
   process.exit()
 }
+if (argv.t) {
+  logger = new Logsene(argv.t, 'logs')
+}
+if (argv._.length > 0)
+{
+  // tail files 
+  tailFiles(argv._) 
+} else {
+  readStdIn() 
+}
+// checks for file list and start tail for all files 
+tailFileFromEnvVar('LOGSENE_TAIL_FILES')
 
-rl.on('close', terminate)
+

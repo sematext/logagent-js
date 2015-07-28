@@ -1,6 +1,6 @@
 {
   "name": "logagent-js",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Smart log parser written in Node",
   "main": "lib/index.js",
   "bin": {
@@ -16,6 +16,14 @@
   "bugs": {
     "url": "https://github.com/sematext/logagent-js/issues"
   },
+  "keywords": [
+    "monitoring",
+    "alerting",
+    "log management",
+    "sematext",
+    "logsene",
+    "log parser"
+  ],
   "homepage": "https://www.sematext.com",
   "author": "Stefan Thies <stefan.thies@sematext.com> (https://github.com/megastef) ",
   "license": "Apache-2.0",

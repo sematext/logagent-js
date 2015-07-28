@@ -76,7 +76,7 @@ patterns:
       regex: !!js/regexp /([\w|\s]+\s\d{2}\s[\d|\:|\.]+)\s+(<.+?>)\s(.*)/
       fields: [ts,service,message]
       dateFormat: MMM DD HH:mm:ss
-    - # 2015-07-27 10:42:02 +0000: /Library/Server/Web/Config/apache2/getsslpassphrase: Found wildcard site for port 443
+    - 
       type: log
       regex: !!js/regexp /(\d{4}[\-|\d{2}]+\s[\d|\:]+\s\+\d{4})\:\s+(.+)/
       fields: [ts,message]

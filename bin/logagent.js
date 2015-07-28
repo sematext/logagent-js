@@ -13,7 +13,7 @@
 var argv = require('minimist')(process.argv.slice(2))
 var prettyjson = require('prettyjson')
 var LogAnalyzer = require('../lib/index.js')
-var la = new LogAnalyzer(argv.f || __dirname + '/../patterns.yml')
+var la = new LogAnalyzer(argv.f)
 var readline = require('readline')
 var begin = new Date().getTime()
 var count = 0

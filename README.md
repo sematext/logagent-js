@@ -118,14 +118,14 @@ logagent -t LOGSENE_TOKEN /var/log/*.log
 Use a [glob](https://www.npmjs.com/package/glob) pattern to build the file list 
 
 ```
-logagent -t LOGSENE_TOKEN -g "{/var/log/*.log,/opt/myapp/*.log}"" 
+logagent -t LOGSENE_TOKEN -g "{/var/log/*.log,/opt/myapp/*.log}" 
 ```
 
 Watch selective log output on console by passing logs via stdin and format in YAML
 
 ```
-tail -f /var/log/system.log | logagent -f patterns.yml  -y 
 tail -f /var/log/access.log | logagent -y 
+tail -f /var/log/system.log | logagent -f my_own_patterns.yml  -y 
 ```
 
 # Upstart script (ubuntu)

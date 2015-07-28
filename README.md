@@ -130,10 +130,11 @@ tail -f /var/log/access.log | logagent -y
 
 # Upstart script (ubuntu)
 
-Modify this script (LOGSENE_TOKEN and GLOB_PATTERN) and place it in /etc/init/logagent.conf
+Modify this script and place it in /etc/init/logagent.conf
+
 
 ```
-description "Upstart script to launch a node app"
+description "Upstart Logagent"
 
 start on (local-filesystems and net-device-up IFACE=eth0)
 stop on runlevel [!12345]
@@ -141,16 +142,18 @@ stop on runlevel [!12345]
 respawn
 
 setuid syslog
-setgid root
+setgid syslog
 env NODE_ENV=production
 env LOGSENE_TOKEN=YOUR_LOGSENE_TOKEN
-env GLOB_PATTERN='/var/log/*.log'
-
 chdir  /var/log
 
-exec /usr/local/bin/logagent -s
+exec /usr/local/bin/logagent -s /var/log/*.log 
 ```
 
+Start the service: 
+```
+sudo service logagent start
+```
 
 # Related packages
 

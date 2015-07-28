@@ -16,12 +16,12 @@ patterns:
     - regex: !!js/regexp /(.*)/i
       fields: message
 
-- # APACHE  Web Logs
-  sourceName: !!js/regexp /httpd|access_log|apache2/
+- #  Web Logs
+  sourceName: !!js/regexp /httpd|access_log|apache2|nginx/
   match: 
     # Common Log Format
     - regex:        !!js/regexp /([0-9a-f.:]+)\s+(-|.+?)\s+(-|.+?)\s+\[([0-9]{2}\/[a-z]{3}\/[0-9]{4}\:[0-9]{2}:[0-9]{2}:[0-9]{2}[^\]]*)\] \"(\S+?)\s(\S*?)\s{0,1}(\S+?)\" ([0-9|\-]+) ([0-9|\-]+)/i
-      type: apache_access_common
+      type: access_common
       fields:       [client_ip,remote_id,user,ts,method,path,http_version,status_code,size]
       dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
       transform: !!js/function >
@@ -29,10 +29,21 @@ patterns:
           p.message = p.method + ' ' + p.path
         }
 
-    - regex: !!js/regexp /([0-9a-f.:]+)\s(-|\S+)\s(-|\S+)\s\[([0-9]{2}\/[a-z]{3}\/[0-9]{4}\:[0-9]{2}:[0-9]{2}:[0-9]{2}[^\]]*)\] \"(\w+)\s(.*)\" ([0-9|\-]+) ([0-9|\-]+) \"([^\"]+)\" \"([^\"]+)\"/i
+    - type: access_log_combined
+      regex: !!js/regexp /([0-9a-f.:]+)\s(-|\S+)\s(-|\S+)\s\[([0-9]{2}\/[a-z]{3}\/[0-9]{4}\:[0-9]{2}:[0-9]{2}:[0-9]{2}[^\]]*)\] \"(\w+)\s(.*)\" ([0-9|\-]+) ([0-9|\-]+) \"([^\"]+)\" \"([^\"]+)\"/i
       fields: [client_ip,remote_id,user,'ts',method,path,status_code,size,referer,user_agent]
       dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
     
+    - type: nginx_error_log 
+      regex: !!js/regexp /(\d{4}\/\d{2}\/\d{2}\s[\d|\:]+)\s\[(.+?)]\s(\d+)#(\d+)\:\s(.*)/
+      fields: [ts,level,pid,tid,message]
+      dateformat: YYYY/MM/DD HH:mm:ss
+
+    - type: apache_error_log
+      regex: !!js/regexp /\[(\w{3} \w{3} \d{2} [\d|\:]+\s\d+)\] \[(.+?)\] \[client ([\d|\.]+)\] (.+)/
+      fields: [ts,level,client_ip,message]
+      dateformat: ddd MMM DD hh:mm:ss.SSS YYYY
+       
     # Apache MPM events
     - regex: !!js/regexp \[(.+?)\]\s+\[(.+?)\]\s+\[(.+?)\]\s+(.+)
       fields: [ts,event_type,processInfo,message]
@@ -56,9 +67,9 @@ patterns:
       fields: [ts,host,service,level,message]
       dateFormat: MMM DD HH:mm:ss
     -
-      type: log
-      regex: !!js/regexp /([\w|\s]+\s\d{2}\s[\d|\:]+)\s(\S+)\s(\S+)\s(.+)/
-      fields: [ts,host,service,message]
+      type: system_log
+      regex: !!js/regexp /([\w|\s]+\s\d{2}\s[\d|\:]+)\s(\S+)\s(\S+)\[(\d+)\]\:\s(.+)/
+      fields: [ts,host,service,pid,message]
       dateFormat: MMM DD HH:mm:ss
     - 
       type: log

@@ -128,7 +128,9 @@ tail -f /var/log/access.log | logagent -y
 tail -f /var/log/system.log | logagent -f my_own_patterns.yml  -y 
 ```
 
-# Upstart script (ubuntu)
+# Run logagent as system service to monitor all logs e.g. in /var/log/
+
+## Upstart script (ubuntu)
 
 Modify this script and place it in /etc/init/logagent.conf
 
@@ -153,6 +155,34 @@ exec /usr/local/bin/logagent -s /var/log/*.log
 Start the service: 
 ```
 sudo service logagent start
+```
+
+## Unit file for systemd startup
+
+Create a service file for the logagent, in /etc/systemd/system/logagent.service
+Set the Logsene Token and file list in "ExecStart" directive.
+
+```
+[Service]
+Description=Sematext logagent-js
+Environment=NODE_ENV=production
+ExecStart=/usr/local/bin/logagent -s -t YOUR_LOGSENE_TOKEN /var/log/*.log
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=logagent
+User=syslog
+Group=syslog
+
+[Install]
+WantedBy=multi-user.target
+
+```
+
+Start the service
+
+```
+systemctl start logagent
 ```
 
 # Related packages

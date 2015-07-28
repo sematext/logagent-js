@@ -165,9 +165,9 @@ sudo service logagent start
 
 # Support 
 
-Twitter: [@sematext](http://www.twitter.com/sematext)
-Blog: [blog.sematext.com](http://blog.sematext.com)
-Homepage: [www.sematext.com](http://www.sematext.com)
+- Twitter: [@sematext](http://www.twitter.com/sematext)
+- Blog: [blog.sematext.com](http://blog.sematext.com)
+- Homepage: [www.sematext.com](http://www.sematext.com)
 
 
 

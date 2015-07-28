@@ -11,6 +11,7 @@ The parser detects log formats based on a pattern library (yaml file) and conver
 - create ISO timestamp in '@timestamp' field
 - transform function to manipulate parsed objects
 - unmatched lines end up with timestamp and original line in the message field
+- JSON lines are parsed, and scanned for @timestamp and time fields (logstash and bunyan format)
 
 To test patterns or convert logs from text to JSON use the command line tool 'logagent'. 
 It reads from stdin and outputs line delemited JSON (or pretty JSON or YAML) to the console. 

@@ -24,6 +24,8 @@ var logger = null
 var Tail = require('tail-forever')
 var fs = require('fs')
 var glob = require('glob')
+var globPattern = argv.g || process.env.GLOB_PATTERN
+var logseneToken = argv.t || process.env.LOGSENE_TOKEN
 
 function getFilesizeInBytes (filename) {
   var stats = fs.statSync(filename)
@@ -103,16 +105,16 @@ function terminate () {
   }
   process.exit()
 }
-if (argv.t) {
-  logger = new Logsene(argv.t, 'logs')
+if (logseneToken) {
+  logger = new Logsene(logseneToken, 'logs')
 }
 if (argv._.length > 0) {
   // tail files
   tailFiles(argv._)
-} else if (process.env.GLOB_PATTERN || argv.g) {
+} else if (globPattern) {
   // checks for file list and start tail for all files
-  console.log('using glob pattern:' + (process.env.GLOB_PATTERN || argv.g))
-  tailFilesFromGlob(process.env.GLOB_PATTERN || argv.g)
+  console.log('using glob pattern:' + globPattern)
+  tailFilesFromGlob(globPattern)
 } else {
   readStdIn()
 }

@@ -4,17 +4,28 @@
 # Please use 'ts' for dates and time
 # RegexTools: https://regex101.com/#javascript
 patterns:
+- # MongoDB
+  type: mongodb
+  # name of the docker image
+  sourceName: !!js/regexp /mongo/
+  # 2015-07-28T00:35:46.329+0000 I JOURNAL  [initandlisten] journal dir=/data/db/journal
+  match: 
+    - regex: !!js/regexp /(\d{4}-\d{2}-\d{2}T[\d|\.|\:]+\+\d{4})\s(\w+)\s(\S+)\s+\[(\S+)\]\s(.+)/i
+      fields:  [ts,severity, component, context, message]
+      dateFormat: YYYY-MM-DDTHH:mm:ss.SSZ
+
 - # REDIS
   type: redis
   # name of the docker image
-  sourceName: !!js/regexp /redis/
-  # Example for automatic pattern test while loading
-  example: "1:M 22 Jul 21:58:28.146 # Server started, Redis version 3.0.2"
-  match: 
-    - regex: !!js/regexp /(\d+\:\w)\s(\d\d\s\w+.+)\s\W\s(.*)/i
-      fields:  [pid,ts,message]
-    - regex: !!js/regexp /(.*)/i
-      fields: message
+  # example: "1:M 22 Jul 21:58:28.146 # Server started, Redis version 3.0.2"
+  sourceName: !!js/regexp /redis/i
+  match:
+  - 
+    fields: [pid,node_type,ts,message]
+    regex: !!js/regexp /(\d+):\w+\s(\d\d\s\w+.+)\s\W\s(.*)/
+  - regex: !!js/regexp /(.*)/i
+    fields: message
+
 
 - #  Web Logs
   sourceName: !!js/regexp /httpd|access_log|apache2|nginx/

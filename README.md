@@ -59,7 +59,7 @@ The default patterns are [here](/patterns.yml) - contributions are welcome.
 
 ## Install it as local package
 ```
-npm i sematext/logagent-js
+npm i logagent-js --save
 ```
 
 ## Use the Logparser module in your source code
@@ -92,7 +92,7 @@ sudo apt-get install -y nodejs
 
 # Install logagent-js globally
 ```
-npm i -g sematext/logagent-js
+npm i -g logagent-js
 # ship all your logs to logsene, parsed, timestamped - displyed on console in YAML format (-y)
 logagent -t LOGSENE_TOKEN -y /var/log/*.log
 ```

@@ -3,6 +3,12 @@
 #
 # Please use 'ts' for dates and time
 # RegexTools: https://regex101.com/#javascript
+
+# Sensitive data can be replaced with a hascode (sha1)
+# for all fields matching this field names by a regular expression
+# this function is not optimized (yet) and might take 10-15% of performance
+autohash: !!js/regexp /user|client_ip|password|email|credid_card_number|payment_info/i
+
 patterns:
 - # MongoDB
   type: mongodb

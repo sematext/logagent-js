@@ -6,7 +6,7 @@ The parser detects log formats based on a pattern library (yaml file) and conver
 - find matching regex in pattern library
 - tag it with the recognized type
 - extract fields using regex
-- if autohash is enabled, sensitive data is replaced with its sha1 hash code
+- if 'autohash' is enabled, sensitive data is replaced with its sha1 hash code
 - parse dates and detect date format
   (use 'ts' field for date and time combined) 
 - create ISO timestamp in '@timestamp' field

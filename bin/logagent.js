@@ -102,6 +102,9 @@ function terminate () {
 
   if (argv.s) {
     console.error(duration + ' ms ' + count + ' lines parsed.  ' + throughput.toFixed(0) + ' lines/s ' + throughputBytes.toFixed(3) + ' MB/s - empty lines: ' + emptyLines)
+    console.error('Heap Used: ' + (process.memoryUsage().heapUsed / (1024 * 1024)) + ' MB')
+    console.error('Heap Total: ' + (process.memoryUsage().heapTotal / (1024 * 1024)) + ' MB')
+    console.error('Memory RSS: ' + (process.memoryUsage().rss / (1024 * 1024)) + ' MB')
   }
   process.exit()
 }

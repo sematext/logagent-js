@@ -39,9 +39,9 @@ Properties:
 Example:
 
 ```
-# Sensitive data can be replaced with a hascode (sha1)
-# for all fields matching this field names by a regular expression
-# this function is not optimized (yet) and might take 10-15% of performance
+# Sensitive data can be replaced with a hashcode (sha1)
+# it applies to fields matching the field names by a regular expression
+# Note: this function is not optimized (yet) and might take 10-15% of performance
 # autohash: !!js/regexp /user|client_ip|password|email|credit_card_number|payment_info/i
 
 patterns: 

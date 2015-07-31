@@ -18,7 +18,6 @@ To test patterns or convert logs from text to JSON use the command line tool 'lo
 It reads from stdin and outputs line delemited JSON (or pretty JSON or YAML) to the console. 
 In addtion it can forward the parsed objects directly to [Logsene](http://sematext.com/logsene).
 
-
 # Pattern definitions file
 
 The file format is based on [JS-YAML](https://nodeca.github.io/js-yaml/), in short:
@@ -111,6 +110,7 @@ Parameters:
 - -s silent, print only throughput
 - -t token [Logsene](http://sematext.com/logsene) App Token to insert parsed records into Logsene
 - -g use a [glob](https://www.npmjs.com/package/glob) pattern to watch log files e.g. -g "{/var/log/*.log,/Users/stefan/*/*.log}" 
+- -u UDP_PORT starts a syslogd UDP listener on the given port to act as syslogd
 - list of files, watched by tail-forver starting at end of file to watch
 
 The default output is line delimited JSON.
@@ -118,8 +118,12 @@ The default output is line delimited JSON.
 Examples: 
 ```
 # Be Evil: parse all logs 
-# stream it to Logsene 1-Click ELK stack 
+# stream logs to Logsene 1-Click ELK stack 
 logagent -t LOGSENE_TOKEN /var/log/*.log 
+# Act as syslog server on UDP and forward messages to Logsene
+logagent -t LOGSENE_TOKEN -u 1514 
+# Act as syslog server on UDP and write YAML formated messages to console
+logagent -u 1514 -y  
 ```
 
 Use a [glob](https://www.npmjs.com/package/glob) pattern to build the file list 

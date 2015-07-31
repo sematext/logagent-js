@@ -1,6 +1,6 @@
 {
   "name": "logagent-js",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Smart log parser written in Node",
   "main": "lib/index.js",
   "bin": {
@@ -35,6 +35,7 @@
     "minimist": "^1.1.2",
     "moment": "^2.10.3",
     "prettyjson": "^1.1.2",
+    "syslogd": "^1.1.2",
     "tail-forever": "^0.3.11",
     "yamljs": "^0.2.3"
   }

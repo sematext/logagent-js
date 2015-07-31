@@ -33,6 +33,26 @@ function getFilesizeInBytes (filename) {
   return fileSizeInBytes
 }
 
+function getSyslogServer (appToken, port, type) {
+  // var logger = new Logsene(appToken, type || 'logs')
+  var Syslogd = require('syslogd')
+  var syslogd = Syslogd(function (sysLogMsg) {
+    parseLine(sysLogMsg.msg, 'log', function (e, data) {
+      data['severity'] = sysLogMsg.severity
+      data['syslog-tag'] = sysLogMsg.tag
+      data['facility'] = sysLogMsg.facility
+      data['hostname'] = sysLogMsg.hostname
+      data['@timestamp'] = sysLogMsg['time']
+      log(e, data)
+    })
+  })
+  syslogd.listen(port, function (err) {
+    console.log('start syslog server ' + port + ' ' + (err || ''))
+  })
+  return syslogd
+// this.servers[appToken] = syslogd
+}
+
 function tailFile (file) {
   var tail = new Tail(file, {start: getFilesizeInBytes(file)})
   tail.on('line', function (line) {
@@ -81,10 +101,10 @@ function log (err, data) {
   }
 }
 
-function parseLine (line, sourceName) {
+function parseLine (line, sourceName, cbf) {
   bytes += line.length
   count++
-  la.parseLine(line, sourceName, log)
+  la.parseLine(line, sourceName, cbf || log)
 }
 
 function readStdIn () {
@@ -113,11 +133,19 @@ if (logseneToken) {
 }
 if (argv._.length > 0) {
   // tail files
+  console.log(argv._)
   tailFiles(argv._)
 } else if (globPattern) {
   // checks for file list and start tail for all files
   console.log('using glob pattern:' + globPattern)
   tailFilesFromGlob(globPattern)
+} else if (argv.u) {
+  try {
+    var syslogServer = getSyslogServer(logseneToken, argv.u)
+  } catch (err) {
+    console.error(err)
+    process.exit(-1)
+  }
 } else {
   readStdIn()
 }

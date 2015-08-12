@@ -104,7 +104,7 @@ function log (err, data) {
 function parseLine (line, sourceName, cbf) {
   bytes += line.length
   count++
-  la.parseLine(line, sourceName, cbf || log)
+  la.parseLine(line, argv.n || sourceName, cbf || log)
 }
 
 function readStdIn () {

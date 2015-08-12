@@ -111,6 +111,8 @@ Parameters:
 - -t token [Logsene](http://sematext.com/logsene) App Token to insert parsed records into Logsene
 - -g use a [glob](https://www.npmjs.com/package/glob) pattern to watch log files e.g. -g "{/var/log/*.log,/Users/stefan/*/*.log}" 
 - -u UDP_PORT starts a syslogd UDP listener on the given port to act as syslogd
+- -n name for the source only when stdin is used (e.g. cat zookeeper.log | logagent -n zookeeper), important to make
+  multi-line patterns working on stdin because the status is tracked by the source name. 
 - list of files, watched by tail-forver starting at end of file to watch
 
 The default output is line delimited JSON.

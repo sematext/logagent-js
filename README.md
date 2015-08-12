@@ -13,9 +13,19 @@ The parser detects log formats based on a pattern library (yaml file) and conver
 - transform function to manipulate parsed objects
 - unmatched lines end up with timestamp and original line in the message field
 - JSON lines are parsed, and scanned for @timestamp and time fields (logstash and bunyan format)
+- default patterns for:
+  - MongoDB, 
+  - MySQL, 
+  - Apache httpd, 
+  - Nginx, 
+  - Redis, 
+  - Apache Zookeeper, 
+  - Apache Cassandra, 
+  - Apache Kafka, 
+  - various Linux/Mac OS X system log files   
 
 To test patterns or convert logs from text to JSON use the command line tool 'logagent'. 
-It reads from stdin and outputs line delemited JSON (or pretty JSON or YAML) to the console. 
+It reads from stdin and outputs line delimited JSON (or pretty JSON or YAML) to the console. 
 In addtion it can forward the parsed objects directly to [Logsene](http://sematext.com/logsene).
 
 # Pattern definitions file
@@ -200,8 +210,8 @@ systemctl start logagent
 
 # Related packages
 
-- [Logsene-CLI](https://github.com/sematext/logsene-cli) - Enables searching Logsene log entries from the command-line. 
-- [SPM Agent for Docker](https://github.com/sematext/spm-agent-docker) - collects metrics, events and logs from Docker API and CoreOS
+- [SPM Agent for Docker](https://github.com/sematext/spm-agent-docker) - collects metrics, events and logs from Docker API and CoreOS. Logagent-js is a component of spm-agent-docker. More Information: [Innovative Docker Log Management](http://blog.sematext.com/2015/08/12/docker-log-management/)
+- - [Logsene-CLI](https://github.com/sematext/logsene-cli) - Enables searching Logsene log entries from the command-line. 
 - [SPM Agent for Node.js](https://github.com/sematext/spm-agent-nodejs) - collects performance metrics for Node and io.js applications
 - [Custom Metrics](https://github.com/sematext/spm-metrics-js) - Custom Metrics for SPM 
 - [Winston-Logsene](https://github.com/sematext/winston-logsene) - Logging for Node.js - Winston transport layer for Logsene

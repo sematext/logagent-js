@@ -10,13 +10,40 @@
 # autohash: !!js/regexp /user|client_ip|password|email|credit_card_number|payment_info/i
 
 patterns:
+- # Apache Kafka
+  type: apache_kafka
+  sourceName: !!js/regexp /kafka/
+  match:
+    - regex: !!js/regexp \[(\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+)\]\s(\S+)\s(.+)
+      fields: [ts,severity,message]
+      dateFormat: YYYY-MM-DD HH:mm:ss
+
+- # Apache Zookeeper
+  type: apache_zookeeper
+  sourceName: !!js/regexp /zookeeper|zk/
+  blockStart: !!js/regexp /^\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+\s+/
+  match:
+    - regex: !!js/regexp /^(\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+)\s+(\S+)\s+-\s+(\S+)\s+\[(.+)\]\s-\s+([\S|\s]+)/
+      fields: [ts,pid,severity,thread_info,message]
+      dateFormat: YYYY-MM-DD HH:mm:ss,SS
+
+- # Apache Cassandra
+  type: apache_cassandra
+  sourceName: !!js/regexp cassandra
+  # multi-line, start sequence
+  blockStart: !!js/regexp ^\S+\s\[.+\]\s\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+\s
+  match:
+    - regex: !!js/regexp (\S+)\s\[(.+)\]\s(\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+)\s(.+.java)\s+\(line\s(\d+).+\n\s+(.*)
+      fields: [severity,module,ts,java_file,code_line,message]
+      dateFormat: YYYY-MM-DD HH:mm:ss,SS
+
 - # MongoDB
   type: mongodb
   # name of the docker image
   sourceName: !!js/regexp /mongo/
   # 2015-07-28T00:35:46.329+0000 I JOURNAL  [initandlisten] journal dir=/data/db/journal
   match: 
-    - regex: !!js/regexp /(\d{4}-\d{2}-\d{2}T[\d|\.|\:]+\+\d{4})\s(\w+)\s(\S+)\s+\[(\S+)\]\s(.+)/i
+    - regex: !!js/regexp /^(\d{4}-\d{2}-\d{2}T[\d|\.|\:]+\+\d{4})\s(\w+)\s(\S+)\s+\[(\S+)\]\s(.+)/i
       fields:  [ts,severity, component, context, message]
       dateFormat: YYYY-MM-DDTHH:mm:ss.SSZ
 
@@ -28,8 +55,8 @@ patterns:
   match:
   - 
     fields: [pid,node_type,ts,message]
-    regex: !!js/regexp /(\d+):\w+\s(\d\d\s\w+.+)\s\W\s(.*)/
-  - regex: !!js/regexp /(.*)/i
+    regex: !!js/regexp /^(\d+):\w+\s(\d\d\s\w+.+)\s\W\s(.*)/
+  - regex: !!js/regexp /^(.*)/i
     fields: message
 
 
@@ -37,7 +64,7 @@ patterns:
   sourceName: !!js/regexp /httpd|access_log|apache2|nginx/
   match: 
     # Common Log Format
-    - regex:        !!js/regexp /([0-9a-f.:]+)\s+(-|.+?)\s+(-|.+?)\s+\[([0-9]{2}\/[a-z]{3}\/[0-9]{4}\:[0-9]{2}:[0-9]{2}:[0-9]{2}[^\]]*)\] \"(\S+?)\s(\S*?)\s{0,1}(\S+?)\" ([0-9|\-]+) ([0-9|\-]+)/i
+    - regex:        !!js/regexp /(^[0-9a-f.:]+)\s+(-|.+?)\s+(-|.+?)\s+\[([0-9]{2}\/[a-z]{3}\/[0-9]{4}\:[0-9]{2}:[0-9]{2}:[0-9]{2}[^\]]*)\] \"(\S+?)\s(\S*?)\s{0,1}(\S+?)\" ([0-9|\-]+) ([0-9|\-]+)/i
       type: access_common
       fields:       [client_ip,remote_id,user,ts,method,path,http_version,status_code,size]
       dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
@@ -47,22 +74,22 @@ patterns:
         }
 
     - type: access_log_combined
-      regex: !!js/regexp /([0-9a-f.:]+)\s(-|\S+)\s(-|\S+)\s\[([0-9]{2}\/[a-z]{3}\/[0-9]{4}\:[0-9]{2}:[0-9]{2}:[0-9]{2}[^\]]*)\] \"(\w+)\s(.*)\" ([0-9|\-]+) ([0-9|\-]+) \"([^\"]+)\" \"([^\"]+)\"/i
+      regex: !!js/regexp /^([0-9a-f.:]+)\s(-|\S+)\s(-|\S+)\s\[([0-9]{2}\/[a-z]{3}\/[0-9]{4}\:[0-9]{2}:[0-9]{2}:[0-9]{2}[^\]]*)\] \"(\w+)\s(.*)\" ([0-9|\-]+) ([0-9|\-]+) \"([^\"]+)\" \"([^\"]+)\"/i
       fields: [client_ip,remote_id,user,'ts',method,path,status_code,size,referer,user_agent]
       dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
     
     - type: nginx_error_log 
-      regex: !!js/regexp /(\d{4}\/\d{2}\/\d{2}\s[\d|\:]+)\s\[(.+?)]\s(\d+)#(\d+)\:\s(.*)/
+      regex: !!js/regexp /^(\d{4}\/\d{2}\/\d{2}\s[\d|\:]+)\s\[(.+?)]\s(\d+)#(\d+)\:\s(.*)/
       fields: [ts,level,pid,tid,message]
       dateformat: YYYY/MM/DD HH:mm:ss
 
     - type: apache_error_log
-      regex: !!js/regexp /\[(\w{3} \w{3} \d{2} [\d|\:]+\s\d+)\] \[(.+?)\] \[client ([\d|\.]+)\] (.+)/
+      regex: !!js/regexp /^\[(\w{3} \w{3} \d{2} [\d|\:]+\s\d+)\] \[(.+?)\] \[client ([\d|\.]+)\] (.+)/
       fields: [ts,level,client_ip,message]
       dateformat: ddd MMM DD hh:mm:ss.SSS YYYY
        
     # Apache MPM events
-    - regex: !!js/regexp \[(.+?)\]\s+\[(.+?)\]\s+\[(.+?)\]\s+(.+)
+    - regex: !!js/regexp /^\[(.+?)\]\s+\[(.+?)\]\s+\[(.+?)\]\s+(.+)/
       fields: [ts,event_type,processInfo,message]
       type: apache_mpm
       dateformat: ddd MMM DD hh:mm:ss.SSS YYYY
@@ -71,9 +98,10 @@ patterns:
   # 2015-07-25 14:11:35 0 [Note] mysqld (mysqld 5.6.26) starting as process 1 ...
   sourceName: !!js/regexp /mysql/ 
   match: 
-    - regex: (.+)\s(\d+)\s\[(.+?)\]\s+(.*)
+    - regex: !!js/regexp /^(\d{4}-\d{2}-\d{2}\s[\d|\:]+)\s(\d+)\s\[(.+?)\]\s+(.*)/
       fields: [ts,pid,level,message]
       dateFormat: YYYY-MM-DD HH:mm:ss
+      type: mysql
 
 - # timestamped messages from /var/log/*.log on Mac OS X
   sourceName: !!js/regexp /\.log/ # catch all .log files  

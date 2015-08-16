@@ -10,6 +10,15 @@
 # autohash: !!js/regexp /user|client_ip|password|email|credit_card_number|payment_info/i
 
 patterns:
+- # Apache Solr
+  type: apache_solr
+  #blockStart: !!js/regexp \S+\s+-\s\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3};
+  sourceName: !!js/regexp /solr/
+  match:
+    - regex: !!js/regexp (\S+)\s+-\s(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3});\s\[\s*(.+?)]\s(\S+);\s.*.*webapp=(\S+)\spath=(.+?)\sparams={(.*)}.*hits=(\d+)\sstatus=(\d+)\sQTime=(\d+)
+      fields: [severity,ts,application,class,webapp,path,params,hits,status,qtime]
+      dateFormat: YYYY-MM-DD HH:mm:ss,SS
+
 - # Apache Kafka
   type: apache_kafka
   sourceName: !!js/regexp /kafka/
@@ -17,6 +26,32 @@ patterns:
     - regex: !!js/regexp \[(\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+)\]\s(\S+)\s(.+)
       fields: [ts,severity,message]
       dateFormat: YYYY-MM-DD HH:mm:ss
+
+- # Apache HDFS Data Node
+  type: apache_hdfs_data_node
+  blockStart: !!js/regexp \d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+\s(\S+)\s/
+  sourceName: !!js/regexp /hdfs/
+  match:
+    - regex: !!js/regexp (\d{4}-\d{2}-\d{2}\s+[\d|\:]+,\d+)\s+(\S+)\s(\S+):\s([\s|\S]+)
+      fields: [ts,severity,class,message]
+      dateFormat: YYYY-MM-DD HH:mm:ss,SS
+
+- # Apache HBase Region Server
+  type: apache_hbase_region_server
+  blockStart: !!js/regexp \d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+\s(\S+)\s/
+  sourceName: !!js/regexp /hbase/
+  match:
+    - regex: !!js/regexp (\d{4}-\d{2}-\d{2}\s+[\d|\:]+,\d+)\s+(\S+)\s+\[(.+)\]\s(\S+):\s([\s|\S]+)
+      fields: [ts,severity,thread,class,message]
+      dateFormat: YYYY-MM-DD HH:mm:ss,SS
+
+- # Apache YARN
+  type: apache_hadoop_yarn_node_manager
+  sourceName: !!js/regexp /yarn/
+  match:
+    - regex: !!js/regexp (\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+)\s(\S+)\s(\S+):\s([\S|\s]+)
+      fields: [ts,severity,class_name,message]
+      dateFormat: YYYY-MM-DD HH:mm:ss,SS
 
 - # Apache Zookeeper
   type: apache_zookeeper

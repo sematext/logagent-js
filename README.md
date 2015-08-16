@@ -22,6 +22,10 @@ The parser detects log formats based on a pattern library (yaml file) and conver
   - Apache Zookeeper, 
   - Apache Cassandra, 
   - Apache Kafka, 
+  - Apache HBase HDFS Data Node,
+  - Apache HBase Region Server,
+  - Apache YARN Node Manager, 
+  - Apache SOLR,
   - various Linux/Mac OS X system log files   
 
 To test patterns or convert logs from text to JSON use the command line tool 'logagent'. 

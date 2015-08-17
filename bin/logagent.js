@@ -26,6 +26,7 @@ var fs = require('fs')
 var glob = require('glob')
 var globPattern = argv.g || process.env.GLOB_PATTERN
 var logseneToken = argv.t || process.env.LOGSENE_TOKEN
+var http = require('http')
 
 function getFilesizeInBytes (filename) {
   var stats = fs.statSync(filename)
@@ -51,6 +52,21 @@ function getSyslogServer (appToken, port, type) {
   })
   return syslogd
 // this.servers[appToken] = syslogd
+}
+
+function textMsgBodyHandler (req,res) {
+  var body = ''
+  req.on('data', function (data) {
+      body += data
+  })
+  req.on('end', function () {
+    parseLine(body, argv.n || 'cloudfoundry', log)
+    res.end('ok\n')
+  })
+}
+function getHttpServer (port) {
+  server = http.createServer(textMsgBodyHandler)
+  return server.listen(port)
 }
 
 function tailFile (file) {
@@ -130,6 +146,9 @@ function terminate () {
 }
 if (logseneToken) {
   logger = new Logsene(logseneToken, 'logs')
+}
+if(argv.cfhttp) {
+  getHttpServer(argv.cfhttp)
 }
 if (argv._.length > 0) {
   // tail files

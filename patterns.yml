@@ -10,6 +10,56 @@
 # autohash: !!js/regexp /user|client_ip|password|email|credit_card_number|payment_info/i
 
 patterns:
+- # CloudFoundry Syslog Messages
+  sourceName: !!js/regexp /cloudfoundry|syslog_raw/ 
+  match:
+    -
+      type: cloudfoundry
+      regex: !!js/regexp <(\d+)>(\d+)\s([\d|-]+T[\d|\:|.|\+]+)\s(\S+)\s(.+?)\s\[(.+)\]\s-\s-\s(.+)
+      fields: [prio,version,ts,host,applicationID,processID,message]
+      dateFormat: YYYY-MM-DDTHH:mm:ssZ
+      transform: !!js/function >
+        function (p) {
+          const SEVERITY = [
+            'emerg',
+            'alert',
+            'crit',
+            'err',
+            'warning',
+            'notice',
+            'info',
+            'debug'
+          ]
+          const FACILITY = [
+            'kern',
+            'user',
+            'mail',
+            'daemon',
+            'auth',
+            'syslog',
+            'lpr',
+            'news',
+            'uucp',
+            'cron',
+            'authpriv',
+            'ftp',
+            'ntp',
+            'logaudit',
+            'logalert',
+            'clock',
+            'local0',
+            'local1',
+            'local2',
+            'local3',
+            'local4',
+            'local5',
+            'local6',
+            'local7'
+          ]
+          p.facility = FACILITY[p.prio>>3] || p.prio>>3
+          p.severity = SEVERITY[p.prio&7] || p.prio&7
+        }
+
 - # Apache Solr
   type: apache_solr
   #blockStart: !!js/regexp \S+\s+-\s\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3};

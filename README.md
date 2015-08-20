@@ -18,6 +18,7 @@ The parser detects log formats based on a pattern library (yaml file) and conver
   - MySQL, 
   - Nginx, 
   - Redis, 
+  - Elasticsearch
   - Apache 
     - Webserver (httpd), 
     - Zookeeper, 

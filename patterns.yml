@@ -9,6 +9,8 @@
 # Note: this function is not optimized (yet) and might take 10-15% of performance
 # autohash: !!js/regexp /user|client_ip|password|email|credit_card_number|payment_info/i
 
+#\[(\d{4}-\d{2}-\d{2}\s[\d+|\:]+.\d+)\]\[(.+?)\]\[(.+?)\s*\]\s*\[(.+?)\]\s([\s|\S]+)
+
 patterns:
 - # CloudFoundry Syslog Messages
   sourceName: !!js/regexp /cloudfoundry|syslog_raw/ 
@@ -59,6 +61,15 @@ patterns:
           p.facility = FACILITY[p.prio>>3] || p.prio>>3
           p.severity = SEVERITY[p.prio&7] || p.prio&7
         }
+
+- # Elasticsearch 
+  type: elasticsearch
+  blockStart: !!js/regexp /\d{4}-\d{2}-\d{2}\s[\d+|\:]+.\d+|log4j\:\S+\s/
+  sourceName: !!js/regexp /elasticsearch/
+  match:
+    - regex: !!js/regexp \[(\d{4}-\d{2}-\d{2}\s[\d+|\:]+.\d+)\]\[(.+?)\]\[(.+?)\s*\]\s*\[(.+?)\]\s([\s|\S]+)
+      fields: [ts,level,source,node_name,message]
+      dateFormat: YYYY-MM-DD HH:mm:ss,SS
 
 - # Apache Solr
   type: apache_solr

@@ -68,7 +68,7 @@ patterns:
   sourceName: !!js/regexp /elasticsearch/
   match:
     - regex: !!js/regexp \[(\d{4}-\d{2}-\d{2}\s[\d+|\:]+.\d+)\]\[(.+?)\]\[(.+?)\s*\]\s*\[(.+?)\]\s([\s|\S]+)
-      fields: [ts,level,source,node_name,message]
+      fields: [ts,severity,source,node_name,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
 
 - # Apache Solr
@@ -154,7 +154,39 @@ patterns:
     regex: !!js/regexp /^(\d+):\w+\s(\d\d\s\w+.+)\s\W\s(.*)/
   - regex: !!js/regexp /^(.*)/i
     fields: message
+- # mysql
+  # 2015-07-25 14:11:35 0 [Note] mysqld (mysqld 5.6.26) starting as process 1 ...
+  sourceName: !!js/regexp /mysql/ 
+  match: 
+    - regex: !!js/regexp /^(\d{4}-\d{2}-\d{2}\s[\d|\:]+)\s(\d+)\s\[(.+?)\]\s+(.*)/
+      fields: [ts,pid,level,message]
+      dateFormat: YYYY-MM-DD HH:mm:ss
+      type: mysql
 
+- # timestamped messages from /var/log/*.log on Mac OS X
+  sourceName: !!js/regexp /\.log/ # catch all .log files  
+  match:
+    -
+      type: system_log
+      regex: !!js/regexp /([\w|\s]+\s\d{2}\s[\d|\:]+)\s(.+?)\s(.+?)\s<(.+)>(.*)/
+      fields: [ts,host,service,level,message]
+      dateFormat: MMM DD HH:mm:ss
+    -
+      type: system_log
+      regex: !!js/regexp /([\w|\s]+\s\d{2}\s[\d|\:]+)\s(\S+)\s(\S+)\[(\d+)\]\:\s(.+)/
+      fields: [ts,host,service,pid,message]
+      dateFormat: MMM DD HH:mm:ss
+    - 
+      type: log
+      regex: !!js/regexp /([\w|\s]+\s\d{2}\s[\d|\:|\.]+)\s+(<.+?>)\s(.*)/
+      fields: [ts,service,message]
+      dateFormat: MMM DD HH:mm:ss
+    - 
+      type: log
+      regex: !!js/regexp /(\d{4}[\-|\d{2}]+\s[\d|\:]+\s\+\d{4})\:\s+(.+)/
+      fields: [ts,message]
+      dateFormat: YYYY-MM-DD HH:mm:ss ZZ
+     
 
 - #  Web Logs
   sourceName: !!js/regexp /httpd|access_log|apache2|nginx/
@@ -190,39 +222,6 @@ patterns:
       type: apache_mpm
       dateformat: ddd MMM DD hh:mm:ss.SSS YYYY
 
-- # mysql
-  # 2015-07-25 14:11:35 0 [Note] mysqld (mysqld 5.6.26) starting as process 1 ...
-  sourceName: !!js/regexp /mysql/ 
-  match: 
-    - regex: !!js/regexp /^(\d{4}-\d{2}-\d{2}\s[\d|\:]+)\s(\d+)\s\[(.+?)\]\s+(.*)/
-      fields: [ts,pid,level,message]
-      dateFormat: YYYY-MM-DD HH:mm:ss
-      type: mysql
-
-- # timestamped messages from /var/log/*.log on Mac OS X
-  sourceName: !!js/regexp /\.log/ # catch all .log files  
-  match:
-    -
-      type: system_log
-      regex: !!js/regexp /([\w|\s]+\s\d{2}\s[\d|\:]+)\s(.+?)\s(.+?)\s<(.+)>(.*)/
-      fields: [ts,host,service,level,message]
-      dateFormat: MMM DD HH:mm:ss
-    -
-      type: system_log
-      regex: !!js/regexp /([\w|\s]+\s\d{2}\s[\d|\:]+)\s(\S+)\s(\S+)\[(\d+)\]\:\s(.+)/
-      fields: [ts,host,service,pid,message]
-      dateFormat: MMM DD HH:mm:ss
-    - 
-      type: log
-      regex: !!js/regexp /([\w|\s]+\s\d{2}\s[\d|\:|\.]+)\s+(<.+?>)\s(.*)/
-      fields: [ts,service,message]
-      dateFormat: MMM DD HH:mm:ss
-    - 
-      type: log
-      regex: !!js/regexp /(\d{4}[\-|\d{2}]+\s[\d|\:]+\s\+\d{4})\:\s+(.+)/
-      fields: [ts,message]
-      dateFormat: YYYY-MM-DD HH:mm:ss ZZ
-     
 
 dateFormats: [
     'DD/MMM/YYYY:HH:mm:ss ZZ', #apache

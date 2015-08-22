@@ -62,6 +62,7 @@ patterns:
           p.severity = SEVERITY[p.prio&7] || p.prio&7
         }
 
+
 - # Elasticsearch 
   type: elasticsearch
   blockStart: !!js/regexp /\d{4}-\d{2}-\d{2}\s[\d+|\:]+.\d+|log4j\:\S+\s/
@@ -70,6 +71,14 @@ patterns:
     - regex: !!js/regexp \[(\d{4}-\d{2}-\d{2}\s[\d+|\:]+.\d+)\]\[(.+?)\]\[(.+?)\s*\]\s*\[(.+?)\]\s([\s|\S]+)
       fields: [ts,severity,source,node_name,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
+
+- # nsq.io 
+  type: nsq 
+  sourceName: !!js/regexp nsqio\/nsq
+  match:
+    - regex: !!js/regexp (\d{4}\/\d{2}\/\d{2}\s[\d|\:]+)\s(\S+)\s+(\d+)\s+\[(\S+)\]\s+(.+)
+      fields: [ts, level, pid, module, message]
+      dateFormat: YYYY/MM/DD HH:mm:ss
 
 - # Apache Solr
   type: apache_solr

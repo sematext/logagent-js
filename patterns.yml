@@ -72,13 +72,6 @@ patterns:
       fields: [ts,severity,source,node_name,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
 
-- # nsq.io 
-  type: nsq 
-  sourceName: !!js/regexp nsqio\/nsq
-  match:
-    - regex: !!js/regexp (\d{4}\/\d{2}\/\d{2}\s[\d|\:]+)\s(\S+)\s+(\d+)\s+\[(\S+)\]\s+(.+)
-      fields: [ts, level, pid, module, message]
-      dateFormat: YYYY/MM/DD HH:mm:ss
 
 - # Apache Solr
   type: apache_solr
@@ -195,7 +188,13 @@ patterns:
       regex: !!js/regexp /(\d{4}[\-|\d{2}]+\s[\d|\:]+\s\+\d{4})\:\s+(.+)/
       fields: [ts,message]
       dateFormat: YYYY-MM-DD HH:mm:ss ZZ
-     
+- # nsq.io 
+  type: nsq 
+  sourceName: !!js/regexp nsqio\/nsq
+  match:
+    - regex: !!js/regexp (\d{4}\/\d{2}\/\d{2}\s[\d|\:]+)\s(\S+)\s+(\d+)\s+\[(\S+)\]\s+(.+)
+      fields: [ts, level, pid, module, message]
+      dateFormat: YYYY/MM/DD HH:mm:ss
 
 - #  Web Logs
   sourceName: !!js/regexp /httpd|access_log|apache2|nginx/

@@ -64,97 +64,97 @@ patterns:
 
 
 - # Elasticsearch 
-  type: elasticsearch
   blockStart: !!js/regexp /\d{4}-\d{2}-\d{2}\s[\d+|\:]+.\d+|log4j\:\S+\s/
   sourceName: !!js/regexp /elasticsearch/
   match:
-    - regex: !!js/regexp \[(\d{4}-\d{2}-\d{2}\s[\d+|\:]+.\d+)\]\[(.+?)\]\[(.+?)\s*\]\s*\[(.+?)\]\s([\s|\S]+)
+    - type: elasticsearch
+      regex: !!js/regexp \[(\d{4}-\d{2}-\d{2}\s[\d+|\:]+.\d+)\]\[(.+?)\]\[(.+?)\s*\]\s*\[(.+?)\]\s([\s|\S]+)
       fields: [ts,severity,source,node_name,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
 
 
 - # Apache Solr
-  type: apache_solr
   #blockStart: !!js/regexp \S+\s+-\s\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3};
   sourceName: !!js/regexp /solr/
   match:
-    - regex: !!js/regexp (\S+)\s+-\s(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3});\s\[\s*(.+?)]\s(\S+);\s.*.*webapp=(\S+)\spath=(.+?)\sparams={(.*)}.*hits=(\d+)\sstatus=(\d+)\sQTime=(\d+)
+    - type: apache_solr
+      regex: !!js/regexp (\S+)\s+-\s(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3});\s\[\s*(.+?)]\s(\S+);\s.*.*webapp=(\S+)\spath=(.+?)\sparams={(.*)}.*hits=(\d+)\sstatus=(\d+)\sQTime=(\d+)
       fields: [severity,ts,application,class,webapp,path,params,hits,status,qtime]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
 
 - # Apache Kafka
-  type: apache_kafka
   sourceName: !!js/regexp /kafka/
   match:
-    - regex: !!js/regexp \[(\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+)\]\s(\S+)\s(.+)
+    - type: apache_kafka
+      regex: !!js/regexp \[(\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+)\]\s(\S+)\s(.+)
       fields: [ts,severity,message]
       dateFormat: YYYY-MM-DD HH:mm:ss
 
 - # Apache HDFS Data Node
-  type: apache_hdfs_data_node
   blockStart: !!js/regexp \d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+\s(\S+)\s/
   sourceName: !!js/regexp /hdfs/
   match:
-    - regex: !!js/regexp (\d{4}-\d{2}-\d{2}\s+[\d|\:]+,\d+)\s+(\S+)\s(\S+):\s([\s|\S]+)
+    - type: apache_hdfs_data_node
+      regex: !!js/regexp (\d{4}-\d{2}-\d{2}\s+[\d|\:]+,\d+)\s+(\S+)\s(\S+):\s([\s|\S]+)
       fields: [ts,severity,class,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
 
 - # Apache HBase Region Server
-  type: apache_hbase_region_server
   blockStart: !!js/regexp \d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+\s(\S+)\s/
   sourceName: !!js/regexp /hbase/
   match:
-    - regex: !!js/regexp (\d{4}-\d{2}-\d{2}\s+[\d|\:]+,\d+)\s+(\S+)\s+\[(.+)\]\s(\S+):\s([\s|\S]+)
+    - type: apache_hbase_region_server
+      regex: !!js/regexp (\d{4}-\d{2}-\d{2}\s+[\d|\:]+,\d+)\s+(\S+)\s+\[(.+)\]\s(\S+):\s([\s|\S]+)
       fields: [ts,severity,thread,class,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
 
 - # Apache YARN
-  type: apache_hadoop_yarn_node_manager
   sourceName: !!js/regexp /yarn/
   match:
-    - regex: !!js/regexp (\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+)\s(\S+)\s(\S+):\s([\S|\s]+)
+    - type: apache_hadoop_yarn_node_manager
+      regex: !!js/regexp (\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+)\s(\S+)\s(\S+):\s([\S|\s]+)
       fields: [ts,severity,class_name,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
 
 - # Apache Zookeeper
-  type: apache_zookeeper
   sourceName: !!js/regexp /zookeeper|zk/
   blockStart: !!js/regexp /^\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+\s+/
   match:
-    - regex: !!js/regexp /^(\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+)\s+(\S+)\s+-\s+(\S+)\s+\[(.+)\]\s-\s+([\S|\s]+)/
+    - type: apache_zookeeper
+      regex: !!js/regexp /^(\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+)\s+(\S+)\s+-\s+(\S+)\s+\[(.+)\]\s-\s+([\S|\s]+)/
       fields: [ts,pid,severity,thread_info,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
 
 - # Apache Cassandra
-  type: apache_cassandra
   sourceName: !!js/regexp cassandra
   # multi-line, start sequence
   blockStart: !!js/regexp ^\S+\s\[.+\]\s\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+\s
   match:
-    - regex: !!js/regexp (\S+)\s\[(.+)\]\s(\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+)\s(.+.java)\s+\(line\s(\d+).+\n\s+(.*)
+    - type: apache_cassandra
+      regex: !!js/regexp (\S+)\s\[(.+)\]\s(\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+)\s(.+.java)\s+\(line\s(\d+).+\n\s+(.*)
       fields: [severity,module,ts,java_file,code_line,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
 
 - # MongoDB
-  type: mongodb
   # name of the docker image
   sourceName: !!js/regexp /mongo/
   # 2015-07-28T00:35:46.329+0000 I JOURNAL  [initandlisten] journal dir=/data/db/journal
   match: 
-    - regex: !!js/regexp /^(\d{4}-\d{2}-\d{2}T[\d|\.|\:]+\+\d{4})\s(\w+)\s(\S+)\s+\[(\S+)\]\s(.+)/i
+    - type: mongodb
+      regex: !!js/regexp /^(\d{4}-\d{2}-\d{2}T[\d|\.|\:]+\+\d{4})\s(\w+)\s(\S+)\s+\[(\S+)\]\s(.+)/i
       fields:  [ts,severity, component, context, message]
       dateFormat: YYYY-MM-DDTHH:mm:ss.SSZ
 
 - # REDIS
-  type: redis
   # name of the docker image
   # example: "1:M 22 Jul 21:58:28.146 # Server started, Redis version 3.0.2"
   sourceName: !!js/regexp /redis/i
   match:
-  - 
+  - type: redis
     fields: [pid,node_type,ts,message]
     regex: !!js/regexp /^(\d+):\w+\s(\d\d\s\w+.+)\s\W\s(.*)/
-  - regex: !!js/regexp /^(.*)/i
+  - type: redis
+    regex: !!js/regexp /^(.*)/i
     fields: message
 - # mysql
   # 2015-07-25 14:11:35 0 [Note] mysqld (mysqld 5.6.26) starting as process 1 ...
@@ -188,11 +188,11 @@ patterns:
       regex: !!js/regexp /(\d{4}[\-|\d{2}]+\s[\d|\:]+\s\+\d{4})\:\s+(.+)/
       fields: [ts,message]
       dateFormat: YYYY-MM-DD HH:mm:ss ZZ
-- # nsq.io 
-  type: nsq 
+- # nsq.io  
   sourceName: !!js/regexp nsqio\/nsq
   match:
-    - regex: !!js/regexp (\d{4}\/\d{2}\/\d{2}\s[\d|\:]+)\s(\S+)\s+(\d+)\s+\[(\S+)\]\s+(.+)
+    - type: nsq
+      regex: !!js/regexp (\d{4}\/\d{2}\/\d{2}\s[\d|\:]+)\s(\S+)\s+(\d+)\s+\[(\S+)\]\s+(.+)
       fields: [ts, level, pid, module, message]
       dateFormat: YYYY/MM/DD HH:mm:ss
 

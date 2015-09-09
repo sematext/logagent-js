@@ -97,7 +97,7 @@ patterns:
                 p.parsedParams[key_value[0]] = key_value[1]
             }
             if (p.parsedParams['NOW']) {
-              p.parsedParams['NOW'] = new Date(p.paramsParsed['NOW']*1)
+              p.parsedParams['NOW'] = new Date(p.parsedParams['NOW']*1)
               // if (!p['@timestamp'])
               //   p['@timestamp'] = p.paramsParsed['NOW']
             }

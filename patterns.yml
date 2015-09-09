@@ -75,12 +75,35 @@ patterns:
 
 - # Apache Solr
   #blockStart: !!js/regexp \S+\s+-\s\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3};
+  blockStart: !!js/regexp ^\d{}
   sourceName: !!js/regexp /solr/
   match:
     - type: apache_solr
       regex: !!js/regexp (\S+)\s+-\s(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3});\s\[\s*(.+?)]\s(\S+);\s.*.*webapp=(\S+)\spath=(.+?)\sparams={(.*)}.*hits=(\d+)\sstatus=(\d+)\sQTime=(\d+)
       fields: [severity,ts,application,class,webapp,path,params,hits,status,qtime]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
+    - type: apache_solr_v5_1
+      regex: !!js/regexp (\d+)\s\[(\S+)]\s(\S+)\s(\S+)\s\[(\S+)\s(\S+)\s(\S+)\s(\S+)\].+?\[(.+?)\]\swebapp=(.+?)\spath=(.+?)\sparams={(.+?)}\sstatus=(\d+)\sQTime=(\d+)
+      fields: [relative_ts,thread_id,severity,class,collection,shard,core,replica,core_name,webapp,path,params,status,qtime]
+      transform: !!js/function >
+        function (p) {
+          if (process.env.PARSE_SOLR_QUERY_PARAMS === '1')
+          {
+            var params = p.params.split('&')
+            p.parsedParams={}
+            for(var i=0;i<params.length;i++)
+            {
+              var key_value = params[i].split('=')
+              if (key_value.length>1)
+                p.parsedParams[key_value[0]] = key_value[1]
+            }
+            if (p.parsedParams['NOW']) {
+              p.parsedParams['NOW'] = new Date(p.paramsParsed['NOW']*1)
+              // if (!p['@timestamp'])
+              //   p['@timestamp'] = p.paramsParsed['NOW']
+            }
+          }
+        }
 
 - # Apache Kafka
   sourceName: !!js/regexp /kafka/

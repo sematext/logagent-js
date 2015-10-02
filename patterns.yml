@@ -104,7 +104,7 @@ patterns:
           }
         }
     - type: apache_solr
-      regex: !!js/regexp (\S+)\s+-\s+(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3});\s+(\S+);\s(.*)
+      regex: !!js/regexp (\S+)\s+-\s+(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3});\s+(\S+);\s([\s|\S]+)
       fields: [severity,ts,class,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
 

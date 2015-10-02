@@ -81,10 +81,6 @@ patterns:
       regex: !!js/regexp (\S+)\s+-\s(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3});\s\[\s*(.+?)]\s(\S+);\s.*.*webapp=(\S+)\spath=(.+?)\sparams={(.*)}.*hits=(\d+)\sstatus=(\d+)\sQTime=(\d+)
       fields: [severity,ts,application,class,webapp,path,params,hits,status,qtime]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
-    - type: apache_solr
-      regex: !!js/regexp (\S+)\s+-\s+(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3});\s+(\S+);\s(.*)
-      fields: [severity,ts,class,message]
-      dateFormat: YYYY-MM-DD HH:mm:ss,SS
     - type: apache_solr_v5_1
       regex: !!js/regexp (\d+)\s\[(\S+)]\s(\S+)\s(\S+)\s\[(\S+)\s(\S+)\s(\S+)\s(\S+)\].+?\[(.+?)\]\swebapp=(.+?)\spath=(.+?)\sparams={(.+?)}\sstatus=(\d+)\sQTime=(\d+)
       fields: [relative_ts,thread_id,severity,class,collection,shard,core,replica,core_name,webapp,path,params,status,qtime]
@@ -107,6 +103,10 @@ patterns:
             }
           }
         }
+    - type: apache_solr
+      regex: !!js/regexp (\S+)\s+-\s+(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3});\s+(\S+);\s(.*)
+      fields: [severity,ts,class,message]
+      dateFormat: YYYY-MM-DD HH:mm:ss,SS
 
 - # Apache Kafka
   sourceName: !!js/regexp /kafka/

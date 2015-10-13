@@ -80,19 +80,22 @@ function getLoggerForToken (token, type) {
   return function (err, data) {
     if (!err && data) {
       log(err, msg)
-      // delete data.ts
+      data.ts = null
+      //delete data.ts
       // data['_type'] = type
       var msg = data
-      if (type === 'heroku') {
+      /*if (type === 'heroku') {
         msg = {
           '@timestamp': new Date(),
           message: data.message,
           app: data.app,
           host: data.host,
+          process_tyep: data.process_type
           severity: data.severity,
           facility: data.facility
         }
-      }
+      }*/
+      console.log(JSON.stringify(data, null, '\t'))
       logToLogsene(token, type, msg)
     }
   }
@@ -120,13 +123,27 @@ function herokuHandler (req, res) {
       var lines = body.split('\n')
       console.log(lines)
       lines.forEach(function () {
-        parseLine(body, argv.n || 'heroku', getLoggerForToken(token, 'heroku'))
+        parseLine(body, argv.n || 'heroku', function (err, data) {
+          if(data) {
+              data.headers = req.headers
+          }
+          getLoggerForToken(token, 'heroku')(err, data)
+        })
       })
       res.end('ok\n')
     })
   } catch (err) {
     console.error(err)
   }
+}
+
+function parseAttributes (p)
+{
+  var keyValue = msg.trim().split(' ')
+  keyValue.forEach (function (kv) {
+     var kvs = kv.split ('=')
+     p [kvs[0].trim()] = kvs[1].trim()
+  })
 }
 
 function cloudFoundryHandler (req, res) {

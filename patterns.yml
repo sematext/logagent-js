@@ -260,6 +260,18 @@ patterns:
           ]
           p.facility = FACILITY[p.prio>>3] || p.prio>>3
           p.severity = SEVERITY[p.prio&7] || p.prio&7
+          if (p.process_type === 'router')
+          {
+            try { 
+            var keyValue = p.message.trim().split(' ')
+            keyValue.forEach (function (kv) {
+              var kvs = kv.split ('=')
+              p[kvs[0].trim()] = kvs[1].trim()
+            })
+            } catch (err) {
+              // ignore
+            }
+          }
         }
 
 - # CloudFoundry Syslog Messages

@@ -84,17 +84,18 @@ function getLoggerForToken (token, type) {
       //delete data.ts
       // data['_type'] = type
       var msg = data
-      /*if (type === 'heroku') {
+      if (type === 'heroku') {
         msg = {
           '@timestamp': new Date(),
           message: data.message,
           app: data.app,
           host: data.host,
-          process_tyep: data.process_type
+          process_type: data.process_type,
+          originalLine: data.origignalLine,
           severity: data.severity,
           facility: data.facility
         }
-      }*/
+      }
       console.log(JSON.stringify(data))
       logToLogsene(token, type, msg)
     }

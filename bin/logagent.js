@@ -96,7 +96,7 @@ function getLoggerForToken (token, type) {
           facility: data.facility
         }
       }
-      console.log(JSON.stringify(data))
+      console.log(JSON.stringify(msg))
       logToLogsene(token, type, msg)
     }
   }

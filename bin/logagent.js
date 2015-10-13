@@ -95,7 +95,7 @@ function getLoggerForToken (token, type) {
           facility: data.facility
         }
       }*/
-      console.log(JSON.stringify(data, null, '\t'))
+      console.log(JSON.stringify(data))
       logToLogsene(token, type, msg)
     }
   }
@@ -110,7 +110,7 @@ function herokuHandler (req, res) {
       token = path[1]
     }
     console.log(token + '  path:' + path)
-    console.log(req.headers)
+    console.log(JSON.stringify (req.headers))
     if (!token) {
       res.end('Error: Missing Logsene Token ' + req.url)
       return

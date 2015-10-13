@@ -64,7 +64,8 @@ function getLogger (token, type) {
       // console.log(data)
     })
     logger.on('error', function (err) {
-      console.error('Error in Logsene request:' + err.message)}
+      console.error('Error in Logsene request:' + err.message)
+    })
     loggers[key] = logger
   }
   return loggers[key]
@@ -124,8 +125,7 @@ function cloudFoundryHandler (req, res) {
 }
 function getHttpServer (port, handler) {
   var _port = port || process.env.PORT
-  if (port === true) // a commadn line flag was set but no port given
-  {
+  if (port === true) { // a commadn line flag was set but no port given
     _port = process.env.PORT
   }
   var server = http.createServer(handler)

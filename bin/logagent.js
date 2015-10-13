@@ -28,6 +28,7 @@ var logseneToken = argv.t || process.env.LOGSENE_TOKEN
 var http = require('http')
 var loggers = {}
 
+process.on('beforeExit', function () {})
 function getFilesizeInBytes (filename) {
   var stats = fs.statSync(filename)
   var fileSizeInBytes = stats['size']
@@ -56,7 +57,7 @@ function getSyslogServer (appToken, port, type) {
 
 function getLogger (token, type) {
   var key = token + type
-  console.log(token)
+  // console.log(token)
   if (!loggers[key]) {
     var logger = new Logsene(token, type)
     logger.on('log', function (data) {
@@ -162,7 +163,7 @@ function log (err, data) {
     return
   }
   if (argv.t) {
-    logToLogsene(argv.t || logseneToken, data['_type']|| argv.n || 'logs', data)
+    logToLogsene(argv.t || logseneToken, data['_type'] || argv.n || 'logs', data)
   }
   if (argv.s) {
     return
@@ -188,6 +189,7 @@ function readStdIn () {
   })
   rl.on('line', parseLine)
   rl.on('close', terminate)
+  rl.on('finish', terminate)
 }
 
 function terminate () {
@@ -201,7 +203,17 @@ function terminate () {
     console.error('Heap Total: ' + (process.memoryUsage().heapTotal / (1024 * 1024)) + ' MB')
     console.error('Memory RSS: ' + (process.memoryUsage().rss / (1024 * 1024)) + ' MB')
   }
-  process.exit()
+  setTimeout(function () {
+    console.log(Object.keys(loggers))
+    Object.keys(loggers).forEach(function (l, i) {
+      console.log('send ' + l)
+      loggers[l].send()
+    })
+  }, 300)
+  setTimeout(function () {
+    console.log('Good Bye!!!')
+    process.exit()
+  }, 1000)
 }
 if (argv.cfhttp) {
   getHttpServer(argv.cfhttp, textMsgBodyHandler)

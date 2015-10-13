@@ -111,7 +111,7 @@ curl -sL https://deb.nodesource.com/setup_0.12 | sudo bash -
 sudo apt-get install -y nodejs
 ```
 
-# Install logagent-js globally
+# Install logagent-js as command line tool
 ```
 npm i -g logagent-js
 # ship all your logs to logsene, parsed, timestamped - displyed on console in YAML format (-y)
@@ -129,6 +129,8 @@ Parameters:
 - -u UDP_PORT starts a syslogd UDP listener on the given port to act as syslogd
 - -n name for the source only when stdin is used (e.g. cat zookeeper.log | logagent -n zookeeper), important to make
   multi-line patterns working on stdin because the status is tracked by the source name. 
+- --heroku PORT listens for heroku logs (http drain / framed syslog over http) 
+- --cfhttp PORT listens for CLoudFoundry logs (syslog over http)
 - list of files, watched by tail-forver starting at end of file to watch
 
 The default output is line delimited JSON.

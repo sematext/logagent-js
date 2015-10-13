@@ -20,13 +20,13 @@ var count = 0
 var emptyLines = 0
 var bytes = 0
 var Logsene = require('logsene-js')
-var logger = null
 var Tail = require('tail-forever')
 var fs = require('fs')
 var glob = require('glob')
 var globPattern = argv.g || process.env.GLOB_PATTERN
 var logseneToken = argv.t || process.env.LOGSENE_TOKEN
 var http = require('http')
+var loggers = {}
 
 function getFilesizeInBytes (filename) {
   var stats = fs.statSync(filename)
@@ -54,19 +54,75 @@ function getSyslogServer (appToken, port, type) {
 // this.servers[appToken] = syslogd
 }
 
-function textMsgBodyHandler (req,res) {
+function getLogger (token, type) {
+  var key = token + type
+  console.log(token)
+  if (!loggers[key]) {
+    var logger = new Logsene(token, type)
+    logger.on('log', function (data) {
+      console.log(data)
+    })
+    logger.on('error', console.error)
+    loggers[key] = logger
+  }
+  return loggers[key]
+}
+
+function logToLogsene (token, type, data) {
+  var logger = getLogger(token, type)
+  logger.log(data.level || data.severity || 'info', data.message, data)
+}
+
+function getLoggerForToken (token, type) {
+  return function (err, data) {
+    if (!err && data) {
+      log(err, msg)
+      // delete data.ts
+      // data['_type'] = type
+      var msg = data
+      if (type === 'heroku') {
+        msg = {
+          '@timestamp': new Date(),
+          message: data.message,
+          app: data.app,
+          host: data.host,
+          severity: data.severity,
+          facility: data.facility
+        }
+      }
+      logToLogsene(token, type, msg)
+    }
+  }
+}
+
+function herokuHandler (req, res) {
+  var token = req.url.split('/')[1]
   var body = ''
   req.on('data', function (data) {
-      body += data
+    body += data
+  })
+  req.on('end', function () {
+    var lines = body.split('\n')
+    lines.forEach(function () {
+      parseLine(body, argv.n || 'heroku', getLoggerForToken(token, 'heroku'))
+    })
+    res.end('ok\n')
+  })
+}
+
+function textMsgBodyHandler (req, res) {
+  var body = ''
+  req.on('data', function (data) {
+    body += data
   })
   req.on('end', function () {
     parseLine(body, argv.n || 'cloudfoundry', log)
     res.end('ok\n')
   })
 }
-function getHttpServer (port) {
-  server = http.createServer(textMsgBodyHandler)
-  return server.listen(port)
+function getHttpServer (port, handler) {
+  var server = http.createServer(handler)
+  return server.listen(port || process.env.PORT)
 }
 
 function tailFile (file) {
@@ -98,12 +154,15 @@ function tailFilesFromGlob (globPattern) {
 }
 
 function log (err, data) {
+  if (err) {
+    return
+  }
   if (!data) {
     emptyLines++
     return
   }
   if (argv.t) {
-    logger.log(data.level || data.severity + '' || 'info', data.message, data)
+    logToLogsene(argv.t || logseneToken, data['_type']|| argv.n || 'logs', data)
   }
   if (argv.s) {
     return
@@ -144,11 +203,11 @@ function terminate () {
   }
   process.exit()
 }
-if (logseneToken) {
-  logger = new Logsene(logseneToken, 'logs')
+if (argv.cfhttp) {
+  getHttpServer(argv.cfhttp, textMsgBodyHandler)
 }
-if(argv.cfhttp) {
-  getHttpServer(argv.cfhttp)
+if (argv.heroku || process.env.PORT) {
+  getHttpServer(argv.heroku, herokuHandler)
 }
 if (argv._.length > 0) {
   // tail files
@@ -160,7 +219,7 @@ if (argv._.length > 0) {
   tailFilesFromGlob(globPattern)
 } else if (argv.u) {
   try {
-    var syslogServer = getSyslogServer(logseneToken, argv.u)
+    getSyslogServer(logseneToken, argv.u)
   } catch (err) {
     console.error(err)
     process.exit(-1)

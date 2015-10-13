@@ -61,9 +61,10 @@ function getLogger (token, type) {
   if (!loggers[key]) {
     var logger = new Logsene(token, type)
     logger.on('log', function (data) {
-      console.log(data)
+      // console.log(data)
     })
-    logger.on('error', console.error)
+    logger.on('error', function (err) {
+      console.error('Error in Logsene request:' + err.message)}
     loggers[key] = logger
   }
   return loggers[key]

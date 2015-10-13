@@ -99,27 +99,32 @@ function getLoggerForToken (token, type) {
 }
 
 function herokuHandler (req, res) {
-  var path = req.url.split('/')
-  var token = null
-  if (path.length>0)
-  {
-    token = path[1]
-  }
-  if (token === null)
-  {
-    return res.end('Error: Missing Logsene Token ' + req.url)
-  }
-  var body = ''
-  req.on('data', function (data) {
-    body += data
-  })
-  req.on('end', function () {
-    var lines = body.split('\n')
-    lines.forEach(function () {
-      parseLine(body, argv.n || 'heroku', getLoggerForToken(token, 'heroku'))
+  try { 
+    var path = req.url.split('/')
+    var token = undefined
+    if (path.length > 1) {
+      if(path[1] && path[1].length>12)
+      token = path[1]
+    }
+    console.log(token + '  path:' + path)
+    if (!token) {
+      res.end('Error: Missing Logsene Token ' + req.url)
+      return
+    }
+    var body = ''
+    req.on('data', function (data) {
+      body += data
     })
-    res.end('ok\n')
-  })
+    req.on('end', function () {
+      var lines = body.split('\n')
+      lines.forEach(function () {
+        parseLine(body, argv.n || 'heroku', getLoggerForToken(token, 'heroku'))
+      })
+      res.end('ok\n')
+    })
+  } catch (err) {
+    console.error(err)
+  }
 }
 
 function cloudFoundryHandler (req, res) {

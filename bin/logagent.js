@@ -111,7 +111,7 @@ function herokuHandler (req, res) {
   })
 }
 
-function textMsgBodyHandler (req, res) {
+function cloudFoundryHandler (req, res) {
   var body = ''
   req.on('data', function (data) {
     body += data
@@ -123,6 +123,7 @@ function textMsgBodyHandler (req, res) {
 }
 function getHttpServer (port, handler) {
   var server = http.createServer(handler)
+  console.log('Logagent listening (http): ' + (port || process.env.PORT))
   return server.listen(port || process.env.PORT)
 }
 
@@ -216,10 +217,10 @@ function terminate () {
   }, 1000)
 }
 if (argv.cfhttp) {
-  getHttpServer(argv.cfhttp, textMsgBodyHandler)
+  getHttpServer(argv.cfhttp, cloudFoundryHandler)
 }
-if (argv.heroku || process.env.PORT) {
-  getHttpServer(argv.heroku, herokuHandler)
+if (argv.heroku) {
+  getHttpServer(null, herokuHandler)
 }
 if (argv._.length > 0) {
   // tail files

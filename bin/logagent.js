@@ -107,6 +107,7 @@ function herokuHandler (req, res) {
       token = path[1]
     }
     console.log(token + '  path:' + path)
+    console.log(req.headers)
     if (!token) {
       res.end('Error: Missing Logsene Token ' + req.url)
       return
@@ -117,6 +118,7 @@ function herokuHandler (req, res) {
     })
     req.on('end', function () {
       var lines = body.split('\n')
+      console.log(lines)
       lines.forEach(function () {
         parseLine(body, argv.n || 'heroku', getLoggerForToken(token, 'heroku'))
       })

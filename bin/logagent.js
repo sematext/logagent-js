@@ -122,9 +122,14 @@ function cloudFoundryHandler (req, res) {
   })
 }
 function getHttpServer (port, handler) {
+  var _port = port || process.env.PORT
+  if (port === true) // a commadn line flag was set but no port given
+  {
+    _port = process.env.PORT
+  }
   var server = http.createServer(handler)
-  console.log('Logagent listening (http): ' + (port || process.env.PORT))
-  return server.listen(port || process.env.PORT)
+  console.log('Logagent listening (http): ' + _port)
+  return server.listen(_port)
 }
 
 function tailFile (file) {
@@ -220,7 +225,7 @@ if (argv.cfhttp) {
   getHttpServer(argv.cfhttp, cloudFoundryHandler)
 }
 if (argv.heroku) {
-  getHttpServer(null, herokuHandler)
+  getHttpServer(argv.heroku, herokuHandler)
 }
 if (argv._.length > 0) {
   // tail files

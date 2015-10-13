@@ -217,7 +217,7 @@ patterns:
     -
       type: heroku
       # blockStart: !!js/regexp \^+\s<(\d+)>(\d+)\s/
-      regex: !!js/regexp \d*\s{0,1}<(\d+)>(\d+)\s(\S+\s\S+)\s(\S+)\s(\S+)\s(\S+)\.(\d+)\s-\s(.*)
+      regex: !!js/regexp \d*\s{0,1}<(\d+)>(\d+)\s(\S+)\s(\S+)\s(\S+)\s(\S+)\.{0,1}(\d*)\s+-\s(.*)
       fields: [prio,version,ts,host,app,process_type,dyno,message]
       dateFormat: YYYY-MM-DD HH:mm:ssZ
       transform: !!js/function >

@@ -99,7 +99,16 @@ function getLoggerForToken (token, type) {
 }
 
 function herokuHandler (req, res) {
-  var token = req.url.split('/')[1]
+  var path = req.url.split('/')
+  var token = null
+  if (path.length>0)
+  {
+    token = path[1]
+  }
+  if (token === null)
+  {
+    return res.end('Error: Missing Logsene Token ' + req.url)
+  }
   var body = ''
   req.on('data', function (data) {
     body += data

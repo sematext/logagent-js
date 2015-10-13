@@ -214,6 +214,9 @@ function readStdIn () {
 }
 
 function terminate () {
+  if (argv.heroku) {
+    return
+  }
   var duration = new Date().getTime() - begin
   var throughput = count / (duration / 1000)
   var throughputBytes = (bytes / 1024 / 1024) / (duration / 1000)

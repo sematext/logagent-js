@@ -176,7 +176,7 @@ git push heroku master
 ```
 
 Add the logagent-js URL as HTTPS drain for your application logs. 
-The URL is a combination has the format https://loggerAppName.herokuapps.com/LOGSENE_TOKEN
+The URL format is https://loggerAppName.herokuapps.com/LOGSENE_TOKEN
 
 Use following command, using the dynamically given name from "heroku create".
 

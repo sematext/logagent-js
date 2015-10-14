@@ -2,6 +2,22 @@
 
 Smart Log Parser and Log Shipper written in Node. 
 
+Key features: 
+- intelligent pattern matching
+- pattern library included 
+- recognition of Date and Number fields
+- easy to extend with custom patterns and JS transform functions
+- replace sensitive data with SHA-1 hash codes
+- CLI to act as
+  - log format converter (e.g. text to JSON or YAML) 
+  - Syslog Server (UDP), 
+  - Heroku Log Drain, 
+  - CloudFoundry Log Drain
+  - log forwarder to [Logsene](http://www.sematext.com/logsene/) from 
+- node module to be used in Node.js programs
+- logagent-js is part of [SPM for Docker](https://github.com/sematext/spm-agent-docker) to parse Container Logs
+
+_How does the parser work?_
 The parser detects log formats based on a pattern library (yaml file) and converts it to a JSON Object:
 - find matching regex in pattern library
 - tag it with the recognized type
@@ -28,7 +44,8 @@ The parser detects log formats based on a pattern library (yaml file) and conver
     - HBase Region Server,
     - Hadoop YARN Node Manager, 
     - Apache SOLR,
-  - various Linux/Mac OS X system log files   
+  - various Linux/Mac OS X system log files 
+  - Heroku logs
 
 To test patterns or convert logs from text to JSON use the command line tool 'logagent'. 
 It reads from stdin and outputs line delimited JSON (or pretty JSON or YAML) to the console. 

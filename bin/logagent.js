@@ -86,7 +86,6 @@ function getLoggerForToken (token, type) {
       var msg = data
       if (type === 'heroku') {
         msg = {
-          '@timestamp': new Date(),
           message: data.message,
           app: data.app,
           host: data.host,
@@ -94,6 +93,15 @@ function getLoggerForToken (token, type) {
           originalLine: data.origignalLine,
           severity: data.severity,
           facility: data.facility
+        }
+        var optionalFields = ['method', 'path', 'host', 'request_id', 'fwd', 'dyno', 'connect', 'service', 'status', 'bytes']
+        optionalFields.forEach (function (f) {
+          if(data[f]) {
+            msg[f] = data[f]
+          }
+        })
+        if (!data['@timestamp']) {
+          msg['@timestamp'] = new Date()
         }
       }
       console.log(JSON.stringify(msg))
@@ -136,15 +144,6 @@ function herokuHandler (req, res) {
   } catch (err) {
     console.error(err)
   }
-}
-
-function parseAttributes (p)
-{
-  var keyValue = msg.trim().split(' ')
-  keyValue.forEach (function (kv) {
-     var kvs = kv.split ('=')
-     p [kvs[0].trim()] = kvs[1].trim()
-  })
 }
 
 function cloudFoundryHandler (req, res) {

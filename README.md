@@ -130,7 +130,7 @@ Parameters:
 - -n name for the source only when stdin is used (e.g. cat zookeeper.log | logagent -n zookeeper), important to make
   multi-line patterns working on stdin because the status is tracked by the source name. 
 - --heroku PORT listens for heroku logs (http drain / framed syslog over http) 
-- --cfhttp PORT listens for CLoudFoundry logs (syslog over http)
+- --cfhttp PORT listens for CloudFoundry logs (syslog over http)
 - list of files, watched by tail-forver starting at end of file to watch
 
 The default output is line delimited JSON.
@@ -158,6 +158,39 @@ Watch selective log output on console by passing logs via stdin and format in YA
 tail -f /var/log/access.log | logagent -y 
 tail -f /var/log/system.log | logagent -f my_own_patterns.yml  -y 
 ```
+# Run Logagent to on Heroku as HTTPS drain
+
+Heroku can forward logs via syslog or raw syslog messages over HTTPS using the command
+```
+heroku drain:add --app HerokuAppName URL 
+```
+
+To receive Heroku logs, logagent-js can be deployed to Heroku. It acts as HTTPS log drain. 
+
+```
+git clone https://github.com/sematext/logagent-js.git
+cd logagent-js
+heroku login 
+heroku create
+git push heroku master
+```
+
+Add the logagent-js URL as HTTPS drain for your application logs. 
+The URL is a combination has the format https://loggerAppName.herokuapps.com/LOGSENE_TOKEN
+
+Use following command, using the dynamically given name from "heroku create".
+
+```
+export LOGSENE_TOKEN=YOUR_LOGSENE_TOKEN_FOR_TOUR_HEROKU_APP
+heroku drains:add --app YOUR_HEROKU_MAIN_APPLICATION  `heroku info -s | grep web-url | cut -d= -f2`$LOGSENE_TOKEN
+```
+
+In case of high log volume, scale the logagent-js services on demand using 
+```
+heroku scale web=3
+```
+
+Now you can see your logs in Logsene, define Alert-Queroes or use Kibana 4 for Dashboards. 
 
 # Run logagent as system service to monitor all logs e.g. in /var/log/
 

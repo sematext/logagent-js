@@ -203,8 +203,8 @@ To receive Heroku logs, logagent-js can be deployed to Heroku. It acts as HTTPS 
   ```
 Now you can see your logs in Logsene, define Alert-Queries or use Kibana 4 for Dashboards. 
 
-3. Scale teh service 
-In case of high log volume, scale the logagent-js services on demand using 
+3. Scale logagent-js service on Heroku
+In case of high log volume, scale logagent-js  on demand using 
 ```
 heroku scale web=3
 ```

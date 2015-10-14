@@ -158,7 +158,7 @@ Watch selective log output on console by passing logs via stdin and format in YA
 tail -f /var/log/access.log | logagent -y 
 tail -f /var/log/system.log | logagent -f my_own_patterns.yml  -y 
 ```
-# Run Logagent to on Heroku as HTTPS drain
+# Run Logagent on Heroku as HTTPS log drain
 
 Heroku can forward logs via syslog or raw syslog messages over HTTPS using the command
 ```

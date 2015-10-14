@@ -27,6 +27,8 @@ var globPattern = argv.g || process.env.GLOB_PATTERN
 var logseneToken = argv.t || process.env.LOGSENE_TOKEN
 var http = require('http')
 var loggers = {}
+var throng = require('throng')
+var WORKERS = process.env.WEB_CONCURRENCY || 1
 
 process.on('beforeExit', function () {})
 function getFilesizeInBytes (filename) {
@@ -216,7 +218,13 @@ function log (err, data) {
     console.log(JSON.stringify(data))
   }
 }
-
+function start () {
+  getHttpServer(argv.heroku, herokuHandler)
+  process.on('SIGTERM', function() {
+    terminate('exitWorker')
+    console.log('Worker exiting')
+  })
+}
 function parseLine (line, sourceName, cbf) {
   bytes += line.length
   count++
@@ -232,9 +240,9 @@ function readStdIn () {
   rl.on('finish', terminate)
 }
 
-function terminate () {
-  if (argv.heroku) {
-    return
+function terminate (reason) {
+  if (argv.heroku &&  reason !== 'exitWorker') {
+      return
   }
   var duration = new Date().getTime() - begin
   var throughput = count / (duration / 1000)
@@ -262,7 +270,10 @@ if (argv.cfhttp) {
   getHttpServer(argv.cfhttp, cloudFoundryHandler)
 }
 if (argv.heroku) {
-  getHttpServer(argv.heroku, herokuHandler)
+  throng(start, {
+    workers: WORKERS,
+    lifetime: Infinity
+  })
 }
 if (argv._.length > 0) {
   // tail files

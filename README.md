@@ -8,13 +8,13 @@ Key features:
 - recognition of Date and Number fields
 - easy to extend with custom patterns and JS transform functions
 - replace sensitive data with SHA-1 hash codes
-- CLI to act as
+- Command Line Tool
   - log format converter (e.g. text to JSON or YAML) 
-  - Syslog Server (UDP), 
-  - Heroku Log Drain, 
+  - Syslog Server (UDP)
+  - [Heroku Log Drain](https://github.com/sematext/logagent-js#logagent-as-heroku-log-drain)
   - CloudFoundry Log Drain
-  - log forwarder to [Logsene](http://www.sematext.com/logsene/) from 
-- node module to be used in Node.js programs
+  - Log shipper for [Logsene](http://www.sematext.com/logsene/) from 
+- Node.js module to integrate parsers into Node.js programs
 - logagent-js is part of [SPM for Docker](https://github.com/sematext/spm-agent-docker) to parse Container Logs
 
 _How does the parser work?_

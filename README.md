@@ -111,7 +111,7 @@ curl -sL https://deb.nodesource.com/setup_0.12 | sudo bash -
 sudo apt-get install -y nodejs
 ```
 
-# Install logagent-js as command line tool
+# Install logagent-js command line tool
 ```
 npm i -g logagent-js
 # ship all your logs to logsene, parsed, timestamped - displyed on console in YAML format (-y)
@@ -158,41 +158,41 @@ Watch selective log output on console by passing logs via stdin and format in YA
 tail -f /var/log/access.log | logagent -y 
 tail -f /var/log/system.log | logagent -f my_own_patterns.yml  -y 
 ```
-# Run Logagent on Heroku as HTTPS log drain
+# Logagent as Heroku log drain
 
-Heroku can forward logs via syslog or raw syslog messages over HTTPS using the command
+[Heroku](http://www.heroku.com) can forward logs to a [Log Drain](https://devcenter.heroku.com/articles/log-drains) 
 ```
 heroku drain:add --app HerokuAppName URL 
 ```
 
 To receive Heroku logs, logagent-js can be deployed to Heroku. It acts as HTTPS log drain. 
 
-```
-git clone https://github.com/sematext/logagent-js.git
-cd logagent-js
-heroku login 
-heroku create
-git push heroku master
-```
+1.  deploy logagent-js to Heroku 
+  ```
+  git clone https://github.com/sematext/logagent-js.git
+  cd logagent-js
+  heroku login 
+  heroku create
+  git push heroku master
+  ```
 
-Add the logagent-js URL as HTTPS drain for your application logs. 
-The URL format is https://loggerAppName.herokuapps.com/LOGSENE_TOKEN
+2. Add the the log drain.  
+  The URL format is https://loggerAppName.herokuapps.com/LOGSENE_TOKEN
+  Use following command, using the dynamically given name from "heroku create".
 
-Use following command, using the dynamically given name from "heroku create".
+  ```
+  export LOGSENE_TOKEN=YOUR_LOGSENE_TOKEN_FOR_TOUR_HEROKU_APP
+  heroku drains:add --app YOUR_HEROKU_MAIN_APPLICATION  `heroku info -s | grep web-url | cut -d= -f2`$LOGSENE_TOKEN
+  ```
+Now you can see your logs in Logsene, define Alert-Queries or use Kibana 4 for Dashboards. 
 
-```
-export LOGSENE_TOKEN=YOUR_LOGSENE_TOKEN_FOR_TOUR_HEROKU_APP
-heroku drains:add --app YOUR_HEROKU_MAIN_APPLICATION  `heroku info -s | grep web-url | cut -d= -f2`$LOGSENE_TOKEN
-```
-
+3. Scale teh service 
 In case of high log volume, scale the logagent-js services on demand using 
 ```
 heroku scale web=3
 ```
 
-Now you can see your logs in Logsene, define Alert-Queries or use Kibana 4 for Dashboards. 
-
-# Run logagent as system service to monitor all logs e.g. in /var/log/
+# Logagent as Linux service 
 
 ## Upstart script (ubuntu)
 
@@ -221,22 +221,16 @@ Start the service:
 sudo service logagent start
 ```
 
-## Unit file for systemd startup
+## Systemd startup / journald log forwarding
 
 Create a service file for the logagent, in /etc/systemd/system/logagent.service
-Set the Logsene Token and file list in "ExecStart" directive.
+Set the Logsene Token in the "ExecStart" command.
 
 ```
 [Service]
-Description=Sematext logagent-js
-Environment=NODE_ENV=production
-ExecStart=/usr/local/bin/logagent -s -t YOUR_LOGSENE_TOKEN /var/log/*.log
 Restart=always
-StandardOutput=syslog
-StandardError=syslog
-SyslogIdentifier=logagent
-User=syslog
-Group=syslog
+RestartSec=1s
+ExecStart=/bin/sh -c "journalctl -o json -f | logagent -s -t YOUR_LOGSENE_TOKEN"
 
 [Install]
 WantedBy=multi-user.target

@@ -190,7 +190,7 @@ In case of high log volume, scale the logagent-js services on demand using
 heroku scale web=3
 ```
 
-Now you can see your logs in Logsene, define Alert-Queroes or use Kibana 4 for Dashboards. 
+Now you can see your logs in Logsene, define Alert-Queries or use Kibana 4 for Dashboards. 
 
 # Run logagent as system service to monitor all logs e.g. in /var/log/
 

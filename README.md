@@ -78,12 +78,12 @@ The default patterns are [here](/patterns.yml) - contributions are welcome.
 
 # Use logagent-js in Node
 
-## Install it as local package
 ```
 npm i logagent-js --save
 ```
 
-## Use the Logparser module in your source code
+Use the Logparser module in your source code
+
 ``` 
 var Logparser = require('logagent-js')
 var lp = new Logparser('./patterns.yml')
@@ -118,12 +118,12 @@ npm i -g logagent-js
 logagent -t LOGSENE_TOKEN -y /var/log/*.log
 ```
 
-Parameters:
+## CLI Parameters:
 
 - -f file with pattern definitions 
 - -y prints parsed messages in YAML format
 - -p pretty json output
-- -s silent, print only throughput
+- -s silent, print only throughput on exit
 - -t token [Logsene](http://sematext.com/logsene) App Token to insert parsed records into Logsene
 - -g use a [glob](https://www.npmjs.com/package/glob) pattern to watch log files e.g. -g "{/var/log/*.log,/Users/stefan/*/*.log}" 
 - -u UDP_PORT starts a syslogd UDP listener on the given port to act as syslogd

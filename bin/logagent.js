@@ -147,6 +147,14 @@ function herokuHandler (req, res) {
     console.error(err)
   }
 }
+// heroku start function for WEB_CONCURENCY
+function start () {
+  getHttpServer(argv.heroku, herokuHandler)
+  process.on('SIGTERM', function() {
+    terminate('exitWorker')
+    console.log('Worker exiting')
+  })
+}
 
 function cloudFoundryHandler (req, res) {
   var body = ''
@@ -218,13 +226,7 @@ function log (err, data) {
     console.log(JSON.stringify(data))
   }
 }
-function start () {
-  getHttpServer(argv.heroku, herokuHandler)
-  process.on('SIGTERM', function() {
-    terminate('exitWorker')
-    console.log('Worker exiting')
-  })
-}
+
 function parseLine (line, sourceName, cbf) {
   bytes += line.length
   count++

@@ -205,9 +205,6 @@ function tailFilesFromGlob (globPattern) {
 }
 
 function log (err, data) {
-  if (err) {
-    return
-  }
   if (!data) {
     emptyLines++
     return
@@ -257,14 +254,13 @@ function terminate (reason) {
     console.error('Memory RSS: ' + (process.memoryUsage().rss / (1024 * 1024)) + ' MB')
   }
   setTimeout(function () {
-    console.log(Object.keys(loggers))
+    // console.log(Object.keys(loggers))
     Object.keys(loggers).forEach(function (l, i) {
       console.log('send ' + l)
       loggers[l].send()
     })
   }, 300)
   setTimeout(function () {
-    console.log('Good Bye!!!')
     process.exit()
   }, 1000)
 }
@@ -279,11 +275,10 @@ if (argv.heroku) {
 }
 if (argv._.length > 0) {
   // tail files
-  console.log(argv._)
   tailFiles(argv._)
 } else if (globPattern) {
   // checks for file list and start tail for all files
-  console.log('using glob pattern:' + globPattern)
+  console.log('using glob pattern: ' + globPattern)
   tailFilesFromGlob(globPattern)
 } else if (argv.u) {
   try {

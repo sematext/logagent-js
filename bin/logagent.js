@@ -232,6 +232,7 @@ function parseLine (line, sourceName, cbf) {
 
 function readStdIn () {
   var rl = readline.createInterface({
+  	terminal: false,
     input: process.stdin
   })
   rl.on('line', parseLine)

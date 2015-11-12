@@ -23,6 +23,13 @@ patterns:
       fields: [ts,severity,source,node_name,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
 
+- # Apache Solr
+  blockStart: !!js/regexp \d+\s+\S{3,5}\s
+  sourceName: !!js/regexp /solr/i
+  match:
+    - type: apache_solr
+      regex: !!js/regexp (\d+)\s+(\S+)\s+\((\S+)\)\s+\[(.+?)\]\s(\S+)\s(.+)
+      fields: [relative_ts,severity,thread,thread_id,class,message]
 
 - # Apache Solr
   blockStart: !!js/regexp \S+\s+-\s\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3};

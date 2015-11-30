@@ -142,8 +142,23 @@ patterns:
     fields: [pid,node_type,ts,message]
     regex: !!js/regexp /^(\d+):\w+\s(\d\d\s\w+.+)\s\W\s(.*)/
   - type: redis
+    fields: [pid,ts,message]
+    regex: !!js/regexp /^\[(\d+)\]\s(.+?)\s\*\s(.+)/i
+    dateFormat: DD MMM HH:mm:ss.S
+  - type: redis
     regex: !!js/regexp /^(.*)/i
     fields: message
+
+- # NodeBB Forum
+  sourceName: !!js/regexp /nodebb/i
+  match:
+  - type: nodebb_forum
+    fields: [ts,severity,module,message]
+    regex: !!js/regexp /(\d{4}\-\d{2}\-\d{1,2}T\d\d:\d\d:\d\d\.\d+Z)\s-\s(\w+):\s\[(\S+)]\s(.*)/
+    dateFormat: YYYY-MM-DDTHH:mm:ss.S
+  - type: nodebb_forum
+    fields: [ts,severity,message]
+    regex: !!js/regexp /(\d{4}\-\d{2}\-\d{1,2}T\d\d:\d\d:\d\d\.\d+Z)\s-\s(\w+):\s(.*)/
 - # mysql
   # 2015-07-25 14:11:35 0 [Note] mysqld (mysqld 5.6.26) starting as process 1 ...
   sourceName: !!js/regexp /mysql/ 
@@ -187,6 +202,15 @@ patterns:
 - #  Web Logs
   sourceName: !!js/regexp /httpd|access_log|apache2|nginx/
   match: 
+    # nginx proxy jwilder/nginx-proxy
+    - regex:        !!js/regexp /(\S+)\s\|\s(\S+)\s([0-9a-f.:]+)\s+(-|.+?)\s+(-|.+?)\s\[(.*)\]\s"(.+?)\s(.+?)\s(.+?)"\s(\d+)\s(\d+)\s"(.+?)"\s"(.+?)"/i
+      type: access_common
+      fields:       [proxy_service,virtual_host,client_ip,remote_id,user,ts,method,path,http_version,status_code,size,url,user_agent]
+      dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
+      transform: !!js/function >
+        function (p) {
+          p.message = p.method + ' ' + p.virtual_host + p.path
+        }
     # Common Log Format
     - regex:        !!js/regexp /(^[0-9a-f.:]+)\s+(-|.+?)\s+(-|.+?)\s+\[([0-9]{2}\/[a-z]{3}\/[0-9]{4}\:[0-9]{2}:[0-9]{2}:[0-9]{2}[^\]]*)\] \"(\S+?)\s(\S*?)\s{0,1}(\S+?)\" ([0-9|\-]+) ([0-9|\-]+)/i
       type: access_common
@@ -195,8 +219,7 @@ patterns:
       transform: !!js/function >
         function (p) {
           p.message = p.method + ' ' + p.path
-        }
-
+        }    
     - type: access_log_combined
       regex: !!js/regexp /^([0-9a-f.:]+)\s(-|\S+)\s(-|\S+)\s\[([0-9]{2}\/[a-z]{3}\/[0-9]{4}\:[0-9]{2}:[0-9]{2}:[0-9]{2}[^\]]*)\] \"(\w+)\s(.*)\" ([0-9|\-]+) ([0-9|\-]+) \"([^\"]+)\" \"([^\"]+)\"/i
       fields: [client_ip,remote_id,user,'ts',method,path,status_code,size,referer,user_agent]

@@ -241,6 +241,14 @@ patterns:
       type: apache_mpm
       dateformat: ddd MMM DD hh:mm:ss.SSS YYYY
 
+- # Tutum Logs
+  sourceName: !!js/regexp /tutum\/cleanup/
+  match:
+    - type: tutum_cleanup
+      regex: !!js/regexp /^(\d+\/\d+\/\d+\s\d+:\d+:\d+)\s(.*)/
+      fields: [ts,message]
+      dateFormat: YYYY/MM/DD hh:mm:ss 
+
 - # Heroku Syslog Messages
   sourceName: !!js/regexp /syslog_framed|heroku/ 
   match:

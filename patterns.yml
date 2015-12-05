@@ -22,6 +22,10 @@ patterns:
       regex: !!js/regexp \[(\d{4}-\d{2}-\d{2}\s[\d+|\:]+.\d+)\]\[(.+?)\]\[(.+?)\s*\]\s*\[(.+?)\]\s([\s|\S]+)
       fields: [ts,severity,source,node_name,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
+    - type: elasticsearch
+      regex: !!js/regexp \[(\d{4}-\d{2}-\d{2}\s[\d+|\:]+.\d+)\]\[(.+?)\]\[(.+?)\s*\]\s*\s([\s|\S]+)
+      fields: [ts,severity,source,message]
+      dateFormat: YYYY-MM-DD HH:mm:ss,SS
 
 - # Apache Solr
   blockStart: !!js/regexp \d+\s+\S{3,5}\s

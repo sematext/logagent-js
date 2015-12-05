@@ -203,7 +203,7 @@ patterns:
   sourceName: !!js/regexp /httpd|access_log|apache2|nginx/
   match: 
     # nginx proxy jwilder/nginx-proxy
-    - regex:        !!js/regexp /(\S+)\s\|\s(\S+)\s([0-9a-f.:]+)\s+(-|.+?)\s+(-|.+?)\s\[(.*)\]\s"(.+?)\s(.+?)\s(.+?)"\s(\d+)\s(\d+)\s"(.+?)"\s"(.+?)"/i
+    - regex:        !!js/regexp /(\S+)\s+\|\s(\S+)\s+([0-9a-f.:]+)\s+(-|.+?)\s+(-|.+?)\s\[(.*)\]\s"(.+?)\s(.+?)\s(.+?)"\s(\d+)\s(\d+)\s"(.+?)"\s"(.+?)"/i
       type: access_common
       fields:       [proxy_service,virtual_host,client_ip,remote_id,user,ts,method,path,http_version,status_code,size,url,user_agent]
       dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ

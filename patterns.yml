@@ -9,11 +9,7 @@
 # Note: this function is not optimized (yet) and might take 10-15% of performance
 # autohash: !!js/regexp /user|client_ip|password|email|credit_card_number|payment_info/i
 
-#\[(\d{4}-\d{2}-\d{2}\s[\d+|\:]+.\d+)\]\[(.+?)\]\[(.+?)\s*\]\s*\[(.+?)\]\s([\s|\S]+)
-
 patterns:
-
-
 - # Elasticsearch 
   blockStart: !!js/regexp /\d{4}-\d{2}-\d{2}\s[\d+|\:]+.\d+|log4j\:\S+\s/
   sourceName: !!js/regexp /elasticsearch/
@@ -223,7 +219,17 @@ patterns:
       transform: !!js/function >
         function (p) {
           p.message = p.method + ' ' + p.path
-        }    
+        } 
+
+    - regex: !!js/regexp /^(\S+)\s+(-|.+?)\s+(-|.+?)\s+\[(.*)\]\s\"(\S+)\s(\S+)\s(\S+)\s(\d+)\s(\d+)/i
+      type: access_common
+      fields:       [client_ip,remote_id,user,ts,method,path,http_version,status_code,size]
+      dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
+      transform: !!js/function >
+        function (p) {
+          p.message = p.method + ' ' + p.path
+        } 
+
     - type: access_log_combined
       regex: !!js/regexp /^([0-9a-f.:]+)\s(-|\S+)\s(-|\S+)\s\[([0-9]{2}\/[a-z]{3}\/[0-9]{4}\:[0-9]{2}:[0-9]{2}:[0-9]{2}[^\]]*)\] \"(\w+)\s(.*)\" ([0-9|\-]+) ([0-9|\-]+) \"([^\"]+)\" \"([^\"]+)\"/i
       fields: [client_ip,remote_id,user,'ts',method,path,status_code,size,referer,user_agent]

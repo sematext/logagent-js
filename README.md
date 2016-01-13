@@ -29,8 +29,17 @@ The parser detects log formats based on a pattern library (yaml file) and conver
 - transform function to manipulate parsed objects
 - unmatched lines end up with timestamp and original line in the message field
 - JSON lines are parsed, and scanned for @timestamp and time fields (logstash and bunyan format)
-- default patterns for:
-  - MongoDB, 
+- default patterns for many applications (see below)
+- Heroku logs
+
+To test patterns or convert logs from text to JSON use the command line tool 'logagent'. 
+It reads from stdin and outputs line delimited JSON (or pretty JSON or YAML) to the console. 
+In addtion it can forward the parsed objects directly to [Logsene](http://sematext.com/logsene).
+
+# Pattern definitions
+
+The default pattern definition file include already patterns for:
+- MongoDB, 
   - MySQL, 
   - Nginx, 
   - Redis, 
@@ -45,13 +54,6 @@ The parser detects log formats based on a pattern library (yaml file) and conver
     - Hadoop YARN Node Manager, 
     - Apache SOLR,
   - various Linux/Mac OS X system log files 
-  - Heroku logs
-
-To test patterns or convert logs from text to JSON use the command line tool 'logagent'. 
-It reads from stdin and outputs line delimited JSON (or pretty JSON or YAML) to the console. 
-In addtion it can forward the parsed objects directly to [Logsene](http://sematext.com/logsene).
-
-# Pattern definitions file
 
 The file format is based on [JS-YAML](https://nodeca.github.io/js-yaml/), in short:
 

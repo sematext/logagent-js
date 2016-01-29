@@ -209,8 +209,14 @@ patterns:
       dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
       transform: !!js/function >
         function (p) {
-          p.message = p.method + ' ' + p.virtual_host + p.path
-        }
+          p.message = p.method + ' ' + p.path
+          if(p.status_code === '-') {
+            p.status_code = 0
+          }
+          if(p.size === '-') {
+            p.size = 0
+          }
+        } 
     # Common Log Format
     - regex:        !!js/regexp /(^[0-9a-f.:]+)\s+(-|.+?)\s+(-|.+?)\s+\[([0-9]{2}\/[a-z]{3}\/[0-9]{4}\:[0-9]{2}:[0-9]{2}:[0-9]{2}[^\]]*)\] \"(\S+?)\s(\S*?)\s{0,1}(\S+?)\" ([0-9|\-]+) ([0-9|\-]+)/i
       type: access_common
@@ -219,21 +225,43 @@ patterns:
       transform: !!js/function >
         function (p) {
           p.message = p.method + ' ' + p.path
+          if(p.status_code === '-') {
+            p.status_code = 0
+          }
+          if(p.size === '-') {
+            p.size = 0
+          }
         } 
 
-    - regex: !!js/regexp /^(\S+)\s+(-|.+?)\s+(-|.+?)\s+\[(.*)\]\s\"(\S+)\s(\S+)\s(\S+)\s(\d+)\s(\d+)/i
+    - regex: !!js/regexp /^(\S+)\s+(-|.+?)\s+(-|.+?)\s+\[(.*)\]\s\"(\S+)\s(\S+)\s(\S+)\s(\d+)\s([\d+|\"-\"])/i
       type: access_common
       fields:       [client_ip,remote_id,user,ts,method,path,http_version,status_code,size]
       dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
       transform: !!js/function >
         function (p) {
           p.message = p.method + ' ' + p.path
+          if(p.status_code === '-') {
+            p.status_code = 0
+          }
+          if(p.size === '-') {
+            p.size = 0
+          }
         } 
 
     - type: access_log_combined
       regex: !!js/regexp /^([0-9a-f.:]+)\s(-|\S+)\s(-|\S+)\s\[([0-9]{2}\/[a-z]{3}\/[0-9]{4}\:[0-9]{2}:[0-9]{2}:[0-9]{2}[^\]]*)\] \"(\w+)\s(.*)\" ([0-9|\-]+) ([0-9|\-]+) \"([^\"]+)\" \"([^\"]+)\"/i
       fields: [client_ip,remote_id,user,'ts',method,path,status_code,size,referer,user_agent]
       dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
+      transform: !!js/function >
+        function (p) {
+          p.message = p.method + ' ' + p.path
+          if(p.status_code === '-') {
+            p.status_code = 0
+          }
+          if(p.size === '-') {
+            p.size = 0
+          }
+        } 
     
     - type: nginx_error_log 
       regex: !!js/regexp /^(\d{4}\/\d{2}\/\d{2}\s[\d|\:]+)\s\[(.+?)]\s(\d+)#(\d+)\:\s(.*)/

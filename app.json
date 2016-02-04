@@ -1,7 +1,7 @@
 {
   "name": "logagent-js",
-  "website":"https://sematext.com/logsene/",
-  "description": "Logagent is a Heroku HTTPS log drain to store Logs in Logsene. Setup: heroku drains:add https://mylogagent.herokuapp.com/LOGSENE_TOKEN -a myapp",
+  "website": "https://sematext.com/logsene/",
+  "description": "Logagent as Log Drain for Logsene. Setup: heroku drains:add https://mylogagent.herokuapp.com/LOGSENE_TOKEN -a myapp",
   "repository": "https://github.com/sematext/logagent-js.git",
   "logo": "https://node-js-sample.herokuapp.com/node.svg",
   "keywords": ["node", "logs", "logging", "search", "solr", "lucene", "elasticsearch"]

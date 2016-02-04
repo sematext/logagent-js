@@ -1,7 +1,8 @@
+[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+
 # logagent-js
 
 Smart Log Parser and Log Shipper written in Node. 
-[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
 Key features: 
 - intelligent pattern matching

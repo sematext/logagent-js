@@ -1,0 +1,7 @@
+{
+  "name": "logagent-js",
+  "description": "Smart Log Parser and Log Shipper written in Node.",
+  "repository": "https://github.com/sematext/logagent-js.git",
+  "logo": "https://node-js-sample.herokuapp.com/node.svg",
+  "keywords": ["node", "logs", "logging", "search", "solr", "lucene", "elasticsearch"]
+}

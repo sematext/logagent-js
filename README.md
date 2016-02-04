@@ -190,7 +190,10 @@ heroku drain:add --app HerokuAppName URL
 
 To receive Heroku logs, logagent-js can be deployed to Heroku. It acts as HTTPS log drain. 
 
-1.  deploy logagent-js to Heroku 
+1. Get a free account [apps.sematext.com](https://apps.sematext.com/users-web/register.do)  
+2. Create a [Logsene](http://www.sematext.com/logsene/) App to obtain the Logsene Token
+3.  deploy logagent-js to Heroku 
+Use this button [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy) or use this commands:
   ```
   git clone https://github.com/sematext/logagent-js.git
   cd logagent-js
@@ -198,11 +201,7 @@ To receive Heroku logs, logagent-js can be deployed to Heroku. It acts as HTTPS 
   heroku create
   git push heroku master
   ```
-  
-  Or use this button
-  [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
-
-2. Add the the log drain.  
+4. Add the the log drain.  
   The URL format is https://loggerAppName.herokuapps.com/LOGSENE_TOKEN
   Use following command, using the dynamically given name from "heroku create".
 

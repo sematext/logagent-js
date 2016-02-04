@@ -113,17 +113,18 @@ function getLoggerForToken (token, type) {
 }
 
 function herokuHandler (req, res) {
-  try { 
+  try {
     var path = req.url.split('/')
-    var token = undefined
+    var token = null
     if (path.length > 1) {
-      if(path[1] && path[1].length>12)
-      token = path[1]
+      if (path[1] && path[1].length > 12) {
+        token = path[1]
+      }
     }
     console.log(token + '  path:' + path)
-    console.log(JSON.stringify (req.headers))
+    console.log(JSON.stringify(req.headers))
     if (!token) {
-      res.end('Error: Missing Logsene Token ' + req.url)
+      res.end('<html><body>Error: Missing Logsene Token ' + req.url + '. Please use /LOGSENE_TOKEN more info <a href="https://github.com/sematext/logagent-js#logagent-as-heroku-log-drain"></a>Heroku Log Drain for Logsene<br/> <a href="https://www.sematext.com/logsene/">Logsene Log Management</a></body><html>')
       return
     }
     var body = ''
@@ -135,8 +136,8 @@ function herokuHandler (req, res) {
       console.log(lines)
       lines.forEach(function () {
         parseLine(body, argv.n || 'heroku', function (err, data) {
-          if(data) {
-              data.headers = req.headers
+          if (data) {
+            data.headers = req.headers
           }
           getLoggerForToken(token, 'heroku')(err, data)
         })
@@ -150,7 +151,7 @@ function herokuHandler (req, res) {
 // heroku start function for WEB_CONCURENCY
 function start () {
   getHttpServer(argv.heroku, herokuHandler)
-  process.on('SIGTERM', function() {
+  process.on('SIGTERM', function () {
     terminate('exitWorker')
     console.log('Worker exiting')
   })
@@ -232,7 +233,7 @@ function parseLine (line, sourceName, cbf) {
 
 function readStdIn () {
   var rl = readline.createInterface({
-  	terminal: false,
+    terminal: false,
     input: process.stdin
   })
   rl.on('line', parseLine)
@@ -241,8 +242,8 @@ function readStdIn () {
 }
 
 function terminate (reason) {
-  if (argv.heroku &&  reason !== 'exitWorker') {
-      return
+  if (argv.heroku && reason !== 'exitWorker') {
+    return
   }
   var duration = new Date().getTime() - begin
   var throughput = count / (duration / 1000)

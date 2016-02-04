@@ -149,6 +149,16 @@ patterns:
     regex: !!js/regexp /^(.*)/i
     fields: message
 
+- # Sonatype Nexus
+  sourceName: !!js/regexp /nexus/
+  # YYYY-MM-DD starts a new log entry
+  blockStart: !!js/regexp \d{4}-\d{2}-\d{2}
+  match:
+    - type: nexus
+      regex: !!js/regexp /([\d|\-|\s|\:|\.|\,|\+]+)\s+([A-Z]+)\s+[^\[]*\[\s*([^\]]+)\]\s(\*?\w+)\s+([\w|\.]+)\W+(.+)/
+      fields: [ts,severity,thread,user,class,message]
+      dateFormat: YYYY-MM-DD HH:mm:ss,SSSZ
+
 - # NodeBB Forum
   sourceName: !!js/regexp /nodebb/i
   match:

@@ -1,4 +1,4 @@
-[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/sematext/logagent-js)
 
 # logagent-js
 
@@ -194,7 +194,7 @@ To receive Heroku logs, logagent-js can be deployed to Heroku. It acts as HTTPS 
 2. Create a [Logsene](http://www.sematext.com/logsene/) App to obtain the Logsene Token
 3. Deploy logagent-js to Heroku 
 
-Use this button [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy) or the following commands:
+![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/sematext/logagent-js) or use the following commands:
 
   ```
   git clone https://github.com/sematext/logagent-js.git

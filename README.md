@@ -1,6 +1,7 @@
 # logagent-js
 
 Smart Log Parser and Log Shipper written in Node. 
+[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
 Key features: 
 - intelligent pattern matching
@@ -31,6 +32,8 @@ The parser detects log formats based on a pattern library (yaml file) and conver
 - JSON lines are parsed, and scanned for @timestamp and time fields (logstash and bunyan format)
 - default patterns for many applications (see below)
 - Heroku logs
+
+
 
 To test patterns or convert logs from text to JSON use the command line tool 'logagent'. 
 It reads from stdin and outputs line delimited JSON (or pretty JSON or YAML) to the console. 
@@ -194,6 +197,9 @@ To receive Heroku logs, logagent-js can be deployed to Heroku. It acts as HTTPS 
   heroku create
   git push heroku master
   ```
+  
+  Or use this button
+  [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
 2. Add the the log drain.  
   The URL format is https://loggerAppName.herokuapps.com/LOGSENE_TOKEN

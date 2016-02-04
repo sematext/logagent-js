@@ -124,7 +124,8 @@ function herokuHandler (req, res) {
     console.log(token + '  path:' + path)
     console.log(JSON.stringify(req.headers))
     if (!token) {
-      res.end('<html><body>Error: Missing Logsene Token ' + req.url + '. Please use /LOGSENE_TOKEN more info <a href="https://github.com/sematext/logagent-js#logagent-as-heroku-log-drain"></a>Heroku Log Drain for Logsene<br/> <a href="https://www.sematext.com/logsene/">Logsene Log Management</a></body><html>')
+      res.end('<html><head><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"</head><body><div class="alert alert-danger" role="alert">Error: Missing Logsene Token ' 
+              + req.url + '. Please use /LOGSENE_TOKEN. More info: <ul><li><a href="https://github.com/sematext/logagent-js#logagent-as-heroku-log-drain">Heroku Log Drain for Logsene</a> </li><li><a href="https://www.sematext.com/logsene/">Logsene Log Management by Sematext</a></li></ul></div></body><html>')
       return
     }
     var body = ''

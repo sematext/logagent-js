@@ -3,6 +3,6 @@
   "website": "https://sematext.com/logsene/",
   "description": "Logagent as Log Drain. Setup: heroku drains:add https://mylogagent.herokuapp.com/LOGSENE_TOKEN -a myapp",
   "repository": "https://github.com/sematext/logagent-js.git",
-  "logo": "https://node-js-sample.herokuapp.com/node.svg",
+  "logo": "https://pbs.twimg.com/profile_images/502764375774486528/mxRBQgzI.png",
   "keywords": ["node", "logs", "logging", "search", "solr", "lucene", "elasticsearch"]
 }

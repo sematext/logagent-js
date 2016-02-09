@@ -1,8 +1,22 @@
 {
-  "name": "logagent-js",
-  "website": "https://sematext.com/logsene/",
-  "description": "Logagent as Log Drain. Setup: heroku drains:add https://mylogagent.herokuapp.com/LOGSENE_TOKEN -a myapp",
-  "repository": "https://github.com/sematext/logagent-js.git",
-  "logo": "https://pbs.twimg.com/profile_images/502764375774486528/mxRBQgzI.png",
-  "keywords": ["node", "logs", "logging", "search", "solr", "lucene", "elasticsearch"]
+    "name": "Logagent-js",
+    "description": "Ships Heroku Logs to Logsene / ELK. Setup: heroku drains:add https://mylogagent.herokuapp.com/LOGSENE_TOKEN -a myapp",
+    "website": "https://sematext.com/logsene/",
+    "repository": "https://github.com/sematext/logagent-js.git",
+    "logo": "https://pbs.twimg.com/profile_images/502764375774486528/mxRBQgzI.png",
+    "success_url": "/",
+    "keywords": [
+        "log management",
+        "log analytics",
+        "log shipper",
+        "log shipping",
+        "log agent",
+        "centralized logging",
+        "elk",
+        "kibana",
+        "log drain",
+        "elasticsearch",
+        "splunk alternative"
+    ],
+    "generator": "https://www.expeditedssl.com/heroku-button-maker"
 }

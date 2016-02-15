@@ -9,6 +9,15 @@
 # Note: this function is not optimized (yet) and might take 10-15% of performance
 # autohash: !!js/regexp /user|client_ip|password|email|credit_card_number|payment_info/i
 
+#globalTransform: !!js/function >
+#  function (source, parsedObject) {
+#    // this function is called after parsing
+#    // regardless of the logging source 
+#    // for pattern specific functions use transform in pattern definitions
+#  }
+
+originalLine: true 
+
 patterns:
 - # Elasticsearch 
   blockStart: !!js/regexp /\d{4}-\d{2}-\d{2}\s[\d+|\:]+.\d+|log4j\:\S+\s/

@@ -3,13 +3,12 @@
 /*
  * @copyright Copyright (c) Sematext Group, Inc. - All Rights Reserved
  *
- * @licence logparser-js is free-to-use, proprietary software.
+ * @licence logagent-js is free-to-use, proprietary software.
  * THIS IS PROPRIETARY SOURCE CODE OF Sematext Group, Inc. (Sematext)
  * This source code may not be copied, reverse engineered, or altered for any purpose.
  * This source code is to be used exclusively by users and customers of Sematext.
  * Please see the full license (found in LICENSE in this distribution) for details on its license and the licenses of its dependencies.
  */
-
 var argv = require('minimist')(process.argv.slice(2))
 var prettyjson = require('prettyjson')
 var LogAnalyzer = require('../lib/index.js')
@@ -29,6 +28,9 @@ var http = require('http')
 var loggers = {}
 var throng = require('throng')
 var WORKERS = process.env.WEB_CONCURRENCY || 1
+var dgram = require('dgram');
+var udpClient = dgram.createSocket('udp4') 
+var flat = require('flat')
 
 process.on('beforeExit', function () {})
 function getFilesizeInBytes (filename) {
@@ -82,9 +84,9 @@ function getLoggerForToken (token, type) {
   return function (err, data) {
     if (!err && data) {
       log(err, msg)
-      data.ts = null
+      delete data.ts
       //delete data.ts
-      // data['_type'] = type
+      data['_type'] = type
       var msg = data
       if (type === 'heroku') {
         msg = {
@@ -217,6 +219,7 @@ function log (err, data) {
   if (argv.s) {
     return
   }
+  
   if (argv.p) {
     console.log(JSON.stringify(data, null, '\t'))
   } else if (argv.y) {
@@ -224,8 +227,32 @@ function log (err, data) {
   } else {
     console.log(JSON.stringify(data))
   }
+  if(argv['rtail-port']) {
+    var ts = data['@timestamp'] 
+    delete data['@timestamp']
+    delete data['originalLine']
+    delete data['ts']
+    var type = data['_type']
+    delete data['_type']
+    var message = new Buffer(JSON.stringify({
+      timestamp: ts || new Date(), 
+      content: data, //prettyJs(data),
+      id: type || argv.n || 'logs'
+    })) 
+    udpClient.send(message, 0, message.length, argv['rtail-port'], argv['rtail-host']||'localhost', function (err) {
+      // udpClient.close();
+    })
+  }
 }
 
+function prettyJs(o) {
+  var rv = ''
+  var f = flat(o)
+  Object.keys(f).forEach(function(key, i) {
+    rv += key + ': ' + f[key] + ' '
+  })
+  return rv
+}
 function parseLine (line, sourceName, cbf) {
   bytes += line.length
   count++
@@ -266,6 +293,11 @@ function terminate (reason) {
   setTimeout(function () {
     process.exit()
   }, 1000)
+}
+if (argv['rtail-web-port']) {
+  process.argv = [process.argv[0], process.argv[1], '--web-port', String(argv['rtail-web-port'])]
+  console.log(process.argv)
+  require('rtail/cli/rtail-server.js')
 }
 if (argv.cfhttp) {
   getHttpServer(argv.cfhttp, cloudFoundryHandler)

@@ -65,7 +65,7 @@ Test your patterns:
 cat some.log | bin/logagent -y -f mypatterns.yml
 ```
 
-# Installation for the command line tool 
+# Installation 
 
 ## Get Node.js (debian/ubuntu)
 
@@ -76,7 +76,7 @@ curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
 
-# Install logagent-js command line tool
+## Install logagent-js 
 ```
 npm i -g logagent-js
 # ship all your logs to Logsene, parsed with timestamps - output on console in YAML format (-y)

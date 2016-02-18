@@ -269,6 +269,19 @@ function readStdIn () {
   rl.on('finish', terminate)
 }
 
+function rtailServer() {
+  // console.log(process.argv)
+  try {
+    process.argv = [process.argv[0], process.argv[1], '--web-port', String(argv['rtail-web-port'])]
+    require('rtail/cli/rtail-server.js')
+  } catch (err) {
+    console.log(err)
+    console.log('rtail is not installed. To start rtail server with logagent run:')
+    console.log('    npm i rtail -g')
+    setTimeout(process.exit, 300)
+  }
+}
+
 function terminate (reason) {
   if (argv.heroku && reason !== 'exitWorker') {
     return
@@ -294,34 +307,38 @@ function terminate (reason) {
     process.exit()
   }, 1000)
 }
-if (argv['rtail-web-port']) {
-  process.argv = [process.argv[0], process.argv[1], '--web-port', String(argv['rtail-web-port'])]
-  console.log(process.argv)
-  require('rtail/cli/rtail-server.js')
-}
-if (argv.cfhttp) {
-  getHttpServer(argv.cfhttp, cloudFoundryHandler)
-}
-if (argv.heroku) {
-  throng(start, {
-    workers: WORKERS,
-    lifetime: Infinity
-  })
-}
-if (argv._.length > 0) {
-  // tail files
-  tailFiles(argv._)
-} else if (globPattern) {
-  // checks for file list and start tail for all files
-  console.log('using glob pattern: ' + globPattern)
-  tailFilesFromGlob(globPattern)
-} else if (argv.u) {
-  try {
-    getSyslogServer(logseneToken, argv.u)
-  } catch (err) {
-    console.error(err)
-    process.exit(-1)
+
+function cli() {
+  if (argv['rtail-web-port']) {
+    console.log('loading rtail')
+    rtailServer()
   }
-} else {
-  readStdIn()
+  if (argv.cfhttp) {
+    getHttpServer(argv.cfhttp, cloudFoundryHandler)
+  }
+  if (argv.heroku) {
+    throng(start, {
+      workers: WORKERS,
+      lifetime: Infinity
+    })
+  }
+  if (argv._.length > 0) {
+    // tail files
+    tailFiles(argv._)
+  } else if (globPattern) {
+    // checks for file list and start tail for all files
+    console.log('using glob pattern: ' + globPattern)
+    tailFilesFromGlob(globPattern)
+  } else if (argv.u) {
+    try {
+      getSyslogServer(logseneToken, argv.u)
+    } catch (err) {
+      console.error(err)
+      process.exit(-1)
+    }
+  } else {
+    readStdIn()
+  }
 }
+cli()
+

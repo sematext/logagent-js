@@ -1,4 +1,4 @@
-[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/sematext/logagent-js)
+[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/sematext/logagent-js) - [read more](http://blog.sematext.com/2016/02/18/how-to-ship-heroku-logs-to-logsene-managed-elk-stack/)
 
 # logagent-js
 
@@ -40,64 +40,6 @@ To test patterns or convert logs from text to JSON use the command line tool 'lo
 It reads from stdin and outputs line delimited JSON (or pretty JSON or YAML) to the console. 
 In addtion it can forward the parsed objects directly to [Logsene](http://sematext.com/logsene).
 
-# Pattern definitions
-
-The default pattern definition file include already patterns for:
-- MongoDB, 
-  - MySQL, 
-  - Nginx, 
-  - Redis, 
-  - Elasticsearch
-  - Apache 
-    - Webserver (httpd), 
-    - Zookeeper, 
-    - Cassandra, 
-    - Kafka,
-    - HBase HDFS Data Node,
-    - HBase Region Server,
-    - Hadoop YARN Node Manager, 
-    - Apache SOLR,
-  - various Linux/Mac OS X system log files 
-
-The file format is based on [JS-YAML](https://nodeca.github.io/js-yaml/), in short:
-
-- - indicates an  array
-- !js/regexp - indicates a JS regular expression
-- !!js/function > - indicates a JS function 
-
-Properties:
-- patterns - the list of patterns, each pattern starts with "-"
-- match: A group of patterns for a specific log source
-- regex: a JS regular expression 
-- fields: the field list of extracted match groups from the regex
-- type: the type used in Logsene (Elasticsearch Mapping)
-- dateFormat: the format of the special fields 'ts', if the date format matches, a new field @timestamp is generated
-- transform: a JS function to manipulate the result of regex and date parsing
-
-Example:
-
-```
-# Sensitive data can be replaced with a hashcode (sha1)
-# it applies to fields matching the field names by a regular expression
-# Note: this function is not optimized (yet) and might take 10-15% of performance
-# autohash: !!js/regexp /user|client_ip|password|email|credit_card_number|payment_info/i
-
-patterns: 
-  - # APACHE  Web Logs
-  sourceName: httpd
-  match: 
-    # Common Log Format
-    - regex:        !!js/regexp /([0-9a-f.:]+)\s+(-|.+?)\s+(-|.+?)\s+\[([0-9]{2}\/[a-z]{3}\/[0-9]{4}\:[0-9]{2}:[0-9]{2}:[0-9]{2}[^\]]*)\] \"(\S+?)\s(\S*?)\s{0,1}(\S+?)\" ([0-9|\-]+) ([0-9|\-]+)/i
-      type: apache_access_common
-      fields:       [client_ip,remote_id,user,ts,method,path,http_version,status_code,size]
-      dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
-      transform: !!js/function >
-        function (p) {
-          p.message = p.method + ' ' + p.path
-        }
-```
-
-The default patterns are [here](/patterns.yml) - contributions are welcome.
 
 # Use logagent-js in Node
 
@@ -127,36 +69,36 @@ cat some.log | bin/logagent -y -f mypatterns.yml
 
 ## Get Node.js (debian/ubuntu)
 
+Official Node.js [downloads and instructions](https://nodejs.org/en/download/).
+E.g. for Debian/Ubuntu:
 ```
-# Note the new setup script name for Node.js v0.12
-curl -sL https://deb.nodesource.com/setup_0.12 | sudo bash -
-# Then install with:
+curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
 
 # Install logagent-js command line tool
 ```
 npm i -g logagent-js
-# ship all your logs to logsene, parsed, timestamped - displyed on console in YAML format (-y)
+# ship all your logs to Logsene, parsed with timestamps - output on console in YAML format (-y)
 logagent -t LOGSENE_TOKEN -y /var/log/*.log
 ```
 
 ## CLI Parameters:
 
-- -f file with pattern definitions 
-- -y prints parsed messages in YAML format
-- -p pretty json output
-- -s silent, print only throughput and memory usage on exit
-- -t token [Logsene](http://sematext.com/logsene) App Token to insert parsed records into Logsene.
-- -g use a [glob](https://www.npmjs.com/package/glob) pattern to watch log files e.g. -g "{/var/log/*.log,/Users/stefan/*/*.log}" 
-- -u UDP_PORT starts a syslogd UDP listener on the given port to act as syslogd
-- -n name for the source only when stdin is used (e.g. cat zookeeper.log | logagent -n zookeeper), important to make
+- __-f__ file with pattern definitions 
+- __-y__ prints parsed messages in YAML format
+- __-p__ pretty json output
+- __-s__ silent, print no logss, only throughput and memory usage on exit
+- __-t__ token [Logsene](http://sematext.com/logsene) App Token to insert parsed records into Logsene.
+- __-g__ use a [glob](https://www.npmjs.com/package/glob) pattern to watch log files e.g. -g "{/var/log/*.log,/Users/stefan/*/*.log}" 
+- __-u__ UDP_PORT starts a syslogd UDP listener on the given port to act as syslogd
+- __-n__ name for the source only when stdin is used (e.g. cat zookeeper.log | logagent -n zookeeper), important to make
   multi-line patterns working on stdin because the status is tracked by the source name. 
-- --heroku PORT listens for heroku logs (http drain / framed syslog over http) 
-- --cfhttp PORT listens for CloudFoundry logs (syslog over http)
-- --rtail-port forwards logs via udp to [rtail](http://rtail.org/) server 
-- --rtail-host hostname [rtail](http://rtail.org/) server (UI for realtime logs), default: localhost
-- list of files, watched by tail-forver starting at end of file to watch
+- __--heroku__ PORT listens for heroku logs (http drain / framed syslog over http) 
+- __--cfhttp__ PORT listens for CloudFoundry logs (syslog over http)
+- __--rtail-port__ forwards logs via udp to [rtail](http://rtail.org/) server 
+- __--rtail-host__ hostname [rtail](http://rtail.org/) server (UI for realtime logs), default: localhost
+- __list of files__, e.g. /var/log/*.log watched by tail-forver starting at end of file to watch
 
 The default output is line delimited JSON.
 
@@ -183,6 +125,24 @@ Watch selective log output on console by passing logs via stdin and format in YA
 tail -f /var/log/access.log | logagent -y 
 tail -f /var/log/system.log | logagent -f my_own_patterns.yml  -y 
 ```
+
+Ship logs to rtail and Logsene to view logs in real-time in rtail and store logs in Logsene
+
+```
+# rtail don't need to be installed, logagent uses the rtail protocol
+logagent -t $LOGSENE_TOKEN --rtail-host myrtailserver --rtail-port 9999 /var/log/*.log
+```
+
+Logagent can start the rtail web-server (in-process, saving memory), open browser with http://localhost:8080
+```
+# logagent has no dependency to rtail, to keep the package small
+sudo npm i rtail -g
+logagent -s -t $LOGSENE_TOKEN --rtail-web-port 8080 --rtail-port 9999 /var/log/*.log
+```
+
+And of course you can combine rtail and Logagent in the traditional way, simply connect both via unix pipes. An example with rtail and Logsene storage and charts:
+![](http://g.recordit.co/usjLitb3Dd.gif)
+
 # Logagent as Heroku log drain
 
 [Heroku](http://www.heroku.com) can forward logs to a [Log Drain](https://devcenter.heroku.com/articles/log-drains) 
@@ -272,6 +232,66 @@ Start the service
 ```
 systemctl start logagent
 ```
+
+# Pattern definitions
+
+The default pattern definition file include already patterns for:
+- MongoDB, 
+  - MySQL, 
+  - Nginx, 
+  - Redis, 
+  - Elasticsearch
+  - Apache 
+    - Webserver (httpd), 
+    - Zookeeper, 
+    - Cassandra, 
+    - Kafka,
+    - HBase HDFS Data Node,
+    - HBase Region Server,
+    - Hadoop YARN Node Manager, 
+    - Apache SOLR,
+  - various Linux/Mac OS X system log files 
+
+The file format is based on [JS-YAML](https://nodeca.github.io/js-yaml/), in short:
+
+- - indicates an  array
+- !js/regexp - indicates a JS regular expression
+- !!js/function > - indicates a JS function 
+
+Properties:
+- patterns - the list of patterns, each pattern starts with "-"
+- match: A group of patterns for a specific log source
+- regex: a JS regular expression 
+- fields: the field list of extracted match groups from the regex
+- type: the type used in Logsene (Elasticsearch Mapping)
+- dateFormat: the format of the special fields 'ts', if the date format matches, a new field @timestamp is generated
+- transform: a JS function to manipulate the result of regex and date parsing
+
+Example:
+
+```
+# Sensitive data can be replaced with a hashcode (sha1)
+# it applies to fields matching the field names by a regular expression
+# Note: this function is not optimized (yet) and might take 10-15% of performance
+# autohash: !!js/regexp /user|client_ip|password|email|credit_card_number|payment_info/i
+
+patterns: 
+  - # APACHE  Web Logs
+  sourceName: httpd
+  match: 
+    # Common Log Format
+    - regex:        !!js/regexp /([0-9a-f.:]+)\s+(-|.+?)\s+(-|.+?)\s+\[([0-9]{2}\/[a-z]{3}\/[0-9]{4}\:[0-9]{2}:[0-9]{2}:[0-9]{2}[^\]]*)\] \"(\S+?)\s(\S*?)\s{0,1}(\S+?)\" ([0-9|\-]+) ([0-9|\-]+)/i
+      type: apache_access_common
+      fields:       [client_ip,remote_id,user,ts,method,path,http_version,status_code,size]
+      dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
+      transform: !!js/function >
+        function (p) {
+          p.message = p.method + ' ' + p.path
+        }
+```
+
+The default patterns are [here](/patterns.yml) - contributions are welcome.
+
 
 # Related packages
 

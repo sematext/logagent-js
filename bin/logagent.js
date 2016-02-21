@@ -9,6 +9,19 @@
  * This source code is to be used exclusively by users and customers of Sematext.
  * Please see the full license (found in LICENSE in this distribution) for details on its license and the licenses of its dependencies.
  */
+ var fs = require('fs')
+ try {
+    // read cli paramters from config file
+    var cfgArgs = fs.readFileSync(process.env.LOGAGENT_CONFIG || '/etc/sematext/logagent.conf').toString()
+    cfgArgs = cfgArgs.split(/\s/)
+    cfgArgs = cfgArgs.filter(function(v){
+      return v !== ''
+    })
+    process.argv = [process.argv[0], process.argv[1]].concat(cfgArgs)
+    console.log (process.argv)
+ } catch (err) {
+    // ignore
+ }
 var argv = require('minimist')(process.argv.slice(2))
 var prettyjson = require('prettyjson')
 var LogAnalyzer = require('../lib/index.js')

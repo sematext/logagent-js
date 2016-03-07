@@ -19,7 +19,14 @@
 originalLine: true 
 
 patterns:
-- # Elasticsearch 
+ - # kubernetes hyperkube
+  sourcName: !!js/regexp /hyperkube/
+  match:
+    - type: hyperkube
+      regex: !!js/regexp /\S+\s(\S+)\s+\S+\s+\S+\s([GET|POST|PUT|DELETE|HEAD|OPTIONS]+)\s+(\/.+)\:\s\(([\d|\.]+)(\S+)\)\s(\d+\s)(.*hyperkube.+)\s(.+)\:(\d+)\]/i
+      fields: [ts,method,url,duration,duration_unit,status_code,info,ip,port]
+      dateFormat: HH:mm:ss:S
+ - # Elasticsearch 
   blockStart: !!js/regexp /\d{4}-\d{2}-\d{2}\s[\d+|\:]+.\d+|log4j\:\S+\s/
   sourceName: !!js/regexp /elasticsearch/
   match:
@@ -32,8 +39,7 @@ patterns:
       fields: [ts,severity,source,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
 
-
-- # Apache Solr
+ - # Apache Solr
   blockStart: !!js/regexp ^\S+\s+-\s\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3}|^\d+\s+\S{3,5}\s+
   sourceName: !!js/regexp /solr/i
   match:
@@ -79,7 +85,7 @@ patterns:
       regex: !!js/regexp ^(\d+)\s+(\S+)\s+\((\S+)\)\s+\[(.+?)\]\s(\S+)\s(.+)
       fields: [relative_ts,severity,thread,thread_id,class,message]
 
-- # Apache Kafka
+ - # Apache Kafka
   sourceName: !!js/regexp /kafka/
   match:
     - type: apache_kafka
@@ -87,7 +93,7 @@ patterns:
       fields: [ts,severity,message]
       dateFormat: YYYY-MM-DD HH:mm:ss
 
-- # Apache HDFS Data Node
+ - # Apache HDFS Data Node
   blockStart: !!js/regexp \d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+\s(\S+)\s/
   sourceName: !!js/regexp /hdfs/
   match:
@@ -96,7 +102,7 @@ patterns:
       fields: [ts,severity,class,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
 
-- # Apache HBase Region Server
+ - # Apache HBase Region Server
   blockStart: !!js/regexp \d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+\s(\S+)\s/
   sourceName: !!js/regexp /hbase/
   match:
@@ -105,7 +111,7 @@ patterns:
       fields: [ts,severity,thread,class,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
 
-- # Apache YARN
+ - # Apache YARN
   sourceName: !!js/regexp /yarn/
   match:
     - type: apache_hadoop_yarn_node_manager
@@ -113,7 +119,7 @@ patterns:
       fields: [ts,severity,class_name,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
 
-- # Apache Zookeeper
+ - # Apache Zookeeper
   sourceName: !!js/regexp /zookeeper|zk/
   blockStart: !!js/regexp /^\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+\s+/
   match:
@@ -122,7 +128,7 @@ patterns:
       fields: [ts,pid,severity,thread_info,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
 
-- # Apache Cassandra
+ - # Apache Cassandra
   sourceName: !!js/regexp cassandra
   # multi-line, start sequence
   blockStart: !!js/regexp ^\S+\s\[.+\]\s\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+\s
@@ -132,7 +138,7 @@ patterns:
       fields: [severity,module,ts,java_file,code_line,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
 
-- # MongoDB
+ - # MongoDB
   # name of the docker image
   sourceName: !!js/regexp /mongo/
   # 2015-07-28T00:35:46.329+0000 I JOURNAL  [initandlisten] journal dir=/data/db/journal
@@ -142,7 +148,7 @@ patterns:
       fields:  [ts,severity, component, context, message]
       dateFormat: YYYY-MM-DDTHH:mm:ss.SSZ
 
-- # REDIS
+ - # REDIS
   # name of the docker image
   # example: "1:M 22 Jul 21:58:28.146 # Server started, Redis version 3.0.2"
   sourceName: !!js/regexp /redis/i
@@ -158,7 +164,7 @@ patterns:
     regex: !!js/regexp /^(.*)/i
     fields: message
 
-- # Sonatype Nexus
+ - # Sonatype Nexus
   sourceName: !!js/regexp /nexus/
   # YYYY-MM-DD starts a new log entry
   blockStart: !!js/regexp \d{4}-\d{2}-\d{2}
@@ -168,7 +174,7 @@ patterns:
       fields: [ts,severity,thread,user,class,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SSSZ
 
-- # NodeBB Forum
+ - # NodeBB Forum
   sourceName: !!js/regexp /nodebb/i
   match:
   - type: nodebb_forum
@@ -178,7 +184,7 @@ patterns:
   - type: nodebb_forum
     fields: [ts,severity,message]
     regex: !!js/regexp /(\d{4}\-\d{2}\-\d{1,2}T\d\d:\d\d:\d\d\.\d+Z)\s-\s(\w+):\s(.*)/
-- # mysql
+ - # mysql
   # 2015-07-25 14:11:35 0 [Note] mysqld (mysqld 5.6.26) starting as process 1 ...
   sourceName: !!js/regexp /mysql/ 
   match: 
@@ -187,7 +193,7 @@ patterns:
       dateFormat: YYYY-MM-DD HH:mm:ss
       type: mysql
 
-- # timestamped messages from /var/log/*.log on Mac OS X
+ - # timestamped messages from /var/log/*.log on Mac OS X
   sourceName: !!js/regexp /\.log/ # catch all .log files  
   match:
     -
@@ -210,7 +216,9 @@ patterns:
       regex: !!js/regexp /(\d{4}[\-|\d{2}]+\s[\d|\:]+\s\+\d{4})\:\s+(.+)/
       fields: [ts,message]
       dateFormat: YYYY-MM-DD HH:mm:ss ZZ
-- # nsq.io  
+
+
+ - # nsq.io  
   sourceName: !!js/regexp nsqio\/nsq
   match:
     - type: nsq
@@ -218,7 +226,7 @@ patterns:
       fields: [ts, level, pid, module, message]
       dateFormat: YYYY/MM/DD HH:mm:ss
 
-- #  Web Logs
+ - #  Web Logs
   sourceName: !!js/regexp /httpd|access_log|apache2|nginx/
   match: 
     # nginx proxy jwilder/nginx-proxy
@@ -298,7 +306,7 @@ patterns:
       type: apache_mpm
       dateformat: ddd MMM DD hh:mm:ss.SSS YYYY
 
-- # Tutum Logs
+ - # Tutum Logs
   sourceName: !!js/regexp /tutum\/cleanup/
   match:
     - type: tutum_cleanup
@@ -306,7 +314,7 @@ patterns:
       fields: [ts,message]
       dateFormat: YYYY/MM/DD hh:mm:ss 
 
-- # Heroku Syslog Messages
+ - # Heroku Syslog Messages
   sourceName: !!js/regexp /syslog_framed|heroku/ 
   match:
     -
@@ -369,7 +377,7 @@ patterns:
           }
         }
 
-- # CloudFoundry Syslog Messages
+ - # CloudFoundry Syslog Messages
   sourceName: !!js/regexp /cloudfoundry|syslog_raw|heroku/ 
   match:
     -
@@ -418,7 +426,6 @@ patterns:
           p.facility = FACILITY[p.prio>>3] || p.prio>>3
           p.severity = SEVERITY[p.prio&7] || p.prio&7
         }
-
 
 dateFormats: [
     'DD/MMM/YYYY:HH:mm:ss ZZ', #apache

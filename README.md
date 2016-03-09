@@ -15,7 +15,7 @@ Key features:
   - Syslog Server (UDP)
   - [Heroku Log Drain](https://github.com/sematext/logagent-js#logagent-as-heroku-log-drain)
   - CloudFoundry Log Drain
-  - Log shipper for [Logsene](http://www.sematext.com/logsene/) from 
+  - Log shipper for [Logsene](http://www.sematext.com/logsene/) 
 - Node.js module to integrate parsers into Node.js programs
 - logagent-js is part of [SPM for Docker](https://github.com/sematext/spm-agent-docker) to parse Container Logs
 
@@ -204,10 +204,6 @@ Start/stop service:
 - upstart: ```service logagent stop/start```
 - systemd: ```systemctl stop/start logagent```
 - lauchnchd: ```launchctl start/stop com.sematext.logagent```
-
-
-
-sudo service logagent start
 
 # Pattern definitions
 

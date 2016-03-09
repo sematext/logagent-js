@@ -270,7 +270,10 @@ function prettyJs(o) {
 function parseLine (line, sourceName, cbf) {
   bytes += line.length
   count++
-  la.parseLine(line, argv.n || sourceName, cbf || log)
+  la.parseLine(line.replace(
+      // remove ansi color codes
+      /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,''), 
+      argv.n || sourceName, cbf || log)
 }
 
 function readStdIn () {

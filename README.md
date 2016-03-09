@@ -203,7 +203,7 @@ env NODE_ENV=production
 env LOGSENE_TOKEN=YOUR_LOGSENE_TOKEN
 chdir  /var/log
 
-exec /usr/local/bin/logagent -s /var/log/*.log 
+exec /usr/bin/logagent -s /var/log/*.log 
 ```
 
 Start the service: 

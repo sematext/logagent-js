@@ -191,7 +191,7 @@ npm i logagent-js -g # install logagent package globally
 sudo logagent-setup LOGSENE_TOKEN
 ```
 
-The setup scripts generates a configuraton file in ```/etc/sematext/logagent.conf```.
+The setup script generates a configuraton file in ```/etc/sematext/logagent.conf```.
 This file includes the CLI parameters for logagent running as service.
 The default settings ship all logs from /var/log/**/*.log to Logsene. 
 

@@ -1,6 +1,5 @@
 #!/bin/sh
-':' //; exec "$(command -v node || command -v nodejs)" "$0" "$@"
-
+':' //; exec "$(command -v node || command -v nodejs)" "${NODE_OPTIONS}" "$0" "$@" 
 /*
  * @copyright Copyright (c) Sematext Group, Inc. - All Rights Reserved
  *
@@ -11,18 +10,25 @@
  * Please see the full license (found in LICENSE in this distribution) for details on its license and the licenses of its dependencies.
  */
  var fs = require('fs')
- try {
+ if (process.argv.length === 2) {
+  try {
     // read cli paramters from config file
     var cfgArgs = fs.readFileSync(process.env.LOGAGENT_CONFIG || '/etc/sematext/logagent.conf').toString()
+    if (cfgArgs !== null)
+    {
+      console.log('Logagent config file: ' + (process.env.LOGAGENT_CONFIG || '/etc/sematext/logagent.conf'))
+    }
     cfgArgs = cfgArgs.split(/\s/)
     cfgArgs = cfgArgs.filter(function(v){
       return v !== ''
     })
     process.argv = [process.argv[0], process.argv[1]].concat(cfgArgs)
     console.log (process.argv)
- } catch (err) {
-    // ignore
+   } catch (err) {
+      // ignore
+   } 
  }
+ 
 var argv = require('minimist')(process.argv.slice(2))
 var prettyjson = require('prettyjson')
 var LogAnalyzer = require('../lib/index.js')
@@ -338,6 +344,9 @@ function cli() {
       workers: WORKERS,
       lifetime: Infinity
     })
+  }
+  if (argv.stdin) {
+    readStdIn()
   }
   if (argv._.length > 0) {
     // tail files

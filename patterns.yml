@@ -1,13 +1,20 @@
 # 
 # PARSER DEFINITIONS FILE IN YML FORMAT
 #
-# Please use 'ts' for dates and time
+# Please use 'ts' as feild name for dates and time
 # RegexTools: https://regex101.com/#javascript
 
 # Sensitive data can be replaced with a hashcode (sha1)
 # it applies to fields matching the field names by a regular expression
 # Note: this function is not optimized (yet) and might take 10-15% of performance
 # autohash: !!js/regexp /user|client_ip|password|email|credit_card_number|payment_info/i
+# set this to false when authash fields
+# the original line might include sensitive data
+originalLine: true 
+
+# The global transform function is called for
+# each parsed line. A good place to do ad global fields
+# custom date processing or special parsers. 
 
 # globalTransform: !!js/function >
 #  function (source, parsedObject) {
@@ -20,7 +27,6 @@
 #    }
 #  }
 
-originalLine: true 
 
 patterns:
  - # kubernetes hyperkube

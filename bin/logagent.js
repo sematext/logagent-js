@@ -1,4 +1,5 @@
-#!/usr/bin/env node
+#!/bin/sh
+':' //; exec "$(command -v node || command -v nodejs)" "$0" "$@"
 
 /*
  * @copyright Copyright (c) Sematext Group, Inc. - All Rights Reserved

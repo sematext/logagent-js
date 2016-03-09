@@ -62,7 +62,7 @@ lp.parseLine('log message', 'source name', function (err, data) {
 
 Test your patterns:
 ```
-cat some.log | bin/logagent -y -f mypatterns.yml
+cat myapp.log | bin/logagent -y -n myapp -f mypatterns.yml
 ```
 
 # Installation 
@@ -182,56 +182,32 @@ In case of high log volume, scale logagent-js  on demand using
 heroku scale web=3
 ```
 
-# Logagent as Linux service 
+# Logagent as Linux or Mac OS X service 
 
-## Upstart script (ubuntu)
-
-Modify this script and place it in /etc/init/logagent.conf
-
-
+Logagent detects the init system and installs systemd or upstart service scripts. 
+On Mac OS X it creates a launchd service. Simply run:
 ```
-description "Upstart Logagent"
-
-start on (local-filesystems and net-device-up IFACE=eth0)
-stop on runlevel [!12345]
-
-respawn
-
-setuid syslog
-setgid syslog
-env NODE_ENV=production
-env LOGSENE_TOKEN=YOUR_LOGSENE_TOKEN
-chdir  /var/log
-
-exec /usr/local/bin/logagent -s /var/log/*.log 
+npm i logagent-js -g # install logagent package globally
+sudo logagent-setup LOGSENE_TOKEN
 ```
 
-Start the service: 
-```
+The setup scripts generates a configuraton file in ```/etc/sematext/logagent.conf```.
+This file includes the CLI parameters for logagent running as service.
+The default settings ship all logs from /var/log/**/*.log to Logsene. 
+
+Location of service scripts:
+- upstart: /etc/init/logagent.conf
+- systemd: /etc/systemd/system/logagent.service
+- launchd: /Library/LaunchDaemons/com.sematext.logagent.plist
+
+Start/stop service: 
+- upstart: ```service logagent stop/start```
+- systemd: ```systemctl stop/start logagent```
+- lauchnchd: ```launchctl start/stop com.sematext.logagent```
+
+
+
 sudo service logagent start
-```
-
-## Systemd startup / journald log forwarding
-
-Create a service file for the logagent, in /etc/systemd/system/logagent.service
-Set the Logsene Token in the "ExecStart" command.
-
-```
-[Service]
-Restart=always
-RestartSec=1s
-ExecStart=/bin/sh -c "journalctl -o json -f | logagent -s -t YOUR_LOGSENE_TOKEN"
-
-[Install]
-WantedBy=multi-user.target
-
-```
-
-Start the service
-
-```
-systemctl start logagent
-```
 
 # Pattern definitions
 

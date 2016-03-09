@@ -9,11 +9,15 @@
 # Note: this function is not optimized (yet) and might take 10-15% of performance
 # autohash: !!js/regexp /user|client_ip|password|email|credit_card_number|payment_info/i
 
-#globalTransform: !!js/function >
+# globalTransform: !!js/function >
 #  function (source, parsedObject) {
 #    // this function is called after parsing
 #    // regardless of the logging source 
 #    // for pattern specific functions use transform in pattern definitions
+#    delete parsedObject.ts
+#    if (!parsedObject['@timestamp']) {
+#      // parsedObject['@timestamp'] = new Date()   
+#    }
 #  }
 
 originalLine: true 
@@ -192,31 +196,6 @@ patterns:
       fields: [ts,pid,level,message]
       dateFormat: YYYY-MM-DD HH:mm:ss
       type: mysql
-
- - # timestamped messages from /var/log/*.log on Mac OS X
-  sourceName: !!js/regexp /\.log/ # catch all .log files  
-  match:
-    -
-      type: system_log
-      regex: !!js/regexp /([\w|\s]+\s\d{2}\s[\d|\:]+)\s(.+?)\s(.+?)\s<(.+)>(.*)/
-      fields: [ts,host,service,level,message]
-      dateFormat: MMM DD HH:mm:ss
-    -
-      type: system_log
-      regex: !!js/regexp /([\w|\s]+\s\d{2}\s[\d|\:]+)\s(\S+)\s(\S+)\[(\d+)\]\:\s(.+)/
-      fields: [ts,host,service,pid,message]
-      dateFormat: MMM DD HH:mm:ss
-    - 
-      type: log
-      regex: !!js/regexp /([\w|\s]+\s\d{2}\s[\d|\:|\.]+)\s+(<.+?>)\s(.*)/
-      fields: [ts,service,message]
-      dateFormat: MMM DD HH:mm:ss
-    - 
-      type: log
-      regex: !!js/regexp /(\d{4}[\-|\d{2}]+\s[\d|\:]+\s\+\d{4})\:\s+(.+)/
-      fields: [ts,message]
-      dateFormat: YYYY-MM-DD HH:mm:ss ZZ
-
 
  - # nsq.io  
   sourceName: !!js/regexp nsqio\/nsq
@@ -427,8 +406,44 @@ patterns:
           p.severity = SEVERITY[p.prio&7] || p.prio&7
         }
 
+ - # timestamped messages from /var/log/*.log on Mac OS X
+  sourceName: !!js/regexp /\.log/ # catch all .log files  
+  match:
+    -
+      type: system_log
+      regex: !!js/regexp /([\w|\s]+\s+\d{2}\s[\d|\:]+)\s(.+?)\s(.+?)\s<(.+)>(.*)/
+      fields: [ts,host,service,severity,message]
+      dateFormat: MMM DD HH:mm:ss
+    -
+      type: system_log
+      regex: !!js/regexp /([\w|\s]+\s+\d{1,2}\s[\d|\:]+)\s(\S+)\s(\S+)\[(\d+)\]\s{0,4}<(.+)>\:\s{0,2}(.+)/
+      fields: [ts,host,service,pid,severity,message]
+      dateFormat: MMM DD HH:mm:ss
+    -
+      type: system_log
+      regex: !!js/regexp /([\w|\s]+\s+\d{1,2}\s[\d|\:]+)\s(\S+)\s(\S+)\[(\d+)\]\:\s(.+)/
+      fields: [ts,host,service,pid,message]
+      dateFormat: MMM DD HH:mm:ss
+    -
+      type: system_log
+      regex: !!js/regexp /([\w|\s]+\s+\d{1,2}\s[\d|\:|\.]+)\s+(\S+)\s+(.*)\:\s(.*)/
+      fields: [ts,host,service,message]
+      dateFormat: MMM DD HH:mm:ss
+    - 
+      type: log
+      regex: !!js/regexp /([\w|\s]+\s\d{2}\s[\d|\:|\.]+)\s+(<.+?>)\s(.*)/
+      fields: [ts,service,message]
+      dateFormat: MMM D HH:mm:ss
+    - 
+      type: log
+      regex: !!js/regexp /(\d{4}[\-|\d{2}]+\s[\d|\:]+\s\+\d{4})\:\s+(.+)/
+      fields: [ts,message]
+      dateFormat: YYYY-MM-DD HH:mm:ss ZZ
+
 dateFormats: [
     'DD/MMM/YYYY:HH:mm:ss ZZ', #apache
+    'MMM D HH:mm:ss',
+    'MMM DD HH:mm:ss',
     'DD MMM HH:mm:ss.S',
     'DD MMM HH:mm:ss',
     'DDD MMM DD HH:mm:ss',

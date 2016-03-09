@@ -1,5 +1,9 @@
 #!/bin/sh
-':' //; exec "$(command -v node || command -v nodejs)" "${NODE_OPTIONS}" "$0" "$@" 
+':' //; export MAX_MEM="--max-old-space-size=100"; exec "$(command -v node || command -v nodejs)" "${NODE_OPTIONS:-$MAX_MEM}" "$0" "$@" 
+
+// if(process.execArgv.length > 0)
+//   console.log('Using NODE_OPTIONS: ' + process.execArgv)
+
 /*
  * @copyright Copyright (c) Sematext Group, Inc. - All Rights Reserved
  *

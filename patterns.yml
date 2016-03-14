@@ -10,22 +10,24 @@
 # autohash: !!js/regexp /user|client_ip|password|email|credit_card_number|payment_info/i
 # set this to false when authash fields
 # the original line might include sensitive data
-originalLine: true 
+originalLine: true
+# maxmindGeoIpFile: /usr/local/share/GeoIP/GeoIPCity.dat
 
 # The global transform function is called for
 # each parsed line. A good place to do ad global fields
 # custom date processing or special parsers. 
-
-# globalTransform: !!js/function >
-#  function (source, parsedObject) {
-#    // this function is called after parsing
-#    // regardless of the logging source 
-#    // for pattern specific functions use transform in pattern definitions
-#    delete parsedObject.ts
-#    if (!parsedObject['@timestamp']) {
-#      // parsedObject['@timestamp'] = new Date()   
-#    }
-#  }
+globalTransform: !!js/function >
+  function (source, parsedObject) {
+    // this function is called after parsing
+    // regardless of the logging source 
+    // for pattern specific functions use transform in pattern definitions
+    // this.geopip lookups for ip adresses
+    // this.moment for date parsing
+    // Example:
+    // if (parsedObject['client_ip']) {
+    //  parsedObject['logsene_geopip'] = this.geoip.getLocation(parsedObject['client_ip'])   
+    //}
+  }
 
 
 patterns:
@@ -219,6 +221,7 @@ patterns:
       type: access_common
       fields:       [proxy_service,virtual_host,client_ip,remote_id,user,ts,method,path,http_version,status_code,size,url,user_agent]
       dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
+      geoIP: client_ip
       transform: !!js/function >
         function (p) {
           p.message = p.method + ' ' + p.path

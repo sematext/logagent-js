@@ -36,7 +36,6 @@
 var argv = require('minimist')(process.argv.slice(2))
 var prettyjson = require('prettyjson')
 var LogAnalyzer = require('../lib/index.js')
-var la = new LogAnalyzer(argv.f)
 var readline = require('readline')
 var begin = new Date().getTime()
 var count = 0
@@ -55,6 +54,10 @@ var WORKERS = process.env.WEB_CONCURRENCY || 1
 var dgram = require('dgram');
 var udpClient = dgram.createSocket('udp4') 
 var flat = require('flat')
+
+var la = new LogAnalyzer(argv.f, {}, function () {
+  cli() 
+})
 
 process.on('beforeExit', function () {})
 function getFilesizeInBytes (filename) {
@@ -370,5 +373,6 @@ function cli() {
     readStdIn()
   }
 }
-cli()
+
+
 

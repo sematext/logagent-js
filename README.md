@@ -10,6 +10,7 @@ Key features:
 - recognition of Date and Number fields
 - easy to extend with custom patterns and JS transform functions
 - replace sensitive data with SHA-1 hash codes
+- GeoIP lookup with automatic GeoIP db updates (maxmind geopip-lite files)
 - Command Line Tool
   - log format converter (e.g. text to JSON or YAML) 
   - Syslog Server (UDP)
@@ -245,8 +246,12 @@ Example:
 # Sensitive data can be replaced with a hashcode (sha1)
 # it applies to fields matching the field names by a regular expression
 # Note: this function is not optimized (yet) and might take 10-15% of performance
-# autohash: !!js/regexp /user|client_ip|password|email|credit_card_number|payment_info/i
-
+autohash: !!js/regexp /user|password|email|credit_card_number|payment_info/i
+# activate GeoIP lookup
+geoIP: true
+# logagent updates geoip db files automatically
+# pls. note write access to this directory is required
+maxmindDbDir: /tmp/
 patterns: 
   - # APACHE  Web Logs
   sourceName: httpd
@@ -256,6 +261,8 @@ patterns:
       type: apache_access_common
       fields:       [client_ip,remote_id,user,ts,method,path,http_version,status_code,size]
       dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
+      # lookup geoip info for the field client_ip
+      geoIP: client_ip
       transform: !!js/function >
         function (p) {
           p.message = p.method + ' ' + p.path

@@ -274,7 +274,7 @@ The default patterns are [here](/patterns.yml) - contributions are welcome.
 
 # Related packages
 
-- [SPM Agent for Docker](https://github.com/sematext/spm-agent-docker) - collects metrics, events and logs from Docker API and CoreOS. Logagent-js is a component of spm-agent-docker. More Information: [Innovative Docker Log Management](http://blog.sematext.com/2015/08/12/docker-log-management/)
+- [Sematext Agent for Docker](https://github.com/sematext/sematext-agent-docker) - collects metrics, events and logs from Docker API and CoreOS. Logagent-js is a component of sematext-agent-docker. More Information: [Innovative Docker Log Management](http://blog.sematext.com/2015/08/12/docker-log-management/)
 - [Logsene-CLI](https://github.com/sematext/logsene-cli) - Enables searching Logsene log entries from the command-line. 
 - [SPM Agent for Node.js](https://github.com/sematext/spm-agent-nodejs) - collects performance metrics for Node and io.js applications
 - [Custom Metrics](https://github.com/sematext/spm-metrics-js) - Custom Metrics for SPM 

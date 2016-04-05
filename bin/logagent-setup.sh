@@ -18,7 +18,7 @@ respawn
 chdir  /tmp
 exec $1 " > /etc/init/${SERVICE_NAME}.conf
 runCommand "initctl reload-configuration"
-stop $SERVICE_NAME2 > /dev/null
+stop $SERVICE_NAME 2> /dev/null
 runCommand "start ${SERVICE_NAME}"
 }
 

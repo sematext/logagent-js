@@ -36,7 +36,6 @@ globalTransform: !!js/function >
     // this.enrichGeoIp(parsedObject, 'client_ip')
   }
 
-
 patterns:
  - # kubernetes hyperkube
   sourcName: !!js/regexp /hyperkube/

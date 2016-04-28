@@ -97,22 +97,17 @@ docker run --log-driver=syslog  --log-opt syslog-address=udp://$DOCKER_HOSTNAME:
 curl $DOCKER_HOSTNAME:9003
 ```
 
-Options
-1. Pass your custom pattern file
-
+**Container Options**
+- Pass a custom pattern file
 ```
 -v $PWD/patterns.yml:/patterns.yml -e PATTERN_FILE=/patterns.yml
 ```
-
-2. Set any CLI option
+- Set any CLI option
 e.g. print logs in YML format to console (default is "-s" - silent)
-
 ```
 -e LOGAGENT_OPTIONS="-y"
 ```
-
-3. Set Node.js Memory limits
-
+- Set Node.js Memory limits
 ```
 -e NODE_OPTIONS="--max-old-space-size=200"
 ```

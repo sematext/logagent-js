@@ -421,7 +421,18 @@ patterns:
           p.facility = FACILITY[p.prio>>3] || p.prio>>3
           p.severity = SEVERITY[p.prio&7] || p.prio&7
         }
-
+ - # Docker Swarm 
+  sourceName: !!js/regexp /swarm/ # catch all .log files  
+  match:
+    -
+      type: docker
+      regex: !!js/regexp /time="(.*)\slevel=(\S+)\smsg="(.+?)"\saddr="(.+?)"\sdiscovery="(.+?)"/
+      fields: [ts,severity,message,address,discovery]
+    -
+      type: docker
+      regex: !!js/regexp /time="(.*)\slevel=(\S+)\smsg="(.+?)/
+      fields: [ts,severity,message]
+   
  - # timestamped messages from /var/log/*.log on Mac OS X
   sourceName: !!js/regexp /\.log/ # catch all .log files  
   match:

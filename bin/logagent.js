@@ -68,14 +68,49 @@ function getFilesizeInBytes (filename) {
 
 function getSyslogServer (appToken, port, type) {
   // var logger = new Logsene(appToken, type || 'logs')
+  var SEVERITY = [
+            'emerg',
+            'alert',
+            'crit',
+            'err',
+            'warning',
+            'notice',
+            'info',
+            'debug'
+          ]
+  var FACILITY = [
+            'kern',
+            'user',
+            'mail',
+            'daemon',
+            'auth',
+            'syslog',
+            'lpr',
+            'news',
+            'uucp',
+            'cron',
+            'authpriv',
+            'ftp',
+            'ntp',
+            'logaudit',
+            'logalert',
+            'clock',
+            'local0',
+            'local1',
+            'local2',
+            'local3',
+            'local4',
+            'local5',
+            'local6',
+            'local7'
+          ]
   var Syslogd = require('syslogd')
   var syslogd = Syslogd(function (sysLogMsg) {
-    parseLine(sysLogMsg.msg, 'log', function (e, data) {
-      data['severity'] = sysLogMsg.severity
+    parseLine(sysLogMsg.msg, sysLogMsg.tag, function (e, data) {
+      data['severity'] = SEVERITY[sysLogMsg.facility]
       data['syslog-tag'] = sysLogMsg.tag
-      data['facility'] = sysLogMsg.facility
-      data['hostname'] = sysLogMsg.hostname
-      data['@timestamp'] = sysLogMsg['time']
+      data['facility'] = FACILITY[sysLogMsg.severity]
+      data['host'] = sysLogMsg.address
       log(e, data)
     })
   })
@@ -104,7 +139,7 @@ function getLogger (token, type) {
 
 function logToLogsene (token, type, data) {
   var logger = getLogger(token, type)
-  logger.log(data.level || data.severity || 'info', data.message, data)
+  logger.log(data.level || data.severity || 'info', data.message || data.msg || data.MESSAGE, data)
 }
 
 function getLoggerForToken (token, type) {

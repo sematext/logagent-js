@@ -84,7 +84,40 @@ npm i -g logagent-js
 logagent -t LOGSENE_TOKEN -y /var/log/*.log
 ```
 
-## CLI Parameters:
+## Logagent as syslog service for Docker logs
+Build the image and start logagent with the LOGSENE_TOKEN
+```
+docker build -t logagent . 
+docker run -p 514:514/udp -e LOGSENE_TOKEN=YOUR_LOGSENE_TOKEN  -d --name logagent --restart=always logagent
+```
+Run your container with syslog driver
+```
+export $DOCKER_HOSTNAME=192.168.99.100
+docker run --log-driver=syslog  --log-opt syslog-address=udp://$DOCKER_HOSTNAME:514 --log-opt tag="{{.ImageName}}_{{.Name}}_{{.ID}}" -p 9003:80 -d nginx
+curl $DOCKER_HOSTNAME:9003
+```
+
+Options
+1. Pass your custom pattern file
+
+```
+-v $PWD/patterns.yml:/patterns.yml -e PATTERN_FILE=/patterns.yml
+```
+
+2. Set any CLI option
+e.g. print logs in YML format to console (default is "-s" - silent)
+
+```
+-e LOGAGENT_OPTIONS="-y"
+```
+
+3. Set Node.js Memory limits
+
+```
+-e NODE_OPTIONS="--max-old-space-size=200"
+```
+
+## All CLI Parameters:
 
 - __-f__ file with pattern definitions 
 - __-y__ prints parsed messages in YAML format

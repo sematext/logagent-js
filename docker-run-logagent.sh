@@ -1,5 +1,6 @@
 #!/bin/sh
 export NODE_OPTIONS=${NODE_OPTIONS:-"--max-old-space-size=512"}
+export RTAIL_OPTIONS="-s --rtail-host $HOSTNAME --rtail-web-port 80 --rtail-port 9999"
 # default is silent mode, no logs to console
 export LOGAGENT_OPTIONS=${LOGAGENT_OPTIONS:-"-s"}
 # default pattern file

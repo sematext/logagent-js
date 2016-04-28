@@ -92,6 +92,15 @@ cd logagent-js
 docker build -t logagent . 
 docker run -p 514:514/udp -e LOGSENE_TOKEN=YOUR_LOGSENE_TOKEN  -d --name logagent --restart=always logagent
 ```
+
+To view realtime logs in the Web Browser with rtail, simply add the options for rtail and open the http port for rtail-server UI. Please note: __ rtail UI might get slow for high log volumes __ 
+
+```
+export LOGAGENT_OPTIONS="-s --rtail-host $HOSTNAME --rtail-web-port 80 --rtail-port 9999"
+docker run -p 8080:80 -p 514:514/udp -e LOGAGENT_OPTIONS -e LOGSENE_TOKEN=YOUR_LOGSENE_TOKEN  -d --name logagent --restart=always logagent
+```
+
+
 Run your container with syslog driver
 ```
 export $DOCKER_HOSTNAME=192.168.99.100

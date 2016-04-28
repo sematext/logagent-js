@@ -109,6 +109,7 @@ function getSyslogServer (appToken, port, type) {
     parseLine(sysLogMsg.msg, sysLogMsg.tag, function (e, data) {
       data['severity'] = SEVERITY[sysLogMsg.facility]
       data['syslog-tag'] = sysLogMsg.tag
+      if(/\#(.+)\#(.+)\#(.+?)\[(\d+)\]/)
       data['facility'] = FACILITY[sysLogMsg.severity]
       data['host'] = sysLogMsg.address
       log(e, data)
@@ -278,6 +279,22 @@ function log (err, data) {
   if (argv.t) {
     logToLogsene(argv.t || logseneToken, data['_type'] || argv.n || 'logs', data)
   }
+  if(argv['rtail-port']) {
+    var ts = data['@timestamp'] 
+    delete data['@timestamp']
+    delete data['originalLine']
+    delete data['ts']
+    var type = data['@source']
+    delete data['_type']
+    var message = new Buffer(JSON.stringify({
+      timestamp: ts || new Date(), 
+      content: data.message,
+      id: type || argv.n || 'logs'
+    })) 
+    udpClient.send(message, 0, message.length, argv['rtail-port'], argv['rtail-host']||'localhost', function (err) {
+      // udpClient.close();
+    })
+  }
   if (argv.s) {
     return
   }
@@ -289,22 +306,7 @@ function log (err, data) {
   } else {
     console.log(JSON.stringify(data))
   }
-  if(argv['rtail-port']) {
-    var ts = data['@timestamp'] 
-    delete data['@timestamp']
-    delete data['originalLine']
-    delete data['ts']
-    var type = data['_type']
-    delete data['_type']
-    var message = new Buffer(JSON.stringify({
-      timestamp: ts || new Date(), 
-      content: data, //prettyJs(data),
-      id: type || argv.n || 'logs'
-    })) 
-    udpClient.send(message, 0, message.length, argv['rtail-port'], argv['rtail-host']||'localhost', function (err) {
-      // udpClient.close();
-    })
-  }
+  
 }
 
 function prettyJs(o) {
@@ -337,7 +339,8 @@ function readStdIn () {
 function rtailServer() {
   // console.log(process.argv)
   try {
-    process.argv = [process.argv[0], process.argv[1], '--web-port', String(argv['rtail-web-port'])]
+    process.argv = [process.argv[0], process.argv[1], '--web-port', String(argv['rtail-web-port']), '--web-host', process.env.HOSTNAME, '--udp-port', String(argv['rtail-port']), '--udp-host', process.env.HOSTNAME]
+    console.log ('start rtail server' + process.argv)
     require('rtail/cli/rtail-server.js')
   } catch (err) {
     console.log(err)

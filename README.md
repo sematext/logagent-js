@@ -87,6 +87,8 @@ logagent -t LOGSENE_TOKEN -y /var/log/*.log
 ## Logagent as syslog service for Docker logs
 Build the image and start logagent with the LOGSENE_TOKEN
 ```
+git clone https://github.com/sematext/logagent-js.git
+cd logagent-js
 docker build -t logagent . 
 docker run -p 514:514/udp -e LOGSENE_TOKEN=YOUR_LOGSENE_TOKEN  -d --name logagent --restart=always logagent
 ```

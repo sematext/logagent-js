@@ -38,7 +38,7 @@ globalTransform: !!js/function >
 
 patterns:
  - # kubernetes hyperkube
-  sourcName: !!js/regexp /hyperkube/
+  sourceName: !!js/regexp /hyperkube/
   match:
     - type: hyperkube
       regex: !!js/regexp /\S+\s(\S+)\s+\S+\s+\S+\s([GET|POST|PUT|DELETE|HEAD|OPTIONS]+)\s+(\/.+)\:\s\(([\d|\.]+)(\S+)\)\s(\d+\s)(.*hyperkube.+)\s(.+)\:(\d+)\]/i

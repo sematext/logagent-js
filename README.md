@@ -142,7 +142,7 @@ docker run -p 8080:80 -p 514:514/udp -e LOGAGENT_OPTIONS -e LOGSENE_TOKEN=YOUR_L
 | __--cfhttp__ PORT | listens for CloudFoundry logs (syslog over http)|
 | __--rtail-port__  | forwards logs via udp to [rtail](http://rtail.org/) server 
 | __--rtail-host__ hostname | [rtail](http://rtail.org/) server (UI for realtime logs), default: localhost|
-| __list of files__, e.g. /var/log/*.log | watched by tail-forver starting at end of file to watch|
+| __list of files__, e.g. /var/log/*.log | watched by [tail-forever](https://www.npmjs.com/package/tail-forever) starting at end of file to watch|
 
 The default output is line delimited JSON.
 

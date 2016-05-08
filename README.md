@@ -127,21 +127,23 @@ docker run -p 8080:80 -p 514:514/udp -e LOGAGENT_OPTIONS -e LOGSENE_TOKEN=YOUR_L
 
 ## All CLI Parameters:
 
-- __-f__ file with pattern definitions 
-- __-y__ prints parsed messages in YAML format
-- __-p__ pretty json output
-- __-s__ silent, print no logss, only throughput and memory usage on exit
-- __-t__ token [Logsene](http://sematext.com/logsene) App Token to insert parsed records into Logsene.
-- __-g__ use a [glob](https://www.npmjs.com/package/glob) pattern to watch log files e.g. -g "{/var/log/*.log,/Users/stefan/*/*.log}" 
-- __--logsene-tmp-dir__ - directory to store buffered logs during network outage
-- __-u__ UDP_PORT starts a syslogd UDP listener on the given port to act as syslogd
-- __-n__ name for the source only when stdin is used (e.g. cat zookeeper.log | logagent -n zookeeper), important to make
-  multi-line patterns working on stdin because the status is tracked by the source name. 
-- __--heroku__ PORT listens for heroku logs (http drain / framed syslog over http) 
-- __--cfhttp__ PORT listens for CloudFoundry logs (syslog over http)
-- __--rtail-port__ forwards logs via udp to [rtail](http://rtail.org/) server 
-- __--rtail-host__ hostname [rtail](http://rtail.org/) server (UI for realtime logs), default: localhost
-- __list of files__, e.g. /var/log/*.log watched by tail-forver starting at end of file to watch
+| Paramater | Description |
+|-----------|-------------|
+| __-f__ | file with pattern definitions | 
+| __-y__ | prints parsed messages in YAML format |
+| __-p__ | pretty json output |
+| __-s__ | silent, print no logss, only throughput and memory usage on exit |
+| __-t__ token | [Logsene](http://sematext.com/logsene) App Token to insert parsed records into Logsene. |
+| __-g__ glob-pattern | use a [glob](https://www.npmjs.com/package/glob) pattern to watch log files e.g. -g "{/var/log/*.log,/Users/stefan/*/*.log}" |
+| __--logsene-tmp-dir__ | directory to store buffered logs during network outage |
+| __-u__ UDP_PORT | starts a syslogd UDP listener on the given port to act as syslogd |
+| __-n__ name | name for the source only when stdin is used (e.g. cat zookeeper.log | logagent -n zookeeper), important to make
+  multi-line patterns working on stdin because the status is tracked by the source name.| 
+| __--heroku__ PORT | listens for heroku logs (http drain / framed syslog over http) |
+| __--cfhttp__ PORT | listens for CloudFoundry logs (syslog over http)|
+| __--rtail-port__  | forwards logs via udp to [rtail](http://rtail.org/) server 
+| __--rtail-host__ hostname | [rtail](http://rtail.org/) server (UI for realtime logs), default: localhost|
+| __list of files__, e.g. /var/log/*.log | watched by tail-forver starting at end of file to watch|
 
 The default output is line delimited JSON.
 

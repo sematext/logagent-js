@@ -29,11 +29,14 @@
     process.argv = [process.argv[0], process.argv[1]].concat(cfgArgs)
     console.log (process.argv)
    } catch (err) {
-      // ignore
+      // ignore -> regular cli mode
    } 
  }
  
 var argv = require('minimist')(process.argv.slice(2))
+var https = require('https')
+// limit number of socket connections to Logsene
+https.globalAgent.maxSockets=20
 var prettyjson = require('prettyjson')
 var LogAnalyzer = require('../lib/index.js')
 var readline = require('readline')
@@ -54,7 +57,6 @@ var WORKERS = process.env.WEB_CONCURRENCY || 1
 var dgram = require('dgram');
 var udpClient = dgram.createSocket('udp4') 
 var flat = require('flat')
-
 var la = new LogAnalyzer(argv.f, {}, function () {
   cli() 
 })
@@ -67,7 +69,6 @@ function getFilesizeInBytes (filename) {
 }
 
 function getSyslogServer (appToken, port, type) {
-  // var logger = new Logsene(appToken, type || 'logs')
   var SEVERITY = [
             'emerg',
             'alert',
@@ -119,14 +120,14 @@ function getSyslogServer (appToken, port, type) {
     console.log('start syslog server ' + port + ' ' + (err || ''))
   })
   return syslogd
-// this.servers[appToken] = syslogd
 }
 
 function getLogger (token, type) {
   var key = token + type
   // console.log(token)
   if (!loggers[key]) {
-    var logger = new Logsene(token, type)
+    var logger = new Logsene(token, type, null, 
+                             argv['logsene-tmp-dir'] || process.env.LOGSENE_TMP_DIR || require('os').tmpdir())
     logger.on('log', function (data) {
       // console.log(data)
     })
@@ -298,7 +299,6 @@ function log (err, data) {
   if (argv.s) {
     return
   }
-  
   if (argv.p) {
     console.log(JSON.stringify(data, null, '\t'))
   } else if (argv.y) {

@@ -95,7 +95,7 @@ function install_script ()
 	export SPM_AGENT_CONFIG_FILE="/etc/sematext/logagent.conf"
 	mkdir -p /etc/sematext
 
-echo "-s -t $2 -g $3" > $SPM_AGENT_CONFIG_FILE
+echo "-s --logsene-tmp-dir /tmp -t $2 -g $3" > $SPM_AGENT_CONFIG_FILE
 runCommand "chown root $SPM_AGENT_CONFIG_FILE"
 runCommand "chmod 0600 $SPM_AGENT_CONFIG_FILE"
 

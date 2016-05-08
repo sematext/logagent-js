@@ -16,7 +16,9 @@ Key features:
   - Syslog Server (UDP)
   - [Heroku Log Drain](https://github.com/sematext/logagent-js#logagent-as-heroku-log-drain)
   - CloudFoundry Log Drain
-  - Log shipper for [Logsene](http://www.sematext.com/logsene/) 
+  - Log shipper for [Logsene](http://www.sematext.com/logsene/)
+    - including cli, launchd (Mac OS X), upstart and systemd (Linux) service installer
+    - disk buffer for failed inserts during network outage
 - Node.js module to integrate parsers into Node.js programs
 - logagent-js is part of [SPM for Docker](https://github.com/sematext/spm-agent-docker) to parse Container Logs
 
@@ -131,6 +133,7 @@ docker run -p 8080:80 -p 514:514/udp -e LOGAGENT_OPTIONS -e LOGSENE_TOKEN=YOUR_L
 - __-s__ silent, print no logss, only throughput and memory usage on exit
 - __-t__ token [Logsene](http://sematext.com/logsene) App Token to insert parsed records into Logsene.
 - __-g__ use a [glob](https://www.npmjs.com/package/glob) pattern to watch log files e.g. -g "{/var/log/*.log,/Users/stefan/*/*.log}" 
+- __--logsene-tmp-dir__ - directory to store buffered logs during network outage
 - __-u__ UDP_PORT starts a syslogd UDP listener on the given port to act as syslogd
 - __-n__ name for the source only when stdin is used (e.g. cat zookeeper.log | logagent -n zookeeper), important to make
   multi-line patterns working on stdin because the status is tracked by the source name. 

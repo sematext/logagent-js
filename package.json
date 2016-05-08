@@ -32,7 +32,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "flat": "^2.0.0",
-    "glob": "^5.0.14",
+    "glob": "^7.0.3",
     "js-yaml": "^3.3.1",
     "logsene-js": "^1.0.7",
     "maxmind": "^0.6.0",
@@ -42,7 +42,7 @@
     "prettyjson": "^1.1.2",
     "syslogd": "^1.1.2",
     "tail-forever": "^0.3.11",
-    "throng": "^1.0.1",
+    "throng": "^4.0.0",
     "yamljs": "^0.2.3"
   }
 }

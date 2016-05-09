@@ -81,5 +81,5 @@ patterns:
         }
 ```
 
-The default patterns are [here](/patterns.yml) - contributions are welcome.
+The default patterns are [here](https://github.com/sematext/logagent-js/blob/master/patterns.yml) - contributions are welcome.
 

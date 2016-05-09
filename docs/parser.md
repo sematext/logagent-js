@@ -49,7 +49,7 @@ Properties:
 - dateFormat: the format of the special fields 'ts', if the date format matches, a new field @timestamp is generated
 - transform: a JS function to manipulate the result of regex and date parsing
 
-Example:
+# Example
 
 ```
 # Sensitive data can be replaced with a hashcode (sha1)

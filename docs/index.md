@@ -6,7 +6,7 @@ Smart Log Parser and Log Shipper written in Node.
 
 # Features
 
-This project contains a liraray and patterns for log parsing and cli tools and installers to use logagent-js as log shipper having following features: 
+This project contains a library and patterns for log parsing and cli tools and installers to use logagent-js as log shipper with following features: 
 
 ## Parser
 - log format detection and intelligent pattern matching 

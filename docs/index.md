@@ -32,8 +32,13 @@ This project contains a liraray and patterns for log parsing and cli tools and i
 - CloudFoundry Log Drain
 
 ## Processing
-- logagent-js applies the patterns defined in ```patterns.yml' to all logs to create structured output from plain text lines
+- logagent-js applies the patterns defined in ```patterns.yml' to all logs to create structured output from plain text lines. Patterns are defined for input sources with regular expressions. The parsed logs can be post-processed with node.js transform function e.g. to enrich data or perform complex parser operations. 
 - GeoIP lookups for IP adress fields, including download and update of the GeoIP lite database from Maxmind
+
+## Security
+- Masking sensitive data - Logagent can relace field content with SHA-1 hash codes to mask sensitive data. The advantage of hash codes is that data is still searchable when you hash the original value before you start a search.  In addtion it is possible to exclude the original log line from shipping to avoid that sensitive data gets shipped in the field "originalLogLine".
+- Shipping logs to Logsene is done via https by default 
+- Support of proxy servers if the logging server is behind a firewall
 
 ## Reliable log shipping with disk buffer
 

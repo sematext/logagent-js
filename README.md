@@ -2,7 +2,7 @@
 
 # logagent-js
 
-Smart Log Parser and Log Shipper written in Node. 
+Smart Log Parser and Log Shipper written in Node. See [Documentation](http://sematext.github.io/logagent-js/).
 
 # Features
 

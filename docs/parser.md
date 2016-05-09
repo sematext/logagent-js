@@ -16,29 +16,31 @@ The parser detects log formats based on a pattern library (yaml file) and conver
 - Heroku logs
 
 The default pattern definition file include already patterns for:
+
 - MongoDB, 
-  - MySQL, 
-  - Nginx, 
-  - Redis, 
-  - Elasticsearch
-  - Apache 
-    - Webserver (httpd), 
-    - Zookeeper, 
-    - Cassandra, 
-    - Kafka,
-    - HBase HDFS Data Node,
-    - HBase Region Server,
-    - Hadoop YARN Node Manager, 
-    - Apache SOLR,
-  - various Linux/Mac OS X system log files 
+- MySQL, 
+- Nginx, 
+- Redis, 
+- Elasticsearch
+- Webserver (nginx, apache httpd), 
+- Zookeeper, 
+- Cassandra, 
+- Kafka,
+- HBase HDFS Data Node,
+- HBase Region Server,
+- Hadoop YARN Node Manager, 
+- Apache SOLR,
+- various Linux/Mac OS X system log files 
 
 The file format is based on [JS-YAML](https://nodeca.github.io/js-yaml/), in short:
-
+```
 - - indicates an  array
 - !js/regexp - indicates a JS regular expression
 - !!js/function > - indicates a JS function 
+```
 
 Properties:
+
 - patterns - the list of patterns, each pattern starts with "-"
 - match: A group of patterns for a specific log source
 - regex: a JS regular expression 

@@ -7,14 +7,14 @@ curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
 
-# Install logagent-js with npm
+# Logagnet command line tool with npm
 ```
 npm i -g logagent-js
 # Test to ship your logs to Logsene, parsed with timestamps - output on console in YAML format (-y)
 logagent -y /var/log/*.log
 ```
 
-## Install logagent as Linux or Mac OS X service for Logsene
+## Linux or Mac OS X service for Logsene
 
 1. Get a free account at [sematext.com/spm](https://apps.sematext.com/users-web/register.do)  
 2. [create a Logsene App](https://apps.sematext.com/logsene-reports/registerApplication.do) to obtain an App Token for [Logsene](http://www.sematext.com/logsene/) 
@@ -41,7 +41,7 @@ Start/stop service:
 - lauchnchd: ```launchctl start/stop com.sematext.logagent```
 
 
-## Install logagent as syslog container for Docker logs
+## Docker - receive logs via syslog 
 Build the image and start logagent with the LOGSENE_TOKEN
 ```
 git clone https://github.com/sematext/logagent-js.git
@@ -79,6 +79,8 @@ docker run -p 8080:80 -p 514:514/udp -e LOGAGENT_OPTIONS -e LOGSENE_TOKEN=YOUR_L
 ```
 -e NODE_OPTIONS="--max-old-space-size=200"
 ```
+
+Please note [Sematext Agent Docker](https://hub.docker.com/r/sematext/sematext-agent-docker/) might be of interest if you like to collect logs, events and metrics from Docker. 
 
 ## Install logagent as Heroku log drain
 

@@ -9,7 +9,10 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node bin/logagent.js -s --heroku $PORT"
+    "start": "node bin/logagent.js -s --heroku $PORT",
+    "pubdocs": "mkdocs gh-deploy --clean",
+    "docs": "mkdocs serve",
+    "mkdocs": "pip install mkdocs"
   },
   "repository": {
     "type": "git",

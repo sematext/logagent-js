@@ -385,10 +385,10 @@ function cli() {
     getHttpServer(argv.cfhttp, cloudFoundryHandler)
   }
   if (argv.heroku) {
-    throng(start, {
+    throng({
       workers: WORKERS,
       lifetime: Infinity
-    })
+    }, start)
   }
   if (argv.stdin) {
     readStdIn()

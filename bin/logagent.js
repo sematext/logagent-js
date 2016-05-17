@@ -253,17 +253,11 @@ function cloudFoundryHandler (req, res) {
     body += data
   })
   req.on('end', function () {
-    var lines = body.split('\n')
-    lines.forEach(function (line) {
-      if (!line) {
-        return
+    parseLine(body, argv.n || 'cloudfoundry', function (err, data) {
+      if (data) {
+        data.headers = req.headers
       }
-      parseLine(body, argv.n || 'cloudfoundry', function (err, data) {
-        if (data) {
-          data.headers = req.headers
-        }
-        getLoggerForToken(token, 'cloudfoundry')(err, data)
-      })
+      getLoggerForToken(token, 'cloudfoundry')(err, data)
     })
     res.end('ok')
   })

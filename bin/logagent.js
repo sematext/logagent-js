@@ -1,8 +1,6 @@
 #!/bin/sh
-':' //; export MAX_MEM="--max-old-space-size=100"; exec "$(command -v node || command -v nodejs)" "${NODE_OPTIONS:-$MAX_MEM}" "$0" "$@" 
-
-// if(process.execArgv.length > 0)
-//   console.log('Using NODE_OPTIONS: ' + process.execArgv)
+':' // ; export MAX_MEM="--max-old-space-size=100"; exec "$(command -v node || command -v nodejs)" "${NODE_OPTIONS:-$MAX_MEM}" "$0" "$@" 
+'use strict'
 
 /*
  * @copyright Copyright (c) Sematext Group, Inc. - All Rights Reserved
@@ -13,30 +11,29 @@
  * This source code is to be used exclusively by users and customers of Sematext.
  * Please see the full license (found in LICENSE in this distribution) for details on its license and the licenses of its dependencies.
  */
- var fs = require('fs')
- if (process.argv.length === 2) {
+var fs = require('fs')
+if (process.argv.length === 2) {
   try {
     // read cli paramters from config file
     var cfgArgs = fs.readFileSync(process.env.LOGAGENT_CONFIG || '/etc/sematext/logagent.conf').toString()
-    if (cfgArgs !== null)
-    {
+    if (cfgArgs !== null) {
       console.log('Logagent config file: ' + (process.env.LOGAGENT_CONFIG || '/etc/sematext/logagent.conf'))
     }
     cfgArgs = cfgArgs.split(/\s/)
-    cfgArgs = cfgArgs.filter(function(v){
+    cfgArgs = cfgArgs.filter(function (v) {
       return v !== ''
     })
     process.argv = [process.argv[0], process.argv[1]].concat(cfgArgs)
-    console.log (process.argv)
-   } catch (err) {
-      // ignore -> regular cli mode
-   } 
- }
- 
+    console.log(process.argv)
+  } catch (err) {
+    // ignore -> regular cli mode
+  }
+}
+
 var argv = require('minimist')(process.argv.slice(2))
 var https = require('https')
 // limit number of socket connections to Logsene
-https.globalAgent.maxSockets=20
+https.globalAgent.maxSockets = 20
 var prettyjson = require('prettyjson')
 var LogAnalyzer = require('../lib/index.js')
 var readline = require('readline')
@@ -46,7 +43,6 @@ var emptyLines = 0
 var bytes = 0
 var Logsene = require('logsene-js')
 var Tail = require('tail-forever')
-var fs = require('fs')
 var glob = require('glob')
 var globPattern = argv.g || process.env.GLOB_PATTERN
 var logseneToken = argv.t || process.env.LOGSENE_TOKEN
@@ -54,11 +50,11 @@ var http = require('http')
 var loggers = {}
 var throng = require('throng')
 var WORKERS = process.env.WEB_CONCURRENCY || 1
-var dgram = require('dgram');
-var udpClient = dgram.createSocket('udp4') 
+var dgram = require('dgram')
+var udpClient = dgram.createSocket('udp4')
 var flat = require('flat')
 var la = new LogAnalyzer(argv.f, {}, function () {
-  cli() 
+  cli()
 })
 
 process.on('beforeExit', function () {})
@@ -70,48 +66,49 @@ function getFilesizeInBytes (filename) {
 
 function getSyslogServer (appToken, port, type) {
   var SEVERITY = [
-            'emerg',
-            'alert',
-            'crit',
-            'err',
-            'warning',
-            'notice',
-            'info',
-            'debug'
-          ]
+    'emerg',
+    'alert',
+    'crit',
+    'err',
+    'warning',
+    'notice',
+    'info',
+    'debug'
+  ]
   var FACILITY = [
-            'kern',
-            'user',
-            'mail',
-            'daemon',
-            'auth',
-            'syslog',
-            'lpr',
-            'news',
-            'uucp',
-            'cron',
-            'authpriv',
-            'ftp',
-            'ntp',
-            'logaudit',
-            'logalert',
-            'clock',
-            'local0',
-            'local1',
-            'local2',
-            'local3',
-            'local4',
-            'local5',
-            'local6',
-            'local7'
-          ]
+    'kern',
+    'user',
+    'mail',
+    'daemon',
+    'auth',
+    'syslog',
+    'lpr',
+    'news',
+    'uucp',
+    'cron',
+    'authpriv',
+    'ftp',
+    'ntp',
+    'logaudit',
+    'logalert',
+    'clock',
+    'local0',
+    'local1',
+    'local2',
+    'local3',
+    'local4',
+    'local5',
+    'local6',
+    'local7'
+  ]
   var Syslogd = require('syslogd')
   var syslogd = Syslogd(function (sysLogMsg) {
     parseLine(sysLogMsg.msg, sysLogMsg.tag, function (e, data) {
       data['severity'] = SEVERITY[sysLogMsg.facility]
       data['syslog-tag'] = sysLogMsg.tag
-      if(/\#(.+)\#(.+)\#(.+?)\[(\d+)\]/)
-      data['facility'] = FACILITY[sysLogMsg.severity]
+      if (/\#(.+)\#(.+)\#(.+?)\[(\d+)\]/) {
+        data['facility'] = FACILITY[sysLogMsg.severity]
+      }
       data['host'] = sysLogMsg.address
       log(e, data)
     })
@@ -126,8 +123,8 @@ function getLogger (token, type) {
   var key = token + type
   // console.log(token)
   if (!loggers[key]) {
-    var logger = new Logsene(token, type, null, 
-                             argv['logsene-tmp-dir'] || process.env.LOGSENE_TMP_DIR || require('os').tmpdir())
+    var logger = new Logsene(token, type, null,
+      argv['logsene-tmp-dir'] || process.env.LOGSENE_TMP_DIR || require('os').tmpdir())
     logger.on('log', function (data) {
       // console.log(data)
     })
@@ -147,11 +144,11 @@ function logToLogsene (token, type, data) {
 function getLoggerForToken (token, type) {
   return function (err, data) {
     if (!err && data) {
-      log(err, msg)
       delete data.ts
-      //delete data.ts
+      // delete data.ts
       data['_type'] = type
       var msg = data
+      log(err, msg)
       if (type === 'heroku') {
         msg = {
           message: data.message,
@@ -163,8 +160,8 @@ function getLoggerForToken (token, type) {
           facility: data.facility
         }
         var optionalFields = ['method', 'path', 'host', 'request_id', 'fwd', 'dyno', 'connect', 'service', 'status', 'bytes']
-        optionalFields.forEach (function (f) {
-          if(data[f]) {
+        optionalFields.forEach(function (f) {
+          if (data[f]) {
             msg[f] = data[f]
           }
         })
@@ -172,7 +169,6 @@ function getLoggerForToken (token, type) {
           msg['@timestamp'] = new Date()
         }
       }
-      console.log(JSON.stringify(msg))
       logToLogsene(token, type, msg)
     }
   }
@@ -183,7 +179,7 @@ function herokuHandler (req, res) {
     var path = req.url.split('/')
     var token = null
     if (path.length > 1) {
-      if (path[1] && path[1].length > 31 && /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/.test(path[1]) ) {
+      if (path[1] && path[1].length > 31 && /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/.test(path[1])) {
         token = path[1]
       } else {
         console.log('Bad Url: ' + path)
@@ -191,8 +187,8 @@ function herokuHandler (req, res) {
       }
     }
     if (!token) {
-      res.end('<html><head><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"</head><body><div class="alert alert-danger" role="alert">Error: Missing Logsene Token ' 
-              + req.url + '. Please use /LOGSENE_TOKEN. More info: <ul><li><a href="https://github.com/sematext/logagent-js#logagent-as-heroku-log-drain">Heroku Log Drain for Logsene</a> </li><li><a href="https://www.sematext.com/logsene/">Logsene Log Management by Sematext</a></li></ul></div></body><html>')
+      res.end('<html><head><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"</head><body><div class="alert alert-danger" role="alert">Error: Missing Logsene Token ' +
+               req.url + '. Please use /LOGSENE_TOKEN. More info: <ul><li><a href="https://github.com/sematext/logagent-js#logagent-as-heroku-log-drain">Heroku Log Drain for Logsene</a> </li><li><a href="https://www.sematext.com/logsene/">Logsene Log Management by Sematext</a></li></ul></div></body><html>')
       return
     }
     var body = ''
@@ -201,9 +197,11 @@ function herokuHandler (req, res) {
     })
     req.on('end', function () {
       var lines = body.split('\n')
-      console.log(lines)
-      lines.forEach(function () {
-        parseLine(body, argv.n || 'heroku', function (err, data) {
+      lines.forEach(function (line) {
+        if (!line) {
+          return
+        }
+        parseLine(line, argv.n || 'heroku', function (err, data) {
           if (data) {
             data.headers = req.headers
           }
@@ -236,33 +234,38 @@ function startCloudfoundryServer () {
 
 function cloudFoundryHandler (req, res) {
   var path = req.url.split('/')
-    var token = null
-    if (path.length > 1) {
-      if (path[1] && path[1].length > 31 && /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/.test(path[1]) ) {
-        token = path[1]
-      } else {
-        console.log('Bad Url: ' + path)
-        console.log(JSON.stringify(req.headers))
-      }
+  var token = null
+  if (path.length > 1) {
+    if (path[1] && path[1].length > 31 && /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/.test(path[1])) {
+      token = path[1]
+    } else {
+      console.log('Bad Url: ' + path)
+      console.log(JSON.stringify(req.headers))
     }
-    if (!token) {
-      res.end('<html><head><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"</head><body><div class="alert alert-danger" role="alert">Error: Missing Logsene Token ' 
-              + req.url + '. Please use /LOGSENE_TOKEN. More info: <ul><li><a href="https://github.com/sematext/logagent-js">CloudFoundry Log Drain for Logsene</a> </li><li><a href="https://www.sematext.com/logsene/">Logsene Log Management by Sematext</a></li></ul></div></body><html>')
-      return
-    }
-
+  }
+  if (!token) {
+    res.end('<html><head><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"</head><body><div class="alert alert-danger" role="alert">Error: Missing Logsene Token ' +
+             req.url + '. Please use /LOGSENE_TOKEN. More info: <ul><li><a href="https://github.com/sematext/logagent-js">CloudFoundry Log Drain for Logsene</a> </li><li><a href="https://www.sematext.com/logsene/">Logsene Log Management by Sematext</a></li></ul></div></body><html>')
+    return
+  }
   var body = ''
   req.on('data', function (data) {
     body += data
   })
   req.on('end', function () {
-    parseLine(body, argv.n || 'cloudfoundry', function (err, data) {
-      if (data) {
-        data.headers = req.headers
+    var lines = body.split('\n')
+    lines.forEach(function (line) {
+      if (!line) {
+        return
       }
-      getLoggerForToken(token, 'cloudfoundry')(err, data)
-      res.end('ok\n')
+      parseLine(body, argv.n || 'cloudfoundry', function (err, data) {
+        if (data) {
+          data.headers = req.headers
+        }
+        getLoggerForToken(token, 'cloudfoundry')(err, data)
+      })
     })
+    res.end('ok')
   })
 }
 function getHttpServer (aport, handler) {
@@ -273,10 +276,10 @@ function getHttpServer (aport, handler) {
   var server = http.createServer(handler)
   try {
     server = server.listen(_port)
-    console.log('Logagent listening (http): ' + _port +', process id: ' + process.pid)
-    return server  
+    console.log('Logagent listening (http): ' + _port + ', process id: ' + process.pid)
+    return server
   } catch (err) {
-    console.log('Port in use (' + _port +'): ' + err)
+    console.log('Port in use (' + _port + '): ' + err)
   }
 }
 
@@ -309,27 +312,27 @@ function tailFilesFromGlob (globPattern) {
 }
 
 function log (err, data) {
-  if (!data) {
+  if (err && !data) {
     emptyLines++
     return
   }
   if (argv.t) {
     logToLogsene(argv.t || logseneToken, data['_type'] || argv.n || 'logs', data)
   }
-  if(argv['rtail-port']) {
-    var ts = data['@timestamp'] 
+  if (argv['rtail-port']) {
+    var ts = data['@timestamp']
     delete data['@timestamp']
     delete data['originalLine']
     delete data['ts']
     var type = data['@source']
     delete data['_type']
     var message = new Buffer(JSON.stringify({
-      timestamp: ts || new Date(), 
+      timestamp: ts || new Date(),
       content: data.message,
       id: type || argv.n || 'logs'
-    })) 
-    udpClient.send(message, 0, message.length, argv['rtail-port'], argv['rtail-host']||'localhost', function (err) {
-      // udpClient.close();
+    }))
+    udpClient.send(message, 0, message.length, argv['rtail-port'], argv['rtail-host'] || 'localhost', function (err) {
+      // udpClient.close()
     })
   }
   if (argv.s) {
@@ -342,13 +345,12 @@ function log (err, data) {
   } else {
     console.log(JSON.stringify(data))
   }
-  
 }
 
-function prettyJs(o) {
+function prettyJs (o) {
   var rv = ''
   var f = flat(o)
-  Object.keys(f).forEach(function(key, i) {
+  Object.keys(f).forEach(function (key, i) {
     rv += key + ': ' + f[key] + ' '
   })
   return rv
@@ -357,9 +359,9 @@ function parseLine (line, sourceName, cbf) {
   bytes += line.length
   count++
   la.parseLine(line.replace(
-      // remove ansi color codes
-      /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,''), 
-      argv.n || sourceName, cbf || log)
+    // remove ansi color codes
+    /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, ''),
+    argv.n || sourceName, cbf || log)
 }
 
 function readStdIn () {
@@ -372,11 +374,11 @@ function readStdIn () {
   rl.on('finish', terminate)
 }
 
-function rtailServer() {
+function rtailServer () {
   // console.log(process.argv)
   try {
     process.argv = [process.argv[0], process.argv[1], '--web-port', String(argv['rtail-web-port']), '--web-host', process.env.HOSTNAME, '--udp-port', String(argv['rtail-port']), '--udp-host', process.env.HOSTNAME]
-    console.log ('start rtail server' + process.argv)
+    console.log('start rtail server' + process.argv)
     require('rtail/cli/rtail-server.js')
   } catch (err) {
     console.log(err)
@@ -412,7 +414,7 @@ function terminate (reason) {
   }, 1000)
 }
 
-function cli() {
+function cli () {
   if (argv['rtail-web-port']) {
     console.log('loading rtail')
     rtailServer()
@@ -450,6 +452,3 @@ function cli() {
     readStdIn()
   }
 }
-
-
-

@@ -356,8 +356,8 @@ patterns:
             'local6',
             'local7'
           ]
-          p.facility = FACILITY[p.prio>>3] || p.prio>>3
-          p.severity = SEVERITY[p.prio&7] || p.prio&7
+          p.facility = FACILITY[p.prio>>3] || String(p.prio>>3)
+          p.severity = SEVERITY[p.prio&7] || String(p.prio&7)
           if (p.process_type === 'router')
           {
             try { 
@@ -418,8 +418,9 @@ patterns:
             'local6',
             'local7'
           ]
-          p.facility = FACILITY[p.prio>>3] || p.prio>>3
-          p.severity = SEVERITY[p.prio&7] || p.prio&7
+          p.facility = FACILITY[p.prio>>3] || String(p.prio>>3)
+          p.severity = SEVERITY[p.prio&7] || String(p.prio&7)
+          delete p.prio
         }
  - # Docker Swarm 
   sourceName: !!js/regexp /swarm/ # catch all .log files  

@@ -217,8 +217,17 @@ function herokuHandler (req, res) {
   }
 }
 // heroku start function for WEB_CONCURENCY
-function start () {
-  getHttpServer(argv.heroku, herokuHandler)
+function startHerokuServer () {
+  getHttpServer(Number(argv.heroku), herokuHandler)
+  process.on('SIGTERM', function () {
+    terminate('exitWorker')
+    console.log('Worker exiting')
+  })
+}
+
+// heroku start function for WEB_CONCURENCY
+function startCloudfoundryServer () {
+  getHttpServer(Number(argv.cfhttp), cloudFoundryHandler)
   process.on('SIGTERM', function () {
     terminate('exitWorker')
     console.log('Worker exiting')
@@ -226,23 +235,49 @@ function start () {
 }
 
 function cloudFoundryHandler (req, res) {
+  var path = req.url.split('/')
+    var token = null
+    if (path.length > 1) {
+      if (path[1] && path[1].length > 31 && /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/.test(path[1]) ) {
+        token = path[1]
+      } else {
+        console.log('Bad Url: ' + path)
+        console.log(JSON.stringify(req.headers))
+      }
+    }
+    if (!token) {
+      res.end('<html><head><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"</head><body><div class="alert alert-danger" role="alert">Error: Missing Logsene Token ' 
+              + req.url + '. Please use /LOGSENE_TOKEN. More info: <ul><li><a href="https://github.com/sematext/logagent-js">CloudFoundry Log Drain for Logsene</a> </li><li><a href="https://www.sematext.com/logsene/">Logsene Log Management by Sematext</a></li></ul></div></body><html>')
+      return
+    }
+
   var body = ''
   req.on('data', function (data) {
     body += data
   })
   req.on('end', function () {
-    parseLine(body, argv.n || 'cloudfoundry', log)
-    res.end('ok\n')
+    parseLine(body, argv.n || 'cloudfoundry', function (err, data) {
+      if (data) {
+        data.headers = req.headers
+      }
+      getLoggerForToken(token, 'cloudfoundry')(err, data)
+      res.end('ok\n')
+    })
   })
 }
-function getHttpServer (port, handler) {
-  var _port = port || process.env.PORT
-  if (port === true) { // a commadn line flag was set but no port given
+function getHttpServer (aport, handler) {
+  var _port = aport || process.env.PORT
+  if (aport === true) { // a commadn line flag was set but no port given
     _port = process.env.PORT
   }
   var server = http.createServer(handler)
-  console.log('Logagent listening (http): ' + _port)
-  return server.listen(_port)
+  try {
+    server = server.listen(_port)
+    console.log('Logagent listening (http): ' + _port +', process id: ' + process.pid)
+    return server  
+  } catch (err) {
+    console.log('Port in use (' + _port +'): ' + err)
+  }
 }
 
 function tailFile (file) {
@@ -383,13 +418,16 @@ function cli() {
     rtailServer()
   }
   if (argv.cfhttp) {
-    getHttpServer(argv.cfhttp, cloudFoundryHandler)
+    throng({
+      workers: WORKERS,
+      lifetime: Infinity
+    }, startCloudfoundryServer)
   }
   if (argv.heroku) {
     throng({
       workers: WORKERS,
       lifetime: Infinity
-    }, start)
+    }, startHerokuServer)
   }
   if (argv.stdin) {
     readStdIn()

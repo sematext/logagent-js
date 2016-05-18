@@ -112,7 +112,7 @@ To receive Heroku logs, logagent-js can be deployed to Heroku. It acts as HTTPS 
   export LOGSENE_TOKEN=YOUR_LOGSENE_TOKEN
   heroku drains:add --app YOUR_HEROKU_MAIN_APPLICATION  `heroku info -s | grep web-url | cut -d= -f2`$LOGSENE_TOKEN
   ```
-Now you can see your logs in Logsene, define Alert-Queries or use Kibana 4 for Dashboards. 
+Now you can see your logs in Logsene, define Alert-Queries or use Kibana for Dashboards. 
 
 3. Scale logagent-js service on Heroku
 

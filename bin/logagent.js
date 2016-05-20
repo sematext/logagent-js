@@ -205,12 +205,12 @@ function herokuHandler (req, res) {
           return
         }
         try {
-          parseLine(body, argv.n || 'heroku', function (err, data) {
+          parseLine(line, argv.n || 'heroku', function (err, data) {
             if (data) {
               parseLine(data.message, 'undefined', function (e, d) {
                 if (d) {
                   Object.keys(d).forEach(function (key) {
-                    data[key] = d[key]
+                    this.data[key] = d[key]
                   })
                 }
                 getLoggerForToken(token, 'heroku')(err, data)

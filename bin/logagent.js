@@ -32,8 +32,11 @@ if (process.argv.length === 2) {
 
 var argv = require('minimist')(process.argv.slice(2))
 var https = require('https')
+var http = require('http')
 // limit number of socket connections to Logsene
 https.globalAgent.maxSockets = 20
+// limit number of socket connections to Logsene
+http.globalAgent.maxSockets = 10000
 var prettyjson = require('prettyjson')
 var LogAnalyzer = require('../lib/index.js')
 var readline = require('readline')
@@ -188,7 +191,7 @@ function herokuHandler (req, res) {
     }
     if (!token) {
       res.end('<html><head><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"</head><body><div class="alert alert-danger" role="alert">Error: Missing Logsene Token ' +
-               req.url + '. Please use /LOGSENE_TOKEN. More info: <ul><li><a href="https://github.com/sematext/logagent-js#logagent-as-heroku-log-drain">Heroku Log Drain for Logsene</a> </li><li><a href="https://www.sematext.com/logsene/">Logsene Log Management by Sematext</a></li></ul></div></body><html>')
+        req.url + '. Please use /LOGSENE_TOKEN. More info: <ul><li><a href="https://github.com/sematext/logagent-js#logagent-as-heroku-log-drain">Heroku Log Drain for Logsene</a> </li><li><a href="https://www.sematext.com/logsene/">Logsene Log Management by Sematext</a></li></ul></div></body><html>')
       return
     }
     var body = ''
@@ -201,17 +204,27 @@ function herokuHandler (req, res) {
         if (!line) {
           return
         }
-        parseLine(line, argv.n || 'heroku', function (err, data) {
-          if (data) {
-            data.headers = req.headers
-          }
-          getLoggerForToken(token, 'heroku')(err, data)
-        })
+        try {
+          parseLine(body, argv.n || 'heroku', function (err, data) {
+            if (data) {
+              parseLine(data.message, 'undefined', function (e, d) {
+                if (d) {
+                  Object.keys(d).forEach(function (key) {
+                    data[key] = d[key]
+                  })
+                }
+                getLoggerForToken(token, 'heroku')(err, data)
+              })
+            }
+          })
+        } catch (unknownError) {
+          console.log(new Date() + ': ' + unknownError + ' ' + unknownError.stack)
+        }
       })
       res.end('ok\n')
     })
   } catch (err) {
-    console.error(err)
+    console.error(new Date() + ': ' + err)
   }
 }
 // heroku start function for WEB_CONCURENCY
@@ -245,7 +258,7 @@ function cloudFoundryHandler (req, res) {
   }
   if (!token) {
     res.end('<html><head><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"</head><body><div class="alert alert-danger" role="alert">Error: Missing Logsene Token ' +
-             req.url + '. Please use /LOGSENE_TOKEN. More info: <ul><li><a href="https://github.com/sematext/logagent-js">CloudFoundry Log Drain for Logsene</a> </li><li><a href="https://www.sematext.com/logsene/">Logsene Log Management by Sematext</a></li></ul></div></body><html>')
+      req.url + '. Please use /LOGSENE_TOKEN. More info: <ul><li><a href="https://github.com/sematext/logagent-js">CloudFoundry Log Drain for Logsene</a> </li><li><a href="https://www.sematext.com/logsene/">Logsene Log Management by Sematext</a></li></ul></div></body><html>')
     return
   }
   var body = ''
@@ -253,13 +266,24 @@ function cloudFoundryHandler (req, res) {
     body += data
   })
   req.on('end', function () {
-    parseLine(body, argv.n || 'cloudfoundry', function (err, data) {
-      if (data) {
-        data.headers = req.headers
-      }
-      getLoggerForToken(token, 'cloudfoundry')(err, data)
-    })
-    res.end('ok')
+    try {
+      parseLine(body, argv.n || 'cloudfoundry', function (err, data) {
+        if (data) {
+          parseLine(data.message, 'undefined', function (e, d) {
+            if (d) {
+              Object.keys(d).forEach(function (key) {
+                data[key] = d[key]
+              })
+            }
+            getLoggerForToken(token, 'cloudfoundry')(err, data)
+          })
+        }
+      })
+      res.end()
+    } catch (unknownError) {
+      console.log(unknownError.stack)
+      res.end()
+    }
   })
 }
 function getHttpServer (aport, handler) {
@@ -350,6 +374,9 @@ function prettyJs (o) {
   return rv
 }
 function parseLine (line, sourceName, cbf) {
+  if (!line && cbf) {
+    return cbf(new Error('empty line passed to parseLine()'))
+  }
   bytes += line.length
   count++
   la.parseLine(line.replace(
@@ -382,19 +409,27 @@ function rtailServer () {
   }
 }
 
+function printStats () {
+  var now = new Date().getTime()
+  var duration = now - begin
+  var throughput = count / (duration / 1000)
+  var throughputBytes = (bytes / 1024 / 1024) / (duration / 1000)
+  begin = now
+  count = 0
+  bytes = 0
+  console.error(duration + ' ms ' + count + ' lines parsed.  ' + throughput.toFixed(0) + ' lines/s ' + throughputBytes.toFixed(3) + ' MB/s - empty lines: ' + emptyLines)
+  console.error('Heap Used: ' + (process.memoryUsage().heapUsed / (1024 * 1024)) + ' MB')
+  console.error('Heap Total: ' + (process.memoryUsage().heapTotal / (1024 * 1024)) + ' MB')
+  console.error('Memory RSS: ' + (process.memoryUsage().rss / (1024 * 1024)) + ' MB')
+}
+
 function terminate (reason) {
   if (argv.heroku && reason !== 'exitWorker') {
     return
   }
-  var duration = new Date().getTime() - begin
-  var throughput = count / (duration / 1000)
-  var throughputBytes = (bytes / 1024 / 1024) / (duration / 1000)
 
   if (argv.s) {
-    console.error(duration + ' ms ' + count + ' lines parsed.  ' + throughput.toFixed(0) + ' lines/s ' + throughputBytes.toFixed(3) + ' MB/s - empty lines: ' + emptyLines)
-    console.error('Heap Used: ' + (process.memoryUsage().heapUsed / (1024 * 1024)) + ' MB')
-    console.error('Heap Total: ' + (process.memoryUsage().heapTotal / (1024 * 1024)) + ' MB')
-    console.error('Memory RSS: ' + (process.memoryUsage().rss / (1024 * 1024)) + ' MB')
+    printStats()
   }
   setTimeout(function () {
     // console.log(Object.keys(loggers))
@@ -409,6 +444,9 @@ function terminate (reason) {
 }
 
 function cli () {
+  if (argv.print_stats) {
+    setInterval(printStats, Number(argv.print_stats) * 1000)
+  }
   if (argv['rtail-web-port']) {
     console.log('loading rtail')
     rtailServer()

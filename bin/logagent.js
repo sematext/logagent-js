@@ -205,14 +205,17 @@ function herokuHandler (req, res) {
         try {
           parseLine(line, argv.n || 'heroku', function (err, data) {
             if (data) {
-              parseLine(data.message, data.app || 'undefined', function (e, d) {
-                if (d) {
-                  Object.keys(d).forEach(function (key) {
-                    data[key] = d[key]
-                  })
-                }
+              if (process.env.ENABLE_MESSAGE_PARSER !== 'true') {
                 getLoggerForToken(token, 'heroku')(err, data)
-              })
+              } else {
+                parseLine(data.message, data.app || 'undefined', function (e, d) {
+                  if (d) {
+                    data.message=d.message
+                    data.parsed_message = d
+                  }
+                  getLoggerForToken(token, 'heroku')(err, data)
+                })
+              }
             }
           })
         } catch (unknownError) {
@@ -267,14 +270,17 @@ function cloudFoundryHandler (req, res) {
     try {
       parseLine(body, argv.n || 'cloudfoundry', function (err, data) {
         if (data) {
-          parseLine(data.message, 'undefined', function (e, d) {
-            if (d) {
-              Object.keys(d).forEach(function (key) {
-                data[key] = d[key]
-              })
-            }
+          if (process.env.ENABLE_MESSAGE_PARSER !== 'true') {
             getLoggerForToken(token, 'cloudfoundry')(err, data)
-          })
+          } else {
+            parseLine(data.message, data.app || 'undefined', function (e, d) {
+              if (d) {
+                data.message=d.message
+                data.parsed_message = d
+              }
+              getLoggerForToken(token, 'cloudfoundry')(err, data)
+            })
+          }
         }
       })
       res.end()

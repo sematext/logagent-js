@@ -207,7 +207,7 @@ function herokuHandler (req, res) {
         try {
           parseLine(line, argv.n || 'heroku', function (err, data) {
             if (data) {
-              parseLine(data.message, 'undefined', function (e, d) {
+              parseLine(data.message, data.app || 'undefined', function (e, d) {
                 if (d) {
                   Object.keys(d).forEach(function (key) {
                     data[key] = d[key]

@@ -414,13 +414,13 @@ function printStats () {
   var duration = now - begin
   var throughput = count / (duration / 1000)
   var throughputBytes = (bytes / 1024 / 1024) / (duration / 1000)
-  begin = now
-  count = 0
-  bytes = 0
-  console.error(duration + ' ms ' + count + ' lines parsed.  ' + throughput.toFixed(0) + ' lines/s ' + throughputBytes.toFixed(3) + ' MB/s - empty lines: ' + emptyLines)
+  console.error('pid['+process.pid + ']' + ' ' + duration + ' ms ' + count + ' lines parsed.  ' + throughput.toFixed(0) + ' lines/s ' + throughputBytes.toFixed(3) + ' MB/s - empty lines: ' + emptyLines)
   console.error('Heap Used: ' + (process.memoryUsage().heapUsed / (1024 * 1024)) + ' MB')
   console.error('Heap Total: ' + (process.memoryUsage().heapTotal / (1024 * 1024)) + ' MB')
   console.error('Memory RSS: ' + (process.memoryUsage().rss / (1024 * 1024)) + ' MB')
+  begin = now
+  count = 0
+  bytes = 0
 }
 
 function terminate (reason) {

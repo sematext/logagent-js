@@ -34,9 +34,7 @@ var argv = require('minimist')(process.argv.slice(2))
 var https = require('https')
 var http = require('http')
 // limit number of socket connections to Logsene
-https.globalAgent.maxSockets = 20
-// limit number of socket connections to Logsene
-http.globalAgent.maxSockets = 10000
+https.globalAgent.maxSockets = Number(process.env.MAX_HTTPS_SOCKETS)||20
 var prettyjson = require('prettyjson')
 var LogAnalyzer = require('../lib/index.js')
 var readline = require('readline')

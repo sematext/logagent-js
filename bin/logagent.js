@@ -156,7 +156,7 @@ function getLoggerForToken (token, type) {
           app: data.app,
           host: data.host,
           process_type: data.process_type,
-          originalLine: data.origignalLine,
+          originalLine: data.originalLine,
           severity: data.severity,
           facility: data.facility
         }

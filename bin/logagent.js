@@ -185,8 +185,8 @@ function herokuHandler (req, res) {
       if (path[1] && path[1].length > 31 && /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/.test(path[1])) {
         token = path[1]
       } else {
-        console.log('Bad Url: ' + path)
-        console.log(JSON.stringify(req.headers))
+        // console.log('Bad Url: ' + path)
+        // console.log(JSON.stringify(req.headers))
       }
     }
     if (!token) {
@@ -252,8 +252,8 @@ function cloudFoundryHandler (req, res) {
     if (path[1] && path[1].length > 31 && /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/.test(path[1])) {
       token = path[1]
     } else {
-      console.log('Bad Url: ' + path)
-      console.log(JSON.stringify(req.headers))
+      // console.log('Bad Url: ' + path)
+      // console.log(JSON.stringify(req.headers))
     }
   }
   if (!token) {

@@ -32,7 +32,7 @@ This project contains a library and patterns for log parsing and cli tools and i
 - CloudFoundry Log Drain
 
 ## Processing
-- logagent-js applies the patterns defined in ```patterns.yml' to all logs to create structured output from plain text lines. Patterns are defined for input sources with regular expressions. The parsed logs can be post-processed with node.js transform function e.g. to enrich data or perform complex parser operations. 
+- logagent-js applies the patterns defined in ```patterns.yml``` to all logs to create structured output from plain text lines. Patterns are defined for input sources with regular expressions. The parsed logs can be post-processed with node.js transform function e.g. to enrich data or perform complex parser operations. 
 - GeoIP lookups for IP adress fields, including download and update of the GeoIP lite database from Maxmind
 
 ## Security

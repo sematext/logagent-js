@@ -438,7 +438,7 @@ function terminate (reason) {
   }, 300)
   setTimeout(function () {
     process.exit()
-  }, 1000)
+  }, Number(process.env.SIGTERM_TIMEOUT) || 2000)
 }
 
 function cli () {

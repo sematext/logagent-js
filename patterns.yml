@@ -464,6 +464,11 @@ patterns:
       dateFormat: MMM D HH:mm:ss
     - 
       type: log
+      regex: !!js/regexp /(\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2},\d+)\s\[(\S+)]\s(.+)/
+      fields: [ts,severity,message]
+      dateFormat: YYYY-MM-DD HH:mm:ss,S
+    - 
+      type: log
       regex: !!js/regexp /(\d{4}[\-|\d{2}]+\s[\d|\:]+\s\+\d{4})\:\s+(.+)/
       fields: [ts,message]
       dateFormat: YYYY-MM-DD HH:mm:ss ZZ

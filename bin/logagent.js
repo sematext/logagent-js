@@ -147,10 +147,11 @@ function getLoggerForToken (token, type) {
     if (!err && data) {
       delete data.ts
       // delete data.ts
-      data['_type'] = type
+      data['_type'] = ('' + type).replace('_' +token, '')
+      data['@source'] = ('' + data['@source']).replace('_' +token, '')
       var msg = data
       log(err, msg)
-      if (type === 'heroku') {
+      if (/heroku/.test(type)) {
         msg = {
           message: data.message,
           app: data.app,
@@ -203,17 +204,17 @@ function herokuHandler (req, res) {
           return
         }
         try {
-          parseLine(line, argv.n || 'heroku', function (err, data) {
+          parseLine(line, 'heroku_'+token, function (err, data) {
             if (data) {
               if (process.env.ENABLE_MESSAGE_PARSER !== 'true') {
-                getLoggerForToken(token, 'heroku')(err, data)
+                getLoggerForToken(token, 'heroku_'+token)(err, data)
               } else {
-                parseLine(data.message, data.app || 'undefined', function (e, d) {
+                parseLine(data.message, (data.app || 'undefined')+ '_' + token, function (e, d) {
                   if (d) {
                     data.message=d.message
                     data.parsed_message = d
                   }
-                  getLoggerForToken(token, 'heroku')(err, data)
+                  getLoggerForToken(token, 'heroku_'+token)(err, data)
                 })
               }
             }
@@ -268,17 +269,17 @@ function cloudFoundryHandler (req, res) {
   })
   req.on('end', function () {
     try {
-      parseLine(body, argv.n || 'cloudfoundry', function (err, data) {
+      parseLine(body, 'cloudfoundry_'+token, function (err, data) {
         if (data) {
           if (process.env.ENABLE_MESSAGE_PARSER !== 'true') {
-            getLoggerForToken(token, 'cloudfoundry')(err, data)
+            getLoggerForToken(token, 'cloudfoundry_'+token)(err, data)
           } else {
-            parseLine(data.message, data.app || 'undefined', function (e, d) {
+            parseLine(data.message, (data.app || 'undefined') + '_' + token, function (e, d) {
               if (d) {
                 data.message=d.message
                 data.parsed_message = d
               }
-              getLoggerForToken(token, 'cloudfoundry')(err, data)
+              getLoggerForToken(token, 'cloudfoundry_'+token)(err, data)
             })
           }
         }

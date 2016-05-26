@@ -29,7 +29,7 @@ This project contains a library and patterns for log parsing and cli tools and i
   - patterns are applied to each incoming text line; includes support for multi-line patters, e.g. for Java Stack Traces and JSON input.
 - Syslog Server (UDP) listener - logagent-js can also act as a syslog server and receive Syslog messages via UDP. The parser is applied to the message field. 
 - [Heroku Log Drain](https://github.com/sematext/logagent-js#logagent-as-heroku-log-drain) makes it easy to ship Heroku logs to Elasticsearch or [Logsene](http://www.sematext.com/logsene/)
-- CloudFoundry Log Drain
+- Cloud Foundry Log Drain
 
 ## Processing
 - logagent-js applies patterns defined in patterns.yml to all logs and creates structured logs from plain-text log lines
@@ -72,16 +72,21 @@ sudo apt-get install -y nodejs
 # Install logagent-js with npm
 ```
 npm i -g logagent-js
+
 # Be Evil: parse all logs 
 # stream logs to Logsene 1-Click ELK stack 
 logagent -t LOGSENE_TOKEN /var/log/*.log 
-# Act as syslog server on UDP and write YAML formated messages to console
+
+# Act as syslog server on UDP and write YAML formatted messages to console
 logagent -u 514 -y  
+
 # Act as syslog server on UDP and forward messages to Logsene
-logagent -t LOGSENE_TOKEN -u 514 
+logagent -u 514 -t LOGSENE_TOKEN
+
 # Install the service (Linux, Mac OS X)
 sudo logagent-setup LOGSENE_TOKEN
-# Change CLI parameters to your needs
+
+# Adjust CLI parameters for your needs
 vi /etc/sematext/logagent.conf
 ```
 

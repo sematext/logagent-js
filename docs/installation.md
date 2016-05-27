@@ -123,3 +123,5 @@ In case of high log volume, scale logagent-js on demand using
 ```
 heroku scale web=3
 ```
+See also:
+- [How to Ship Heroku Logs to Logsene / Managed ELK Stack]https://sematext.com/blog/2016/02/18/how-to-ship-heroku-logs-to-logsene-managed-elk-stack/)

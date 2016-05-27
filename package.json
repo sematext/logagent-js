@@ -1,6 +1,6 @@
 {
   "name": "logagent-js",
-  "version": "1.1.60",
+  "version": "1.1.61",
   "description": "Smart log parser written in Node",
   "main": "lib/index.js",
   "bin": {
@@ -41,6 +41,7 @@
     "maxmind": "^0.6.0",
     "maxmind-geolite-mirror": "^1.0.5",
     "minimist": "^1.1.2",
+    "mkpath": "^1.0.0",
     "moment": "^2.10.3",
     "prettyjson": "^1.1.2",
     "syslogd": "^1.1.2",

@@ -19,6 +19,17 @@
 
 The default output is line delimited JSON.
 
+## Environment variables
+|Variable|Description|
+|--------|-----------|
+|LOGSENE_TMP_DIR | Directory to store failed bulk requests, for later re-transmission.|
+|LOGSENE_LOG_INTERVAL | Time to collect logs before a bulk request is done. Default 10000 ms (10 seconds)|
+|LOGSENE_BULK_SIZE | Maximum size of a bulk request. Default 1000.|
+|LOGSENE_URL | URL for the Logsene receiver. For a local Elasticsearch server or for On-Premise version of Logsene. Defaults to Sematext Logsene SaaS receiver https://logsene-receiver.sematext.com/_bulk. Example for Elasticsearch: ```LOGSENE_URL=http://localhost:9200/_bulk```|
+|HTTPS_PROXY|Proxy URL for https endpoints, like Logsene receiver. ```export HTTPS_PROXY=http://my-proxy.example```|
+|HTTP_PROXY|Proxy URL for HTTP endpoints (e.g. On-Premises or local Elasticsearch). ```export HTTP_PROXY=http://my-proxy.example```|
+
+
 ## Command Line Examples 
 ```
 # Be Evil: parse all logs 

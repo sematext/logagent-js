@@ -54,6 +54,13 @@ var WORKERS = process.env.WEB_CONCURRENCY || 1
 var dgram = require('dgram')
 var udpClient = dgram.createSocket('udp4')
 var flat = require('flat')
+var logseneDiskBufferDir = argv['logsene-tmp-dir'] || process.env.LOGSENE_TMP_DIR || require('os').tmpdir()
+var mkpath = require('mkpath')
+mkpath(logseneDiskBufferDir, function (err) {
+  if (err) {
+    console.error('ERROR: create directory LOGSENE_TMP_DIR (' + logseneDiskBufferDir + '): ' + err.message)
+  }
+})
 var la = new LogAnalyzer(argv.f, {}, function () {
   cli()
 })
@@ -120,12 +127,15 @@ function getSyslogServer (appToken, port, type) {
   return syslogd
 }
 
+  
+
 function getLogger (token, type) {
   var key = token + type
   // console.log(token)
+
   if (!loggers[key]) {
     var logger = new Logsene(token, type, null,
-      argv['logsene-tmp-dir'] || process.env.LOGSENE_TMP_DIR || require('os').tmpdir())
+      logseneDiskBufferDir)
     logger.on('log', function (data) {
       // console.log(data)
     })

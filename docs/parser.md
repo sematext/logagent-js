@@ -15,22 +15,22 @@ The parser detects log formats based on a pattern library (yaml file) and conver
 - default patterns for many applications (see below)
 - Heroku logs
 
-The default pattern definition file include already patterns for:
+The default pattern definition file comes with patterns for:
 
-- MongoDB, 
-- MySQL, 
-- Nginx, 
-- Redis, 
+- MongoDB
+- MySQL
+- Nginx
+- Redis
 - Elasticsearch
-- Webserver (nginx, apache httpd), 
-- Zookeeper, 
-- Cassandra, 
-- Kafka,
-- HBase HDFS Data Node,
-- HBase Region Server,
-- Hadoop YARN Node Manager, 
-- Apache SOLR,
-- various Linux/Mac OS X system log files 
+- Webserver (nginx, apache httpd)
+- Zookeeper
+- Cassandra
+- Kafka
+- HBase HDFS Data Node
+- HBase Region Server
+- Hadoop YARN Node Manager
+- Apache Solr
+- various Linux/Mac OS X system log files
 
 The file format is based on [JS-YAML](https://nodeca.github.io/js-yaml/), in short:
 ```
@@ -41,13 +41,13 @@ The file format is based on [JS-YAML](https://nodeca.github.io/js-yaml/), in sho
 
 Properties:
 
-- patterns - the list of patterns, each pattern starts with "-"
-- match: A group of patterns for a specific log source
-- regex: a JS regular expression 
-- fields: the field list of extracted match groups from the regex
-- type: the type used in Logsene (Elasticsearch Mapping)
-- dateFormat: the format of the special fields 'ts', if the date format matches, a new field @timestamp is generated
-- transform: a JS function to manipulate the result of regex and date parsing
+- patterns: list of patterns, each pattern starts with "-"
+- match: group of patterns for a specific log source
+- regex: JS regular expression 
+- fields: field list of extracted match groups from the regex
+- type: type used in Logsene (Elasticsearch Mapping)
+- dateFormat: format of the special fields 'ts', if the date format matches, a new field @timestamp is generated
+- transform: JS function to manipulate the result of regex and date parsing
 
 # Example
 
@@ -56,14 +56,18 @@ Properties:
 # it applies to fields matching the field names by a regular expression
 # Note: this function is not optimized (yet) and might take 10-15% of performance
 autohash: !!js/regexp /user|password|email|credit_card_number|payment_info/i
-# set this to false when authash fields
+
+# set this to false when autohash fields
 # the original line might include sensitive data!
 originalLine: false
+
 # activate GeoIP lookup
 geoIP: true
+
 # logagent updates geoip db files automatically
 # pls. note write access to this directory is required
 maxmindDbDir: /tmp/
+
 patterns: 
   - # APACHE  Web Logs
   sourceName: httpd
@@ -81,5 +85,4 @@ patterns:
         }
 ```
 
-The default patterns are [here](https://github.com/sematext/logagent-js/blob/master/patterns.yml) - contributions are welcome.
-
+The default patterns are [here](https://github.com/sematext/logagent-js/blob/master/patterns.yml) - contributions are welcome!

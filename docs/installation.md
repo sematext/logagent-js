@@ -1,4 +1,4 @@
-## Preparation: Install Node.js 
+## Install Node.js 
 
 Official Node.js [downloads and instructions](https://nodejs.org/en/download/).
 E.g. for Debian/Ubuntu:
@@ -7,10 +7,10 @@ curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
 
-# Logagnet command line tool with npm
+# Logagent command line tool with npm
 ```
 npm i -g logagent-js
-# Test to ship your logs to Logsene, parsed with timestamps - output on console in YAML format (-y)
+# Test logs reading parsed with timestamps - output on console in YAML format (-y)
 logagent -y /var/log/*.log
 ```
 
@@ -18,7 +18,7 @@ logagent -y /var/log/*.log
 
 1. Get a free account at [sematext.com/spm](https://apps.sematext.com/users-web/register.do)  
 2. [create a Logsene App](https://apps.sematext.com/logsene-reports/registerApplication.do) to obtain an App Token for [Logsene](http://www.sematext.com/logsene/) 
-3. Install logagnet as system service
+3. Install logagent as system service
 Logagent detects the init system and installs systemd or upstart service scripts. 
 On Mac OS X it creates a launchd service. Simply run:
 ```
@@ -28,7 +28,7 @@ sudo logagent-setup LOGSENE_TOKEN
 
 The setup script generates a configuraton file in ```/etc/sematext/logagent.conf```.
 This file includes the CLI parameters for logagent running as service.
-The default settings ship all logs from ```/var/log/**/*.log`` to Logsene. 
+The default settings ship all logs from ```/var/log/**/*.log``` to Logsene. 
 
 Location of service scripts:
 - upstart: /etc/init/logagent.conf

@@ -25,9 +25,9 @@ The default output is line delimited JSON.
 # stream logs to Logsene 1-Click ELK stack 
 logagent -t LOGSENE_TOKEN /var/log/*.log 
 # Act as syslog server on UDP and forward messages to Logsene
-logagent -t LOGSENE_TOKEN -u 1514 
-# Act as syslog server on UDP and write YAML formated messages to console
-logagent -u 1514 -y  
+logagent -u 514 -t LOGSENE_TOKEN  
+# Act as syslog server on UDP and write YAML formatted messages to console
+logagent -u 514 -y  
 ```
 
 Use a [glob](https://www.npmjs.com/package/glob) pattern to build the file list 

@@ -7,7 +7,7 @@ curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
 
-# Logagent command line tool with npm
+# Install Logagent
 ```
 npm i -g logagent-js
 # Test logs reading parsed with timestamps - output on console in YAML format (-y)
@@ -16,7 +16,7 @@ logagent -y /var/log/*.log
 
 ## Linux or Mac OS X service for Logsene
 
-1. Get a free account at [sematext.com/spm](https://apps.sematext.com/users-web/register.do)  
+1. Get a free account at [sematext.com/spm](https://apps.sematext.com/users-web/register.do)
 2. [create a Logsene App](https://apps.sematext.com/logsene-reports/registerApplication.do) to obtain an App Token for [Logsene](http://www.sematext.com/logsene/) 
 3. Install logagent as system service
 Logagent detects the init system and installs systemd or upstart service scripts. 
@@ -41,19 +41,21 @@ Start/stop service:
 - lauchnchd: ```launchctl start/stop com.sematext.logagent```
 
 
-## Docker - receive logs via syslog 
-Build the image and start logagent with the LOGSENE_TOKEN
+## Running Logagent in a Docker Container as Syslog Listener
+You can build a Docker image with logagent running in it and activing as a Syslog UDP listener.  Then you can run this as a container.  Once you have this "containerized logagent" you can start all yoour other containers with Syslog driver and point it to the "containerized logagent's" UDP port (514).  Here are the steps:
+
+Build the docker image, and then run logagent inside it with the given LOGSENE_TOKEN
 ```
 git clone https://github.com/sematext/logagent-js.git
 cd logagent-js
 docker build -t logagent . 
-docker run -p 514:514/udp -e LOGSENE_TOKEN=YOUR_LOGSENE_TOKEN  -d --name logagent --restart=always logagent
+docker run -p 514:514/udp -e LOGSENE_TOKEN=YOUR_LOGSENE_TOKEN -d --name logagent --restart=always logagent
 ```
 
-Run your container with syslog driver
+Run your other containers with Syslog driver
 ```
 export $DOCKER_HOSTNAME=192.168.99.100
-docker run --log-driver=syslog  --log-opt syslog-address=udp://$DOCKER_HOSTNAME:514 --log-opt tag="{{.ImageName}}#{{.Name}}#{{.ID}}" -p 9003:80 -d nginx
+docker run --log-driver=syslog --log-opt syslog-address=udp://$DOCKER_HOSTNAME:514 --log-opt tag="{{.ImageName}}#{{.Name}}#{{.ID}}" -p 9003:80 -d nginx
 curl $DOCKER_HOSTNAME:9003
 ```
 
@@ -72,7 +74,7 @@ To view realtime logs in the Web Browser with rtail, simply add the options for 
 
 ```
 export LOGAGENT_OPTIONS="-s --rtail-host $HOSTNAME --rtail-web-port 80 --rtail-port 9999"
-docker run -p 8080:80 -p 514:514/udp -e LOGAGENT_OPTIONS -e LOGSENE_TOKEN=YOUR_LOGSENE_TOKEN  -d --name logagent --restart=always logagent
+docker run -p 8080:80 -p 514:514/udp -e LOGAGENT_OPTIONS -e LOGSENE_TOKEN=YOUR_LOGSENE_TOKEN -d --name logagent --restart=always logagent
 ```
 
 - Set Node.js Memory limits
@@ -82,20 +84,22 @@ docker run -p 8080:80 -p 514:514/udp -e LOGAGENT_OPTIONS -e LOGSENE_TOKEN=YOUR_L
 
 Please note [Sematext Agent Docker](https://hub.docker.com/r/sematext/sematext-agent-docker/) might be of interest if you like to collect logs, events and metrics from Docker. 
 
-## Install logagent as Heroku log drain
+## Install Logagent as Heroku Log Drain
 
-[Heroku](http://www.heroku.com) can forward logs to a [Log Drain](https://devcenter.heroku.com/articles/log-drains) 
+You can forward your [Heroku](http://www.heroku.com) logs to Logsene using Heroku [Log Drain](https://devcenter.heroku.com/articles/log-drains) like this:
 ```
-heroku drain:add --app HerokuAppName URL 
+heroku drain:add --app HerokuAppName URL
 ```
+Here are the steps:
 
 To receive Heroku logs, logagent-js can be deployed to Heroku. It acts as HTTPS log drain. 
 
-1. Get a free account [apps.sematext.com](https://apps.sematext.com/users-web/register.do)  
+1. Get a free account [apps.sematext.com](https://apps.sematext.com/users-web/register.do)
 2. Create a [Logsene](http://www.sematext.com/logsene/) App to obtain the Logsene Token
-3. Deploy logagent-js to Heroku 
+3. Deploy logagent-js to Heroku usign the Deploy to Heroku button
 
-[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/sematext/logagent-js) or use the following commands:
+[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/sematext/logagent-js) 
+... or use the following commands:
 
   ```
   git clone https://github.com/sematext/logagent-js.git
@@ -104,19 +108,19 @@ To receive Heroku logs, logagent-js can be deployed to Heroku. It acts as HTTPS 
   heroku create
   git push heroku master
   ```
-4. Add the the log drain.  
-  The URL format is https://loggerAppName.herokuapps.com/LOGSENE_TOKEN
-  Use following command, using the dynamically given name from "heroku create".
+4. Add the log drain
+  The URL format is https://loggerAppName.herokuapps.com/LOGSENE_TOKEN.
+  Use the following command to grab the dynamically assigned name from "heroku create".
 
   ```
   export LOGSENE_TOKEN=YOUR_LOGSENE_TOKEN
-  heroku drains:add --app YOUR_HEROKU_MAIN_APPLICATION  `heroku info -s | grep web-url | cut -d= -f2`$LOGSENE_TOKEN
+  heroku drains:add --app YOUR_HEROKU_MAIN_APPLICATION `heroku info -s | grep web-url | cut -d= -f2`$LOGSENE_TOKEN
   ```
 Now you can see your logs in Logsene, define Alert-Queries or use Kibana for Dashboards. 
 
 3. Scale logagent-js service on Heroku
 
-In case of high log volume, scale logagent-js  on demand using 
+In case of high log volume, scale logagent-js on demand using 
 ```
 heroku scale web=3
 ```

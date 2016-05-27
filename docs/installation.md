@@ -84,7 +84,7 @@ docker run -p 8080:80 -p 514:514/udp -e LOGAGENT_OPTIONS -e LOGSENE_TOKEN=YOUR_L
 
 Please note [Sematext Agent Docker](https://hub.docker.com/r/sematext/sematext-agent-docker/) might be of interest if you like to collect logs, events and metrics from Docker. 
 
-## Install Logagent as Heroku Log Drain
+## Run Logagent as Heroku Log Drain
 
 You can forward your [Heroku](http://www.heroku.com) logs to Logsene using Heroku [Log Drain](https://devcenter.heroku.com/articles/log-drains) like this:
 ```
@@ -92,11 +92,11 @@ heroku drain:add --app HerokuAppName URL
 ```
 Here are the steps:
 
-To receive Heroku logs, logagent-js can be deployed to Heroku. It acts as HTTPS log drain. 
+To ship your Heroku logs to Logsene or Elasticsearch deploy Logagent on Heroku. It will act as an HTTPS log drain. 
 
 1. Get a free account [apps.sematext.com](https://apps.sematext.com/users-web/register.do)
 2. Create a [Logsene](http://www.sematext.com/logsene/) App to obtain the Logsene Token
-3. Deploy logagent-js to Heroku usign the Deploy to Heroku button
+3. Deploy logagent-js to Heroku using the Deploy to Heroku button
 
 [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/sematext/logagent-js) 
 ... or use the following commands:
@@ -108,9 +108,8 @@ To receive Heroku logs, logagent-js can be deployed to Heroku. It acts as HTTPS 
   heroku create
   git push heroku master
   ```
-4. Add the log drain
-  The URL format is https://loggerAppName.herokuapps.com/LOGSENE_TOKEN.
-  Use the following command to grab the dynamically assigned name from "heroku create".
+4. Add the log drain using the URL format like https://loggerAppName.herokuapps.com/LOGSENE_TOKEN.
+  Use the following command to grab the dynamically assigned name from "heroku create" command.
 
   ```
   export LOGSENE_TOKEN=YOUR_LOGSENE_TOKEN

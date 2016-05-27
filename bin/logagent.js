@@ -139,6 +139,7 @@ function getLogger (token, type) {
 
 function logToLogsene (token, type, data) {
   var logger = getLogger(token, type)
+  //console.log('token:' + token + ' message: ' + JSON.stringify(data))
   logger.log(data.level || data.severity || 'info', data.message || data.msg || data.MESSAGE, data)
 }
 
@@ -450,7 +451,7 @@ function terminate (reason) {
 
 function cli () {
   if (argv.print_stats) {
-    setInterval(printStats, Number(argv.print_stats) * 1000)
+    setInterval(printStats, (Number(argv.print_stats)||30) * 1000)
   }
   if (argv['rtail-web-port']) {
     console.log('loading rtail')

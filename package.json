@@ -7,12 +7,16 @@
     "logagent": "bin/logagent.js",
     "logagent-setup": "bin/logagent-setup.sh"
   },
+  "directories": {
+    "test": "test"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node bin/logagent.js -s --heroku $PORT",
     "pubdocs": "mkdocs gh-deploy --clean",
     "docs": "mkdocs serve",
-    "mkdocs": "pip install mkdocs"
+    "mkdocs": "pip install mkdocs",
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
@@ -48,5 +52,8 @@
     "tail-forever": "^0.3.11",
     "throng": "^4.0.0",
     "yamljs": "^0.2.3"
+  },
+  "devDependencies": {
+    "mocha": "^2.5.3"
   }
 }

@@ -1,5 +1,5 @@
 #!/bin/sh
-':' // ; export MAX_MEM="--max-old-space-size=100"; exec "$(command -v node || command -v nodejs)" "${NODE_OPTIONS:-$MAX_MEM}" "$0" "$@" 
+':' // ; export MAX_MEM="--max-old-space-size=500"; exec "$(command -v node || command -v nodejs)" "${NODE_OPTIONS:-$MAX_MEM}" "$0" "$@" 
 'use strict'
 
 /*
@@ -127,8 +127,6 @@ function getSyslogServer (appToken, port, type) {
   return syslogd
 }
 
-  
-
 function getLogger (token, type) {
   var key = token + type
   // console.log(token)
@@ -142,6 +140,9 @@ function getLogger (token, type) {
     logger.on('error', function (err) {
       console.error('Error in Logsene request:' + err.message)
     })
+    if (process.env.LOG_NEW_TOKENS) {
+      console.log('create logger for token: ' + token)
+    }
     loggers[key] = logger
   }
   return loggers[key]
@@ -431,6 +432,7 @@ function printStats () {
   var throughput = count / (duration / 1000)
   var throughputBytes = (bytes / 1024 / 1024) / (duration / 1000)
   console.error('pid['+process.pid + ']' + ' ' + duration + ' ms ' + count + ' lines parsed.  ' + throughput.toFixed(0) + ' lines/s ' + throughputBytes.toFixed(3) + ' MB/s - empty lines: ' + emptyLines)
+  console.error('Tokens used: ' + Object.keys(loggers).length)
   console.error('Heap Used: ' + (process.memoryUsage().heapUsed / (1024 * 1024)) + ' MB')
   console.error('Heap Total: ' + (process.memoryUsage().heapTotal / (1024 * 1024)) + ' MB')
   console.error('Memory RSS: ' + (process.memoryUsage().rss / (1024 * 1024)) + ' MB')

@@ -39,7 +39,7 @@ globalTransform: !!js/function >
   }
 
 # IMPORTANT:
-# PATTERNS ARE EVALUATED SEQUENTIALLY FOR EACH LOG EVENT. PUT MORE COMPLEX PATTERNS FIRST.
+# PATTERNS ARE EVALUATED SEQUENTIALLY FOR EACH LOG EVENT. PUT MORE COMPLEX AND MORE SPECIFIC PATTERNS FIRST.
 # As soon as a pattern matches a log event the rest of the patterns are skipped.
 #
 # To test your pattern: cat myTest.log | logagent -n <pattern name here> -yml -f mypatterns.yml

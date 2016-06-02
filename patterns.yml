@@ -6,25 +6,27 @@
 
 # Sensitive data can be replaced with a hashcode (sha1)
 # it applies to fields matching the field names by a regular expression
-# Note: this function is not optimized (yet) and might take 10-15% of performance
+# Note: this function is not optimized (yet) and might cause 10-15% performance hit
 # autohash: !!js/regexp /user|client_ip|password|email|credit_card_number|payment_info/i
 
-# set this to false when authash fields
+# set this to false when auothash fields
 # the original line might include sensitive data!
 originalLine: true
 
-# Please note when geoIP: true  
-# There is a delay during first start of logagent, downloading the 
-# maxmind database. Logagent downloads the file every 24hrs or 
-# during startup. 
+# Please note when geoIP: true
+# There will be a slight delay during first start of logagent while maxmind
+# database is downloaded. Logagent downloads the MaxMind database every 24hrs or 
+# during startup.
 geoIP: true
+
 # The database is stored in a temporary directory
 # The path could be modified via env. variable MAXMIND_DB_DIR
 maxmindDbDir: /tmp/
+
 debug: false
-# The global transform function is called for
-# each parsed line. A good place to do ad global fields
-# custom date processing or special parsers. 
+
+# The global transform function is called for each parsed line.
+# A good place to do add global fields, custom date processing, or special parsers.
 globalTransform: !!js/function >
   function (source, parsedObject) {
     // this function is called after parsing
@@ -35,6 +37,13 @@ globalTransform: !!js/function >
     // Example:
     // this.enrichGeoIp(parsedObject, 'client_ip')
   }
+
+# IMPORTANT:
+# PATTERNS ARE EVALUATED SEQUENTIALLY FOR EACH LOG EVENT. PUT MORE COMPLEX PATTERNS FIRST.
+# As soon as a pattern matches a log event the rest of the patterns are skipped.
+#
+# To test your pattern: cat myTest.log | logagent -n <pattern name here> -yml -f mypatterns.yml
+# A pattern name are things like 'kubernetes hyperkube' or 'Elasticsearch' or 'Apache Solr' below.
 
 patterns:
  - # kubernetes hyperkube

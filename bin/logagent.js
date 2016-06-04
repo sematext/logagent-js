@@ -319,15 +319,21 @@ function getHttpServer (aport, handler) {
 }
 
 function tailFile (file) {
-  var tail = new Tail(file, {start: getFilesizeInBytes(file)})
-  tail.on('line', function (line) {
-    parseLine(line, file, log)
-  })
-  tail.on('error', function (error) {
-    console.log('ERROR: ', error)
-  })
-  console.log('Watching file:' + file)
-  return tail
+  var tail = null 
+  try {
+      tail = new Tail(file, {start: getFilesizeInBytes(file)})
+      tail.on('line', function (line) {
+        parseLine(line, file, log)
+      })
+      tail.on('error', function (error) {
+        console.log('ERROR tailing file '+file+': ', error.Error || error)
+      })
+      console.log('Watching file:' + file)
+      return tail
+  } catch (ex) {
+     console.log('ERROR tailing file '+file+': ', error.Error || error)
+    return null
+  }
 }
 
 function tailFiles (fileList) {
@@ -336,11 +342,11 @@ function tailFiles (fileList) {
 
 function tailFilesFromGlob (globPattern) {
   if (globPattern) {
-    glob(globPattern, function (err, files) {
+    glob(globPattern, {strict: false, silent: false}, function (err, files) {
       if (!err) {
         tailFiles(files)
       } else {
-        console.error('Error in glob file patttern ' + globPattern + ': ' + err)
+        console.error('Error in glob file patttern ' + globPattern + ': ' + err.message)
       }
     })
   }

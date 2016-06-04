@@ -469,7 +469,7 @@ function terminate (reason) {
 
 function cli () {
   if (argv.print_stats) {
-    setInterval(printStats, (Number(argv.print_stats)||30) * 1000)
+    setInterval(printStats, (Number(argv.print_stats||30))+1 * 1000)
   }
   if (argv['rtail-web-port']) {
     console.log('loading rtail')

@@ -71,7 +71,7 @@ sudo apt-get install -y nodejs
 
 # Install logagent-js with npm
 ```
-npm i -g logagent-js
+npm i logagent-js -g
 
 # Be Evil: parse all logs 
 # stream logs to Logsene 1-Click ELK stack 

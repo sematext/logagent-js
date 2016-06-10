@@ -9,9 +9,12 @@ sudo apt-get install -y nodejs
 
 # Install Logagent
 ```
-npm i -g logagent-js
+npm i logagent-js -g
 # Test logs reading parsed with timestamps - output on console in YAML format (-y)
-logagent -y /var/log/*.log
+# tail mode, parse only new lines
+logagent -y /var/log/*.log  
+# parse complete file
+cat /var/log/httpd/access.log | logagent -y -n apache 
 ```
 
 ## Linux or Mac OS X service for Logsene

@@ -34,6 +34,7 @@ The default output is line delimited JSON for parsed log lines, as long as no fo
 |HTTPS_PROXY|Proxy URL for HTTPS endpoints, like Logsene receiver. ```export HTTPS_PROXY=http://my-proxy.example```|
 |HTTP_PROXY|Proxy URL for HTTP endpoints (e.g. On-Premises or local Elasticsearch). ```export HTTP_PROXY=http://my-proxy.example```|
 |LOGAGENT_CONFIG | Filename to read logagent CLI parameters from a file, defaults to ```/etc/sematext/logagent.conf`` |
+|PATTERN_MATCHING_ENABLED | Default is 'true'. The value 'false' disables parsing of logs. |
 
 
 ## Command Line Examples 

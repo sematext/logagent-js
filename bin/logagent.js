@@ -119,10 +119,13 @@ function getSyslogServer (appToken, port, type) {
       }
       data['host'] = sysLogMsg.address
       log(e, data)
-    })
+    }, {address: argv.udp_bind_address||'0.0.0.0'})
+
   })
+  //syslogd.server.bind({address: argv.udp_bind_address||'0.0.0.0', port:port})
   syslogd.listen(port, function (err) {
-    console.log('start syslog server ' + port + ' ' + (err || ''))
+    console.log('start syslog server ' + syslogd.server.address().address + ':' +port + ' ' + (err || ''))
+
   })
   return syslogd
 }
@@ -469,7 +472,7 @@ function terminate (reason) {
 
 function cli () {
   if (argv.print_stats) {
-    setInterval(printStats, (Number(argv.print_stats||30))+1 * 1000)
+    setInterval(printStats, (Number(argv.print_stats) || 30) * 1000)
   }
   if (argv['rtail-web-port']) {
     console.log('loading rtail')

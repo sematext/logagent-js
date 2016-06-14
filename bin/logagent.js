@@ -40,6 +40,8 @@ var LogAnalyzer = require('../lib/index.js')
 var readline = require('readline')
 var begin = new Date().getTime()
 var count = 0
+var logsShipped = 0
+var httpFailed = 0
 var emptyLines = 0
 var bytes = 0
 var Logsene = require('logsene-js')
@@ -138,10 +140,11 @@ function getLogger (token, type) {
     var logger = new Logsene(token, type, null,
       logseneDiskBufferDir)
     logger.on('log', function (data) {
-      // console.log(data)
+      logsShipped += (Number(data.count) || 0)
     })
     logger.on('error', function (err) {
-      console.error('Error in Logsene request:' + err.message)
+      httpFailed++
+      console.error('Error in Logsene request: ' + JSON.stringify(err))
     })
     if (process.env.LOG_NEW_TOKENS) {
       console.log('create logger for token: ' + token)
@@ -151,10 +154,13 @@ function getLogger (token, type) {
   return loggers[key]
 }
 
+function _logToLogsene () {
+  var logger = getLogger(this.token, this.type)
+  var data = this.data
+  logger.log(data.level || data.severity || 'info', data.message || data.msg || data.MESSAGE, data) 
+}
 function logToLogsene (token, type, data) {
-  var logger = getLogger(token, type)
-  //console.log('token:' + token + ' message: ' + JSON.stringify(data))
-  logger.log(data.level || data.severity || 'info', data.message || data.msg || data.MESSAGE, data)
+  setImmediate(_logToLogsene.bind({token: token, data: data, type:type}))
 }
 
 function getLoggerForToken (token, type) {
@@ -399,6 +405,7 @@ function prettyJs (o) {
   })
   return rv
 }
+
 function parseLine (line, sourceName, cbf) {
   if (!line && cbf) {
     return cbf(new Error('empty line passed to parseLine()'))
@@ -411,14 +418,16 @@ function parseLine (line, sourceName, cbf) {
     argv.n || sourceName, cbf || log)
 }
 
+
 function readStdIn () {
-  var rl = readline.createInterface({
-    terminal: false,
-    input: process.stdin
-  })
-  rl.on('line', parseLine)
-  rl.on('close', terminate)
-  rl.on('finish', terminate)
+  var tr = require('through2')
+  var split = require('split')
+  process.stdin.on('end', terminate)
+  process.stdin.pipe(split()).pipe(tr(function (chunk, enc, callback) {
+    parseLine(chunk.toString())
+    setImmediate(callback)
+  }))
+  
 }
 
 function rtailServer () {
@@ -441,13 +450,17 @@ function printStats () {
   var throughput = count / (duration / 1000)
   var throughputBytes = (bytes / 1024 / 1024) / (duration / 1000)
   console.error('pid['+process.pid + ']' + ' ' + duration + ' ms ' + count + ' lines parsed.  ' + throughput.toFixed(0) + ' lines/s ' + throughputBytes.toFixed(3) + ' MB/s - empty lines: ' + emptyLines)
-  console.error('Tokens used: ' + Object.keys(loggers).length)
-  console.error('Heap Used: ' + (process.memoryUsage().heapUsed / (1024 * 1024)) + ' MB')
-  console.error('Heap Total: ' + (process.memoryUsage().heapTotal / (1024 * 1024)) + ' MB')
-  console.error('Memory RSS: ' + (process.memoryUsage().rss / (1024 * 1024)) + ' MB')
+  console.error('Tokens used:\t' + Object.keys(loggers).length)
+  console.error('Logs shipped:\t' + logsShipped)
+  console.error('HTTP failed:\t' + httpFailed)
+  console.error('Heap Used:\t' + (process.memoryUsage().heapUsed / (1024 * 1024)) + ' MB')
+  console.error('Heap Total:\t' + (process.memoryUsage().heapTotal / (1024 * 1024)) + ' MB')
+  console.error('Memory RSS:\t' + (process.memoryUsage().rss / (1024 * 1024)) + ' MB')
   begin = now
   count = 0
   bytes = 0
+  logsShipped=0
+  httpFailed=0
 }
 
 function terminate (reason) {

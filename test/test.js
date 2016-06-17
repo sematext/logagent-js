@@ -41,3 +41,25 @@ describe('Logagent parse web server Log', function() {
   })
 })
 
+describe('Logagent parse unknown log', function() {
+  it('should have message===logtext and timestamp', function(done) {
+    this.timeout(150000)
+    var Logagent = require('../lib/index.js')
+    var la = new Logagent()
+    var logText = 'a simple log line matching no patterns'
+    la.parseLine (logText, 
+      'nginx', function (err, data) {
+      if (err !== 'not found') {
+        done(err)
+      } else {
+        if(data.message === logText && data['@timestamp'] && data[la.LOG_SOURCE_FIELD_NAME]) {
+          done()  
+        } else {
+          console.log(la.LOG_SOURCE_NAME)
+          done (new Error('message is wrong: ' + JSON.stringify(data)))
+        }
+      }
+    })
+  })
+})
+

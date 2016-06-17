@@ -340,7 +340,7 @@ function tailFile (file) {
       console.log('Watching file:' + file)
       return tail
   } catch (error) {
-    console.log('ERROR tailing file '+file+': ', error.Error || error)
+    console.log('ERROR tailing file '+file+': ', error)
     return null
   }
 }

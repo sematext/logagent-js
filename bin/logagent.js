@@ -33,8 +33,8 @@ if (process.argv.length === 2) {
 var argv = require('minimist')(process.argv.slice(2))
 var https = require('https')
 var http = require('http')
-// limit number of socket connections to Logsene
-https.globalAgent.maxSockets = Number(process.env.MAX_HTTPS_SOCKETS)||20
+var TailFileManager = require ('../lib/fileManager')
+
 var prettyjson = require('prettyjson')
 var LogAnalyzer = require('../lib/index.js')
 var readline = require('readline')
@@ -45,7 +45,6 @@ var httpFailed = 0
 var emptyLines = 0
 var bytes = 0
 var Logsene = require('logsene-js')
-var Tail = require('tail-forever')
 var glob = require('glob')
 var globPattern = argv.g || process.env.GLOB_PATTERN
 var logseneToken = argv.t || process.env.LOGSENE_TOKEN
@@ -58,21 +57,20 @@ var udpClient = dgram.createSocket('udp4')
 var flat = require('flat')
 var logseneDiskBufferDir = argv['logsene-tmp-dir'] || process.env.LOGSENE_TMP_DIR || require('os').tmpdir()
 var mkpath = require('mkpath')
+
 mkpath(logseneDiskBufferDir, function (err) {
   if (err) {
     console.error('ERROR: create directory LOGSENE_TMP_DIR (' + logseneDiskBufferDir + '): ' + err.message)
   }
 })
+var fileManager = new TailFileManager({parseLine: parseLine, log: log})
+
 var la = new LogAnalyzer(argv.f, {}, function () {
   cli()
-})
+}.bind(this))
 
-process.on('beforeExit', function () {})
-function getFilesizeInBytes (filename) {
-  var stats = fs.statSync(filename)
-  var fileSizeInBytes = stats['size']
-  return fileSizeInBytes
-}
+process.on('beforeExit', terminate)
+
 
 function getSyslogServer (appToken, port, type) {
   var SEVERITY = [
@@ -250,6 +248,7 @@ function herokuHandler (req, res) {
     console.error(new Date() + ': ' + err)
   }
 }
+
 // heroku start function for WEB_CONCURENCY
 function startHerokuServer () {
   getHttpServer(Number(argv.heroku), herokuHandler)
@@ -327,33 +326,13 @@ function getHttpServer (aport, handler) {
   }
 }
 
-function tailFile (file) {
-  var tail = null 
-  try {
-      tail = new Tail(file, {start: getFilesizeInBytes(file)})
-      tail.on('line', function (line) {
-        parseLine(line, file, log)
-      })
-      tail.on('error', function (error) {
-        console.log('ERROR tailing file '+file+': ', error.Error || error)
-      })
-      console.log('Watching file:' + file)
-      return tail
-  } catch (error) {
-    console.log('ERROR tailing file '+file+': ', error)
-    return null
-  }
-}
 
-function tailFiles (fileList) {
-  fileList.forEach(tailFile)
-}
 
 function tailFilesFromGlob (globPattern) {
   if (globPattern) {
     glob(globPattern, {strict: false, silent: false}, function (err, files) {
       if (!err) {
-        tailFiles(files)
+        fileManager.tailFiles(files)
       } else {
         console.error('Error in glob file patttern ' + globPattern + ': ' + err.message)
       }
@@ -419,6 +398,7 @@ function parseLine (line, sourceName, cbf) {
 }
 
 
+
 function readStdIn () {
   var tr = require('through2')
   var split = require('split')
@@ -462,28 +442,31 @@ function printStats () {
   logsShipped=0
   httpFailed=0
 }
+process.on('SIGINT', function () { terminate('SIGINT') })
+process.on('SIGQUIT', function () { terminate('SIGQUIT') })
 
 function terminate (reason) {
+  console.log('terminate reason: ' + reason)
   if (argv.heroku && reason !== 'exitWorker') {
     return
   }
-
+  fileManager.terminate()
   if (argv.s) {
     printStats()
   }
-  setTimeout(function () {
+  process.nextTick(function () {
     // console.log(Object.keys(loggers))
     Object.keys(loggers).forEach(function (l, i) {
       console.log('send ' + l)
       loggers[l].send()
     })
-  }, 300)
+  })
   setTimeout(function () {
     process.exit()
   }, Number(process.env.SIGTERM_TIMEOUT) || 2000)
 }
 
-function cli () {
+function cli () { 
   if (argv.print_stats) {
     setInterval(printStats, (Number(argv.print_stats) || 30) * 1000)
   }
@@ -508,7 +491,7 @@ function cli () {
   }
   if (argv._.length > 0) {
     // tail files
-    tailFiles(argv._)
+    fileManager.tailFiles(argv._)
   } else if (globPattern) {
     // checks for file list and start tail for all files
     console.log('using glob pattern: ' + globPattern)

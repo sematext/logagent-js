@@ -444,6 +444,7 @@ function printStats () {
 }
 process.on('SIGINT', function () { terminate('SIGINT') })
 process.on('SIGQUIT', function () { terminate('SIGQUIT') })
+process.on('SIGTERM', function () { terminate('SIGTERM') })
 
 function terminate (reason) {
   console.log('terminate reason: ' + reason)

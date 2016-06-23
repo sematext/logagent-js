@@ -27,16 +27,16 @@ debug: false
 
 # The global transform function is called for each parsed line.
 # A good place to do add global fields, custom date processing, or special parsers.
-globalTransform: !!js/function >
-  function (source, parsedObject) {
-    // this function is called after parsing
-    // regardless of the logging source 
-    // for pattern specific functions use transform in pattern definitions
-    // this.geopip lookups for ip adresses
-    // this.moment for date parsing
-    // Example:
-    // this.enrichGeoIp(parsedObject, 'client_ip')
-  }
+#globalTransform: !!js/function >
+#  function (source, parsedObject) {
+#    // this function is called after parsing
+#    // regardless of the logging source 
+#    // for pattern specific functions use transform in pattern definitions
+#    // this.geopip lookups for ip adresses
+#    // this.moment for date parsing
+#    // Example:
+#    // this.enrichGeoIp(parsedObject, 'client_ip')
+#  }
 
 # IMPORTANT:
 # PATTERNS ARE EVALUATED SEQUENTIALLY FOR EACH LOG EVENT. PUT MORE COMPLEX AND MORE SPECIFIC PATTERNS FIRST.

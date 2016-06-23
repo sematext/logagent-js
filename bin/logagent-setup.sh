@@ -121,9 +121,14 @@ echo "Create config file: $SPM_AGENT_CONFIG_FILE"
 }
 command=$(which logagent)
 echo $command
-if [ -n "$1" ] ; then 
+if [ -n "$1" ] ; then
   token=$1
-  install_script $command $token '/var/log/**/*.log';
+  if [ -n "$2" ] ; then
+    pattern=$2
+  else
+    pattern='/var/log/**/*.log'
+  fi
+  install_script $command $token "$pattern";
 else 
 	echo "${COLORred}Missing paramaters. Usage:"
 	echo `basename $0` "LOGSENE_TOKEN filepattern (/var/log/**/*.log)"

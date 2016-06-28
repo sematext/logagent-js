@@ -44,6 +44,7 @@ var logsShipped = 0
 var httpFailed = 0
 var emptyLines = 0
 var bytes = 0
+var retransmit=0
 var Logsene = require('logsene-js')
 var glob = require('glob')
 var globPattern = argv.g || process.env.GLOB_PATTERN
@@ -57,6 +58,7 @@ var udpClient = dgram.createSocket('udp4')
 var flat = require('flat')
 var logseneDiskBufferDir = argv['logsene-tmp-dir'] || process.env.LOGSENE_TMP_DIR || require('os').tmpdir()
 var mkpath = require('mkpath')
+process.env.GEOIP_ENABLED=argv.geoip||false
 
 mkpath(logseneDiskBufferDir, function (err) {
   if (err) {
@@ -142,7 +144,13 @@ function getLogger (token, type) {
     })
     logger.on('error', function (err) {
       httpFailed++
-      console.error('Error in Logsene request: ' + JSON.stringify(err))
+      if (argv.verbose) {
+        console.error('Error in Logsene request: ' + formatObject(err))  
+      }
+    })
+    logger.on('rt', function (data) {
+      console.error(new Date().toISOString() + ' Restransmit ' + data.file + ' to ' + data.url)
+      retransmit++
     })
     if (process.env.LOG_NEW_TOKENS) {
       console.log('create logger for token: ' + token)
@@ -423,24 +431,40 @@ function rtailServer () {
     setTimeout(process.exit, 300)
   }
 }
-
+function formatObject(o) {
+  var rv = ''
+  Object.keys(o).forEach(function (key) {
+    rv = rv + ' ' + key + '=' + o[key]
+  })
+  return rv
+}
 function printStats () {
   var now = new Date().getTime()
   var duration = now - begin
   var throughput = count / (duration / 1000)
   var throughputBytes = (bytes / 1024 / 1024) / (duration / 1000)
-  console.error('pid['+process.pid + ']' + ' ' + duration + ' ms ' + count + ' lines parsed.  ' + throughput.toFixed(0) + ' lines/s ' + throughputBytes.toFixed(3) + ' MB/s - empty lines: ' + emptyLines)
-  console.error('Tokens used:\t' + Object.keys(loggers).length)
-  console.error('Logs shipped:\t' + logsShipped)
-  console.error('HTTP failed:\t' + httpFailed)
-  console.error('Heap Used:\t' + (process.memoryUsage().heapUsed / (1024 * 1024)) + ' MB')
-  console.error('Heap Total:\t' + (process.memoryUsage().heapTotal / (1024 * 1024)) + ' MB')
-  console.error('Memory RSS:\t' + (process.memoryUsage().rss / (1024 * 1024)) + ' MB')
+  var logStatsMsg = formatObject({
+    usedTokens: Object.keys(loggers).length,
+    shippedLogs: logsShipped,
+    httpFailed: httpFailed,
+    httpRetransmit: retransmit,
+    throughputLinesPerSecond: throughput.toFixed(0)
+  })
+  var memStats = formatObject({
+    heapUsedMB: (process.memoryUsage().heapUsed / (1024 * 1024)).toFixed(0),
+    heapTotalMB: (process.memoryUsage().heapTotal / (1024 * 1024)).toFixed(0),
+    memoryRssMB: (process.memoryUsage().rss / (1024 * 1024)).toFixed(0)
+  })
+  console.error(new Date().toISOString() + ' pid['+process.pid + ']' + ' ' + duration + ' ms ' + count + ' lines parsed.  ' + throughput.toFixed(0) + ' lines/s ' + throughputBytes.toFixed(3) + ' MB/s - empty lines: ' + emptyLines)
+  console.log(new Date().toISOString() + ' Logging stats:' + logStatsMsg)
+  console.log(new Date().toISOString() + ' Memory stats: ' + memStats)
+  begin = now
   begin = now
   count = 0
   bytes = 0
   logsShipped=0
   httpFailed=0
+  retransmit=0
 }
 process.on('SIGINT', function () { terminate('SIGINT') })
 process.on('SIGQUIT', function () { terminate('SIGQUIT') })
@@ -468,8 +492,9 @@ function terminate (reason) {
 }
 
 function cli () { 
-  if (argv.print_stats) {
-    setInterval(printStats, (Number(argv.print_stats) || 30) * 1000)
+  if (argv.print_stats || argv.verbose) {
+    setInterval(printStats, ((Number(argv.print_stats)) || 60) * 1000)
+    printStats()
   }
   if (argv['rtail-web-port']) {
     console.log('loading rtail')
@@ -495,6 +520,8 @@ function cli () {
     fileManager.tailFiles(argv._)
   } else if (globPattern) {
     // checks for file list and start tail for all files
+    // remove quotes and spaces
+    globPattern=globPattern.replace(/"/g, '').replace(/'/g,'').replace(/\s/g, '')
     console.log('using glob pattern: ' + globPattern)
     tailFilesFromGlob(globPattern)
   } else if (argv.u) {

@@ -1,6 +1,7 @@
 #!/bin/sh
 ':' // ; export MAX_MEM="--max-old-space-size=500"; exec "$(command -v node || command -v nodejs)" "${NODE_OPTIONS:-$MAX_MEM}" "$0" "$@" 
 'use strict'
+var consoleLogger = require('../lib/logger.js')
 
 /*
  * @copyright Copyright (c) Sematext Group, Inc. - All Rights Reserved
@@ -17,14 +18,14 @@ if (process.argv.length === 2) {
     // read cli paramters from config file
     var cfgArgs = fs.readFileSync(process.env.LOGAGENT_CONFIG || '/etc/sematext/logagent.conf').toString()
     if (cfgArgs !== null) {
-      console.log('Logagent config file: ' + (process.env.LOGAGENT_CONFIG || '/etc/sematext/logagent.conf'))
+      consoleLogger.log('Logagent config file: ' + (process.env.LOGAGENT_CONFIG || '/etc/sematext/logagent.conf'))
     }
     cfgArgs = cfgArgs.split(/\s/)
     cfgArgs = cfgArgs.filter(function (v) {
       return v !== ''
     })
     process.argv = [process.argv[0], process.argv[1]].concat(cfgArgs)
-    console.log(process.argv)
+    consoleLogger.log(process.argv)
   } catch (err) {
     // ignore -> regular cli mode
   }
@@ -46,7 +47,6 @@ var emptyLines = 0
 var bytes = 0
 var retransmit=0
 var Logsene = require('logsene-js')
-var glob = require('glob')
 var globPattern = argv.g || process.env.GLOB_PATTERN
 var logseneToken = argv.t || process.env.LOGSENE_TOKEN
 var http = require('http')
@@ -58,7 +58,7 @@ var udpClient = dgram.createSocket('udp4')
 var flat = require('flat')
 var logseneDiskBufferDir = argv['logsene-tmp-dir'] || process.env.LOGSENE_TMP_DIR || require('os').tmpdir()
 var mkpath = require('mkpath')
-process.env.GEOIP_ENABLED=argv.geoip||false
+process.env.GEOIP_ENABLED=argv.geoip||'false'
 
 mkpath(logseneDiskBufferDir, function (err) {
   if (err) {
@@ -126,7 +126,7 @@ function getSyslogServer (appToken, port, type) {
   })
   //syslogd.server.bind({address: argv.udp_bind_address||'0.0.0.0', port:port})
   syslogd.listen(port, function (err) {
-    console.log('start syslog server ' + syslogd.server.address().address + ':' +port + ' ' + (err || ''))
+    consoleLogger.log('start syslog server ' + syslogd.server.address().address + ':' +port + ' ' + (err || ''))
 
   })
   return syslogd
@@ -149,11 +149,11 @@ function getLogger (token, type) {
       }
     })
     logger.on('rt', function (data) {
-      console.error(new Date().toISOString() + ' Restransmit ' + data.file + ' to ' + data.url)
+      consoleLogger.error(new Date().toISOString() + ' Restransmit ' + data.file + ' to ' + data.url)
       retransmit++
     })
     if (process.env.LOG_NEW_TOKENS) {
-      console.log('create logger for token: ' + token)
+      consoleLogger.log('create logger for token: ' + token)
     }
     loggers[key] = logger
   }
@@ -247,13 +247,13 @@ function herokuHandler (req, res) {
             }
           })
         } catch (unknownError) {
-          console.log(new Date() + ': ' + unknownError + ' ' + unknownError.stack)
+          consoleLogger.log(unknownError + ' ' + unknownError.stack)
         }
       })
       res.end('ok\n')
     })
   } catch (err) {
-    console.error(new Date() + ': ' + err)
+    consoleLogger.error(new Date() + ': ' + err)
   }
 }
 
@@ -262,7 +262,7 @@ function startHerokuServer () {
   getHttpServer(Number(argv.heroku), herokuHandler)
   process.on('SIGTERM', function () {
     terminate('exitWorker')
-    console.log('Worker exiting')
+    consoleLogger.log('Worker exiting')
   })
 }
 
@@ -271,7 +271,7 @@ function startCloudfoundryServer () {
   getHttpServer(Number(argv.cfhttp), cloudFoundryHandler)
   process.on('SIGTERM', function () {
     terminate('exitWorker')
-    console.log('Worker exiting')
+    consoleLogger.log('Worker exiting')
   })
 }
 
@@ -314,7 +314,7 @@ function cloudFoundryHandler (req, res) {
       })
       res.end()
     } catch (unknownError) {
-      console.log(unknownError.stack)
+      consoleLogger.log(unknownError.stack)
       res.end()
     }
   })
@@ -327,26 +327,16 @@ function getHttpServer (aport, handler) {
   var server = http.createServer(handler)
   try {
     server = server.listen(_port)
-    console.log('Logagent listening (http): ' + _port + ', process id: ' + process.pid)
+    consoleLogger.log('Logagent listening (http): ' + _port + ', process id: ' + process.pid)
     return server
   } catch (err) {
-    console.log('Port in use (' + _port + '): ' + err)
+    consoleLogger.log('Port in use (' + _port + '): ' + err)
   }
 }
 
 
 
-function tailFilesFromGlob (globPattern) {
-  if (globPattern) {
-    glob(globPattern, {strict: false, silent: false}, function (err, files) {
-      if (!err) {
-        fileManager.tailFiles(files)
-      } else {
-        console.error('Error in glob file patttern ' + globPattern + ': ' + err.message)
-      }
-    })
-  }
-}
+
 
 function log (err, data) {
   if (err && !data) {
@@ -422,12 +412,12 @@ function rtailServer () {
   // console.log(process.argv)
   try {
     process.argv = [process.argv[0], process.argv[1], '--web-port', String(argv['rtail-web-port']), '--web-host', process.env.HOSTNAME, '--udp-port', String(argv['rtail-port']), '--udp-host', process.env.HOSTNAME]
-    console.log('start rtail server' + process.argv)
+    consoleLogger.log('start rtail server' + process.argv)
     require('rtail/cli/rtail-server.js')
   } catch (err) {
-    console.log(err)
-    console.log('rtail is not installed. To start rtail server with logagent run:')
-    console.log('    npm i rtail -g')
+    consoleLogger.log(err)
+    consoleLogger.log('rtail is not installed. To start rtail server with logagent run:')
+    consoleLogger.log('    npm i rtail -g')
     setTimeout(process.exit, 300)
   }
 }
@@ -455,9 +445,9 @@ function printStats () {
     heapTotalMB: (process.memoryUsage().heapTotal / (1024 * 1024)).toFixed(0),
     memoryRssMB: (process.memoryUsage().rss / (1024 * 1024)).toFixed(0)
   })
-  console.error(new Date().toISOString() + ' pid['+process.pid + ']' + ' ' + duration + ' ms ' + count + ' lines parsed.  ' + throughput.toFixed(0) + ' lines/s ' + throughputBytes.toFixed(3) + ' MB/s - empty lines: ' + emptyLines)
-  console.log(new Date().toISOString() + ' Logging stats:' + logStatsMsg)
-  console.log(new Date().toISOString() + ' Memory stats: ' + memStats)
+  consoleLogger.error('pid['+process.pid + ']' + ' ' + duration + ' ms ' + count + ' lines parsed.  ' + throughput.toFixed(0) + ' lines/s ' + throughputBytes.toFixed(3) + ' MB/s - empty lines: ' + emptyLines)
+  consoleLogger.log('Logging stats:' + logStatsMsg)
+  consoleLogger.log('Memory stats: ' + memStats)
   begin = now
   begin = now
   count = 0
@@ -465,13 +455,20 @@ function printStats () {
   logsShipped=0
   httpFailed=0
   retransmit=0
+  var msg = formatObject(fileManager.stats)
+  if (msg) {
+    consoleLogger.log('Lines read: ' + msg)  
+  }
+  Object.keys(fileManager.stats).forEach(function (file) {
+    fileManager.stats[file]=0
+  })
 }
 process.on('SIGINT', function () { terminate('SIGINT') })
 process.on('SIGQUIT', function () { terminate('SIGQUIT') })
 process.on('SIGTERM', function () { terminate('SIGTERM') })
 
 function terminate (reason) {
-  console.log('terminate reason: ' + reason)
+  consoleLogger.log('terminate reason: ' + reason)
   if (argv.heroku && reason !== 'exitWorker') {
     return
   }
@@ -482,7 +479,7 @@ function terminate (reason) {
   process.nextTick(function () {
     // console.log(Object.keys(loggers))
     Object.keys(loggers).forEach(function (l, i) {
-      console.log('send ' + l)
+      consoleLogger.log('send ' + l)
       loggers[l].send()
     })
   })
@@ -497,7 +494,7 @@ function cli () {
     printStats()
   }
   if (argv['rtail-web-port']) {
-    console.log('loading rtail')
+    consoleLogger.log('loading rtail')
     rtailServer()
   }
   if (argv.cfhttp) {
@@ -522,13 +519,13 @@ function cli () {
     // checks for file list and start tail for all files
     // remove quotes and spaces
     globPattern=globPattern.replace(/"/g, '').replace(/'/g,'').replace(/\s/g, '')
-    console.log('using glob pattern: ' + globPattern)
-    tailFilesFromGlob(globPattern)
+    consoleLogger.log('using glob pattern: ' + globPattern)
+    fileManager.tailFilesFromGlob(globPattern, 60000)
   } else if (argv.u) {
     try {
       getSyslogServer(logseneToken, argv.u)
     } catch (err) {
-      console.error(err)
+      consoleLogger.error(err)
       process.exit(-1)
     }
   } else {

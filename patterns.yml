@@ -482,6 +482,15 @@ patterns:
       fields: [ts,message]
       dateFormat: YYYY-MM-DD HH:mm:ss ZZ
 
+ - # Logagent-js ISO timestamp + message
+  sourceName: !!js/regexp /logagent/   
+  match:    
+    -
+      type: logagent-js
+      regex: !!js/regexp /(\[\d|\:|\-]+Z)\s([\S|\s]+)/
+      fields: [ts,message]
+      dateFormat: YYYY-MM-DDTHHmmss
+
 dateFormats: [
     'DD/MMM/YYYY:HH:mm:ss ZZ', #apache
     'MMM D HH:mm:ss',

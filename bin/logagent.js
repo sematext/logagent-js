@@ -46,6 +46,7 @@ argv
   .option('--geoip <value>', 'true/false to enable/disable geoip lookups in patterns')
   .option('--print_stats <period>', 'prints activity stats every N seconds, useful in comb. with -s to see activity', parseInt)
   .option('-v, --verbose', 'prints activity report every minute')
+  .option('--stdin', 'read logs from stdin (default) when no other input is specified')  
   .option('-u, --udp <port>', 'starts UDP syslog listener to receive logs')
   .option('--heroku <port>', 'starts http server to receive logs from a Heroku log drain')
   .option('--cfhttp <port>', 'starts http server to receive logs from a Cloud Foundry log drain')
@@ -53,13 +54,11 @@ argv
   .option('--rtail-host <hostname>', 'hostname to forward logs to rtail-server')
   .option('--rtail-web-port <port>', 'starts rtail UI webserver (if installed) - npm i rtail -g)')
   .option('--rtail-web-host <port>', 'rtail UI webserver and bind hostname\n\t\t\t\tExample: logagent --rtail-web-port 9000 --rtail-port 8989  --rtail-web-host $(hostname) -g \'/var/log/**/*.log\'')
-  .option('--stdin', 'read logs from stdin (default) when no other input is specified')  
   .parse(process.argv)
 
 if (argv.elasticsearchHost) {
   process.env.LOGSENE_URL=argv.elasticsearchHost + '/_bulk'
 }
-console.log(argv)
 var https = require('https')
 var http = require('http')
 var TailFileManager = require ('../lib/fileManager')

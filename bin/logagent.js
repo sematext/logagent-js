@@ -1,8 +1,6 @@
 #!/bin/sh
 ':' // ; export MAX_MEM="--max-old-space-size=500"; exec "$(command -v node || command -v nodejs)" "${NODE_OPTIONS:-$MAX_MEM}" "$0" "$@" 
 'use strict'
-var consoleLogger = require('../lib/logger.js')
-
 /*
  * @copyright Copyright (c) Sematext Group, Inc. - All Rights Reserved
  *
@@ -12,6 +10,7 @@ var consoleLogger = require('../lib/logger.js')
  * This source code is to be used exclusively by users and customers of Sematext.
  * Please see the full license (found in LICENSE in this distribution) for details on its license and the licenses of its dependencies.
  */
+var consoleLogger = require('../lib/logger.js')
 var fs = require('fs')
 if (process.argv.length === 2) {
   try {
@@ -31,11 +30,39 @@ if (process.argv.length === 2) {
   }
 }
 
-var argv = require('minimist')(process.argv.slice(2))
+var argv = require('commander')
+argv
+  .version(require('../package.json').version)
+  .usage('[options] <logfiles ...>')
+  .option('-f, --file <patternFile>', 'pattern definition file e.g. patterns.yml')
+  .option('-t, --index <indexName>', 'elasticsearch index or Logsene App Token')
+  .option('-e, --elasticsearch-host <url>', 'elasticsearch url')
+  .option('-n, --name <logSourceName>', 'name stdin log source to find patterns e.g. -n nginx to match nginx patterns')
+  .option('-g, --glob <globPattern>', 'glob pattern to match filenames')
+  .option('-s, --suppress', 'supress the output of parsed log lines')
+  .option('-y, --yaml', 'print parsed in YAML format to stdout')
+  .option('-p, --pretty', 'Print parsed logs in pretty JSON format to stdout')
+  .option('-j, --ldjson', 'Print parsed logs in line delimited JSON format to stdout')
+  .option('--geoip <value>', 'true/false to enable/disable geoip lookups in patterns')
+  .option('--print_stats <period>', 'prints activity stats every N seconds, useful in comb. with -s to see activity', parseInt)
+  .option('-v, --verbose', 'prints activity report every minute')
+  .option('-u, --udp <port>', 'starts UDP syslog listener to receive logs')
+  .option('--heroku <port>', 'starts http server to receive logs from a Heroku log drain')
+  .option('--cfhttp <port>', 'starts http server to receive logs from a Cloud Foundry log drain')
+  .option('--rtail-port <port>', 'forward logs to rtail-server with given udp port')
+  .option('--rtail-host <hostname>', 'hostname to forward logs to rtail-server')
+  .option('--rtail-web-port <port>', 'starts rtail UI webserver (if installed) - npm i rtail -g)')
+  .option('--rtail-web-host <port>', 'rtail UI webserver and bind hostname\n\t\t\t\tExample: logagent --rtail-web-port 9000 --rtail-port 8989  --rtail-web-host $(hostname) -g \'/var/log/**/*.log\'')
+  .option('--stdin', 'read logs from stdin (default) when no other input is specified')  
+  .parse(process.argv)
+
+if (argv.elasticsearchHost) {
+  process.env.LOGSENE_URL=argv.elasticsearchHost + '/_bulk'
+}
+console.log(argv)
 var https = require('https')
 var http = require('http')
 var TailFileManager = require ('../lib/fileManager')
-
 var prettyjson = require('prettyjson')
 var LogAnalyzer = require('../lib/index.js')
 var readline = require('readline')
@@ -47,8 +74,8 @@ var emptyLines = 0
 var bytes = 0
 var retransmit=0
 var Logsene = require('logsene-js')
-var globPattern = argv.g || process.env.GLOB_PATTERN
-var logseneToken = argv.t || process.env.LOGSENE_TOKEN
+var globPattern = argv.glob || process.env.GLOB_PATTERN
+var logseneToken = argv.index || process.env.LOGSENE_TOKEN
 var http = require('http')
 var loggers = {}
 var throng = require('throng')
@@ -59,15 +86,22 @@ var flat = require('flat')
 var logseneDiskBufferDir = argv['logsene-tmp-dir'] || process.env.LOGSENE_TMP_DIR || require('os').tmpdir()
 var mkpath = require('mkpath')
 process.env.GEOIP_ENABLED=argv.geoip||'false'
+var removeAnsiColor = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g
+
 
 mkpath(logseneDiskBufferDir, function (err) {
   if (err) {
     console.error('ERROR: create directory LOGSENE_TMP_DIR (' + logseneDiskBufferDir + '): ' + err.message)
   }
 })
-var fileManager = new TailFileManager({parseLine: parseLine, log: log})
 
-var la = new LogAnalyzer(argv.f, {}, function () {
+var fileManager = null
+// create fileManager only for tail files mode
+if (argv.glob || argv.args.length>0) {
+  fileManager = new TailFileManager({parseLine: parseLine, log: log})  
+}
+
+var la = new LogAnalyzer(argv.file, {}, function () {
   cli()
 }.bind(this))
 
@@ -133,10 +167,8 @@ function getSyslogServer (appToken, port, type) {
 }
 
 function getLogger (token, type) {
-  var key = token + type
-  // console.log(token)
-
-  if (!loggers[key]) {
+  var loggerName = token + '_' + type
+  if (!loggers[loggerName]) {
     var logger = new Logsene(token, type, null,
       logseneDiskBufferDir)
     logger.on('log', function (data) {
@@ -145,31 +177,35 @@ function getLogger (token, type) {
     logger.on('error', function (err) {
       httpFailed++
       if (argv.verbose) {
-        console.error('Error in Logsene request: ' + formatObject(err))  
+        consoleLogger.error('Error in Logsene request: ' + formatObject(err))  
       }
     })
     logger.on('rt', function (data) {
-      consoleLogger.error(new Date().toISOString() + ' Restransmit ' + data.file + ' to ' + data.url)
+      consoleLogger.warn('Retransmit ' + data.file + ' to ' + data.url)
       retransmit++
+      logsShipped += data.count
     })
     if (process.env.LOG_NEW_TOKENS) {
       consoleLogger.log('create logger for token: ' + token)
     }
-    loggers[key] = logger
+    loggers[loggerName] = logger
   }
-  return loggers[key]
+  return loggers[loggerName]
 }
 
 function _logToLogsene () {
-  var logger = getLogger(this.token, this.type)
+  var logger = getLogger(String(this.token), this.type)
   var data = this.data
   logger.log(data.level || data.severity || 'info', data.message || data.msg || data.MESSAGE, data) 
 }
-function logToLogsene (token, type, data) {
-  setImmediate(_logToLogsene.bind({token: token, data: data, type:type}))
+function logToLogsene (logToken, logType, data) {
+  setImmediate(_logToLogsene.bind({
+    token: logToken, 
+    data: data, 
+    logType: logType}))
 }
 
-function getLoggerForToken (token, type) {
+function getLoggerForToken (token, logtype) {
   return function (err, data) {
     if (!err && data) {
       delete data.ts
@@ -178,7 +214,7 @@ function getLoggerForToken (token, type) {
       data['@source'] = ('' + data['@source']).replace('_' +token, '')
       var msg = data
       log(err, msg)
-      if (/heroku/.test(type)) {
+      if (/heroku/.test(logtype)) {
         msg = {
           message: data.message,
           app: data.app,
@@ -198,7 +234,7 @@ function getLoggerForToken (token, type) {
           msg['@timestamp'] = new Date()
         }
       }
-      logToLogsene(token, type, msg)
+      logToLogsene(token, logtype, msg)
     }
   }
 }
@@ -260,7 +296,7 @@ function herokuHandler (req, res) {
 // heroku start function for WEB_CONCURENCY
 function startHerokuServer () {
   getHttpServer(Number(argv.heroku), herokuHandler)
-  process.on('SIGTERM', function () {
+  process.once('SIGTERM', function () {
     terminate('exitWorker')
     consoleLogger.log('Worker exiting')
   })
@@ -269,7 +305,7 @@ function startHerokuServer () {
 // heroku start function for WEB_CONCURENCY
 function startCloudfoundryServer () {
   getHttpServer(Number(argv.cfhttp), cloudFoundryHandler)
-  process.on('SIGTERM', function () {
+  process.once('SIGTERM', function () {
     terminate('exitWorker')
     consoleLogger.log('Worker exiting')
   })
@@ -334,19 +370,15 @@ function getHttpServer (aport, handler) {
   }
 }
 
-
-
-
-
 function log (err, data) {
   if (err && !data) {
     emptyLines++
     return
   }
-  if (argv.t) {
-    logToLogsene(argv.t || logseneToken, data['_type'] || argv.n || 'logs', data)
+  if (argv.index) {
+    logToLogsene(logseneToken, data['_type'] || argv.name || 'logs', data)
   }
-  if (argv['rtail-port']) {
+  if (argv['rtailPort']) {
     var ts = data['@timestamp']
     delete data['@timestamp']
     delete data['originalLine']
@@ -356,18 +388,18 @@ function log (err, data) {
     var message = new Buffer(JSON.stringify({
       timestamp: ts || new Date(),
       content: data.message,
-      id: type || argv.n || 'logs'
+      id: type || argv.name || 'logs'
     }))
-    udpClient.send(message, 0, message.length, argv['rtail-port'], argv['rtail-host'] || 'localhost', function (err) {
+    udpClient.send(message, 0, message.length, argv['rtailPort'], argv['rtailHost'] || 'localhost', function (err) {
       // udpClient.close()
     })
   }
-  if (argv.s) {
+  if (argv.suppress) {
     return
   }
-  if (argv.p) {
+  if (argv.pretty) {
     console.log(JSON.stringify(data, null, '\t'))
-  } else if (argv.y) {
+  } else if (argv.yaml) {
     console.log(prettyjson.render(data, {noColor: false}) + '\n')
   } else {
     console.log(JSON.stringify(data))
@@ -389,10 +421,8 @@ function parseLine (line, sourceName, cbf) {
   }
   bytes += line.length
   count++
-  la.parseLine(line.replace(
-    // remove ansi color codes
-    /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, ''),
-    argv.n || sourceName, cbf || log)
+  la.parseLine(line.replace(removeAnsiColor, ''),
+    argv.name || sourceName, cbf || log)
 }
 
 
@@ -411,11 +441,11 @@ function readStdIn () {
 function rtailServer () {
   // console.log(process.argv)
   try {
-    process.argv = [process.argv[0], process.argv[1], '--web-port', String(argv['rtail-web-port']), '--web-host', process.env.HOSTNAME, '--udp-port', String(argv['rtail-port']), '--udp-host', process.env.HOSTNAME]
-    consoleLogger.log('start rtail server' + process.argv)
+    process.argv = [process.argv[0], process.argv[1], '--web-port', String(argv['rtailWebPort']), '--web-host', argv['rtailWebHost']||'localhost','--udp-port', String(argv['rtailPort'])]
+    consoleLogger.log('start rtail server' + ' --web-port '+ argv['rtailWebPort'] + ' --web-host '+  argv['rtailWebHost']||'localhost'+' --udp-port '+ argv['rtailPort'])
     require('rtail/cli/rtail-server.js')
   } catch (err) {
-    consoleLogger.log(err)
+    consoleLogger.log(err.stack)
     consoleLogger.log('rtail is not installed. To start rtail server with logagent run:')
     consoleLogger.log('    npm i rtail -g')
     setTimeout(process.exit, 300)
@@ -428,6 +458,7 @@ function formatObject(o) {
   })
   return rv
 }
+
 function printStats () {
   var now = new Date().getTime()
   var duration = now - begin
@@ -445,8 +476,8 @@ function printStats () {
     heapTotalMB: (process.memoryUsage().heapTotal / (1024 * 1024)).toFixed(0),
     memoryRssMB: (process.memoryUsage().rss / (1024 * 1024)).toFixed(0)
   })
-  consoleLogger.error('pid['+process.pid + ']' + ' ' + duration + ' ms ' + count + ' lines parsed.  ' + throughput.toFixed(0) + ' lines/s ' + throughputBytes.toFixed(3) + ' MB/s - empty lines: ' + emptyLines)
-  consoleLogger.log('Logging stats:' + logStatsMsg)
+  consoleLogger.log('Logagent report: pid['+process.pid + ']' + ' ' + duration + ' ms ' + count + ' lines parsed.  ' + throughput.toFixed(0) + ' lines/s ' + throughputBytes.toFixed(3) + ' MB/s - empty lines: ' + emptyLines)
+  consoleLogger.log('Logagent stats:' + logStatsMsg)
   consoleLogger.log('Memory stats: ' + memStats)
   begin = now
   begin = now
@@ -455,29 +486,33 @@ function printStats () {
   logsShipped=0
   httpFailed=0
   retransmit=0
-  var msg = formatObject(fileManager.stats)
-  if (msg) {
-    consoleLogger.log('Lines read: ' + msg)  
+  if (fileManager) {
+    var msg = formatObject(fileManager.stats)
+    if (msg) {
+      consoleLogger.log('Lines read: ' + msg)  
+    }
+    Object.keys(fileManager.stats).forEach(function (file) {
+      fileManager.stats[file]=0
+    })  
   }
-  Object.keys(fileManager.stats).forEach(function (file) {
-    fileManager.stats[file]=0
-  })
+  
 }
-process.on('SIGINT', function () { terminate('SIGINT') })
-process.on('SIGQUIT', function () { terminate('SIGQUIT') })
-process.on('SIGTERM', function () { terminate('SIGTERM') })
+process.once('SIGINT', function () { terminate('SIGINT') })
+process.once('SIGQUIT', function () { terminate('SIGQUIT') })
+process.once('SIGTERM', function () { terminate('SIGTERM') })
 
 function terminate (reason) {
   consoleLogger.log('terminate reason: ' + reason)
   if (argv.heroku && reason !== 'exitWorker') {
     return
   }
-  fileManager.terminate()
-  if (argv.s) {
+  if (fileManager) {
+    fileManager.terminate()  
+  }
+  if (argv.suppress) {
     printStats()
   }
   process.nextTick(function () {
-    // console.log(Object.keys(loggers))
     Object.keys(loggers).forEach(function (l, i) {
       consoleLogger.log('send ' + l)
       loggers[l].send()
@@ -485,7 +520,7 @@ function terminate (reason) {
   })
   setTimeout(function () {
     process.exit()
-  }, Number(process.env.SIGTERM_TIMEOUT) || 2000)
+  }, Number(process.env.SIGTERM_TIMEOUT) || 5000)
 }
 
 function cli () { 
@@ -493,7 +528,7 @@ function cli () {
     setInterval(printStats, ((Number(argv.print_stats)) || 60) * 1000)
     printStats()
   }
-  if (argv['rtail-web-port']) {
+  if (argv['rtailWebPort']) {
     consoleLogger.log('loading rtail')
     rtailServer()
   }
@@ -512,23 +547,26 @@ function cli () {
   if (argv.stdin) {
     readStdIn()
   }
-  if (argv._.length > 0) {
+  if (argv.args.length > 0) {
     // tail files
-    fileManager.tailFiles(argv._)
-  } else if (globPattern) {
+    fileManager.tailFiles(argv.args)
+  }
+  if (globPattern) {
     // checks for file list and start tail for all files
     // remove quotes and spaces
     globPattern=globPattern.replace(/"/g, '').replace(/'/g,'').replace(/\s/g, '')
     consoleLogger.log('using glob pattern: ' + globPattern)
     fileManager.tailFilesFromGlob(globPattern, 60000)
-  } else if (argv.u) {
+  } 
+  if (argv.udp) {
     try {
-      getSyslogServer(logseneToken, argv.u)
+      getSyslogServer(logseneToken, argv.udp)
     } catch (err) {
       consoleLogger.error(err)
       process.exit(-1)
     }
-  } else {
+  } 
+  if (!argv.glob && !argv.udp && !(argv.args.length>0)) {
     readStdIn()
   }
 }

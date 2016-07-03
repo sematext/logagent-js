@@ -34,6 +34,7 @@ var argv = require('commander')
 argv
   .version(require('../package.json').version)
   .usage('[options] <logfiles ...>')
+  .option('-v, --verbose', 'output activity report every minute')
   .option('-f, --file <patternFile>', 'pattern definition file e.g. patterns.yml')
   .option('-t, --index <indexName>', 'elasticsearch index or Logsene App Token')
   .option('-e, --elasticsearch-host <url>', 'elasticsearch url')
@@ -44,8 +45,8 @@ argv
   .option('-p, --pretty', 'print parsed logs in pretty JSON format to stdout')
   .option('-j, --ldjson', 'print parsed logs in line delimited JSON format to stdout')
   .option('--geoip <value>', 'true/false to enable/disable geoip lookups in patterns')
+  .option('--logsene-tmp-dir <directory>', 'directory store status and buffer logs to disk on network failures')
   .option('--print_stats <period>', 'prints activity stats every N seconds, useful in comb. with -s to see activity', parseInt)
-  .option('-v, --verbose', 'prints activity report every minute')
   .option('--stdin', 'read logs from stdin (default) when no other input is specified')  
   .option('-u, --udp <port>', 'starts UDP syslog listener to receive logs')
   .option('--heroku <port>', 'starts http server to receive logs from a Heroku log drain')
@@ -58,6 +59,7 @@ argv
 
 if (argv.elasticsearchHost) {
   process.env.LOGSENE_URL=argv.elasticsearchHost + '/_bulk'
+  process.env.LOGSENE_RECEIVER_URL=argv.elasticsearchHost + '/_bulk'
 }
 var https = require('https')
 var http = require('http')
@@ -82,7 +84,7 @@ var WORKERS = process.env.WEB_CONCURRENCY || 1
 var dgram = require('dgram')
 var udpClient = dgram.createSocket('udp4')
 var flat = require('flat')
-var logseneDiskBufferDir = argv['logsene-tmp-dir'] || process.env.LOGSENE_TMP_DIR || require('os').tmpdir()
+var logseneDiskBufferDir = argv['logseneTmpDir'] || process.env.LOGSENE_TMP_DIR || require('os').tmpdir()
 var mkpath = require('mkpath')
 process.env.GEOIP_ENABLED=argv.geoip||'false'
 var removeAnsiColor = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g

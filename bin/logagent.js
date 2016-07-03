@@ -10,6 +10,13 @@
  * This source code is to be used exclusively by users and customers of Sematext.
  * Please see the full license (found in LICENSE in this distribution) for details on its license and the licenses of its dependencies.
  */
+
+ var processStreams = [process.stdout, process.stderr]
+ processStreams.forEach(function (stream) {
+  if (stream._handle && typeof stream._handle.setBlocking === 'function') {
+    stream._handle.setBlocking(true)
+  }
+})
 var consoleLogger = require('../lib/logger.js')
 var fs = require('fs')
 if (process.argv.length === 2) {

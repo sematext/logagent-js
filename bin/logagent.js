@@ -86,7 +86,6 @@ var globPattern = argv.glob || process.env.GLOB_PATTERN
 var logseneToken = argv.index || process.env.LOGSENE_TOKEN
 var http = require('http')
 var loggers = {}
-var throng = require('throng')
 var WORKERS = process.env.WEB_CONCURRENCY || 1
 var dgram = require('dgram')
 var udpClient = dgram.createSocket('udp4')
@@ -541,12 +540,14 @@ function cli () {
     rtailServer()
   }
   if (argv.cfhttp) {
+    var throng = require('throng')
     throng({
       workers: WORKERS,
       lifetime: Infinity
     }, startCloudfoundryServer)
   }
   if (argv.heroku) {
+    var throng = require('throng')
     throng({
       workers: WORKERS,
       lifetime: Infinity

@@ -46,6 +46,7 @@ argv
   .version(require('../package.json').version)
   .usage('[options] <logfiles ...>')
   .option('-v, --verbose', 'output activity report every minute')
+  .option('-c, --config <file>', 'load settings from a config file')
   .option('-f, --file <patternFile>', 'pattern definition file e.g. patterns.yml', addFile)
   .option('-t, --index <indexName>', 'elasticsearch index or Logsene App Token')
   .option('-e, --elasticsearch-host <url>', 'elasticsearch url')
@@ -69,6 +70,11 @@ argv
   .option('--rtail-web-port <port>', 'starts rtail UI webserver (if installed) - npm i rtail -g)')
   .option('--rtail-web-host <hostname>', 'rtail UI webserver and bind hostname\n\t\t\t\tExample: logagent --rtail-web-port 9000 --rtail-port 8989  --rtail-web-host $(hostname) -g \'/var/log/**/*.log\'')
   .parse(process.argv)
+
+if (argv.config) {
+  var cfgLoader =  require('../lib/configLoader')
+  cfgLoader(argv.config, true, argv)
+}
 
 if (argv.elasticsearchHost) {
   process.env.LOGSENE_URL=argv.elasticsearchHost + '/_bulk'

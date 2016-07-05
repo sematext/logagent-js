@@ -10,88 +10,21 @@
  * This source code is to be used exclusively by users and customers of Sematext.
  * Please see the full license (found in LICENSE in this distribution) for details on its license and the licenses of its dependencies.
  */
-
- var processStreams = [process.stdout, process.stderr]
- processStreams.forEach(function (stream) {
-  if (stream._handle && typeof stream._handle.setBlocking === 'function') {
-    stream._handle.setBlocking(true)
-  }
-})
 var consoleLogger = require('../lib/logger.js')
 var fs = require('fs')
-if (process.argv.length === 2) {
-  try {
-    // read cli paramters from config file
-    var cfgArgs = fs.readFileSync(process.env.LOGAGENT_CONFIG || '/etc/sematext/logagent.conf').toString()
-    if (cfgArgs !== null) {
-      consoleLogger.log('Logagent config file: ' + (process.env.LOGAGENT_CONFIG || '/etc/sematext/logagent.conf'))
-    }
-    cfgArgs = cfgArgs.split(/\s/)
-    cfgArgs = cfgArgs.filter(function (v) {
-      return v !== ''
-    })
-    process.argv = [process.argv[0], process.argv[1]].concat(cfgArgs)
-    consoleLogger.log(process.argv)
-  } catch (err) {
-    // ignore -> regular cli mode
-  }
-}
-
-var argv = require('commander')
-argv.patternFiles=[]
-function addFile (file) {
-  argv.patternFiles.push(file)
-}
-argv
-  .version(require('../package.json').version)
-  .usage('[options] <logfiles ...>')
-  .option('-v, --verbose', 'output activity report every minute')
-  .option('-c, --config <file>', 'load settings from a config file')
-  .option('-f, --file <patternFile>', 'pattern definition file e.g. patterns.yml', addFile)
-  .option('-t, --index <indexName>', 'elasticsearch index or Logsene App Token')
-  .option('-e, --elasticsearch-host <url>', 'elasticsearch url')
-  .option('-n, --name <logSourceName>', 'name stdin log source to find patterns e.g. -n nginx to match nginx patterns')
-  .option('-g, --glob <globPattern>', 'glob pattern to match file names')
-  .option('-s, --suppress', 'supress output of parsed log lines')
-  .option('-y, --yaml', 'print parsed logs in YAML format to stdout')
-  .option('-p, --pretty', 'print parsed logs in pretty JSON format to stdout')
-  .option('-j, --ldjson', 'print parsed logs in line delimited JSON format to stdout')
-  .option('--geoip-enabled <value>', 'true/false to enable/disable geoip lookups in patterns')
-  .option('--logsene-tmp-dir <directory>', 'directory store status and buffer logs to disk on network failures')
-  .option('--https-proxy <url>', 'URL to a proxy server, which provides TLS on client side')
-  .option('--http-proxy <url>', 'URL to a proxy server')
-  .option('--print_stats <period>', 'prints activity stats every N seconds, useful in comb. with -s to see activity', parseInt)
-  .option('--stdin', 'read logs from stdin (default) when no other input is specified')  
-  .option('-u, --udp <port>', 'starts UDP syslog listener to receive logs')
-  .option('--heroku <port>', 'starts http server to receive logs from a Heroku log drain')
-  .option('--cfhttp <port>', 'starts http server to receive logs from a Cloud Foundry log drain')
-  .option('--rtail-port <port>', 'forward logs to rtail-server with given udp port')
-  .option('--rtail-host <hostname>', 'hostname to forward logs to rtail-server')
-  .option('--rtail-web-port <port>', 'starts rtail UI webserver (if installed) - npm i rtail -g)')
-  .option('--rtail-web-host <hostname>', 'rtail UI webserver and bind hostname\n\t\t\t\tExample: logagent --rtail-web-port 9000 --rtail-port 8989  --rtail-web-host $(hostname) -g \'/var/log/**/*.log\'')
-  .parse(process.argv)
-
-if (argv.config) {
-  var cfgLoader =  require('../lib/configLoader')
-  cfgLoader(argv.config, true, argv)
-}
-
-if (argv.elasticsearchHost) {
-  process.env.LOGSENE_URL=argv.elasticsearchHost + '/_bulk'
-  process.env.LOGSENE_RECEIVER_URL=argv.elasticsearchHost + '/_bulk'
-}
-if (argv.httpProxy) {
-  process.env.HTTP_PROXY = argv.httpProxy 
-}
-if (argv.httpsProxy) {
-  process.env.HTTPS_PROXY=argv.httpsProxy 
-}
+var argv = require('../lib/cli/cliArgs.js')
 var https = require('https')
 var http = require('http')
 var TailFileManager = require ('../lib/fileManager')
 var prettyjson = require('prettyjson')
 var LogAnalyzer = require('../lib/index.js')
 var readline = require('readline')
+var Logsene = require('logsene-js')
+var http = require('http')
+var dgram = require('dgram')
+var mkpath = require('mkpath')
+var flat = require('flat')
+
 var begin = new Date().getTime()
 var count = 0
 var logsShipped = 0
@@ -99,17 +32,17 @@ var httpFailed = 0
 var emptyLines = 0
 var bytes = 0
 var retransmit=0
-var Logsene = require('logsene-js')
+
 var globPattern = argv.glob || process.env.GLOB_PATTERN
 var logseneToken = argv.index || process.env.LOGSENE_TOKEN
-var http = require('http')
+
 var loggers = {}
 var WORKERS = process.env.WEB_CONCURRENCY || 1
-var dgram = require('dgram')
+
 var udpClient = dgram.createSocket('udp4')
-var flat = require('flat')
+
 var logseneDiskBufferDir = argv['logseneTmpDir'] || process.env.LOGSENE_TMP_DIR || require('os').tmpdir()
-var mkpath = require('mkpath')
+
 process.env.GEOIP_ENABLED=argv.geoipEnabled||'false'
 var removeAnsiColor = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g
 
@@ -132,63 +65,7 @@ var la = new LogAnalyzer(argv.patternFiles, {}, function () {
 process.on('beforeExit', terminate)
 
 
-function getSyslogServer (appToken, port, type) {
-  var SEVERITY = [
-    'emerg',
-    'alert',
-    'crit',
-    'err',
-    'warning',
-    'notice',
-    'info',
-    'debug'
-  ]
-  var FACILITY = [
-    'kern',
-    'user',
-    'mail',
-    'daemon',
-    'auth',
-    'syslog',
-    'lpr',
-    'news',
-    'uucp',
-    'cron',
-    'authpriv',
-    'ftp',
-    'ntp',
-    'logaudit',
-    'logalert',
-    'clock',
-    'local0',
-    'local1',
-    'local2',
-    'local3',
-    'local4',
-    'local5',
-    'local6',
-    'local7'
-  ]
-  var Syslogd = require('syslogd')
-  var syslogd = Syslogd(function (sysLogMsg) {
-    parseLine(sysLogMsg.msg, sysLogMsg.tag, function (e, data) {
-      data['severity'] = SEVERITY[sysLogMsg.facility]
-      data['syslog-tag'] = sysLogMsg.tag
-      if (/\#(.+)\#(.+)\#(.+?)\[(\d+)\]/) {
-        data['facility'] = FACILITY[sysLogMsg.severity]
-      }
-      data['host'] = sysLogMsg.address
-      log(e, data)
-    }, {address: argv.udp_bind_address||'0.0.0.0'})
 
-  })
-  //syslogd.server.bind({address: argv.udp_bind_address||'0.0.0.0', port:port})
-  syslogd.listen(port, function (err) {
-    consoleLogger.log('start syslog server ' + syslogd.server.address().address + ':' +port + ' ' + (err || ''))
-
-  })
-  return syslogd
-}
 
 function getLogger (token, type) {
   var loggerName = token + '_' + type
@@ -235,7 +112,7 @@ function getLoggerForToken (token, logtype) {
       delete data.ts
       // delete data.ts
       data['_type'] = ('' + type).replace('_' +token, '')
-      data['@source'] = ('' + data['@source']).replace('_' +token, '')
+      data['logSource'] = ('' + data['logSource']).replace('_' +token, '')
       var msg = data
       log(err, msg)
       if (/heroku/.test(logtype)) {
@@ -399,20 +276,29 @@ function log (err, data) {
     emptyLines++
     return
   }
-  if (argv.index) {
-    logToLogsene(logseneToken, data['_type'] || argv.name || 'logs', data)
+
+  if (argv.indices) {
+    var tokenForSource = argv.indices[data.logSource] || argv.index
+    if (tokenForSource) {
+      logToLogsene(logseneToken, data['_type'] || argv.sourceName || 'logs', data)  
+    }
+  } else {
+    if (argv.index) {
+      logToLogsene(logseneToken, data['_type'] || argv.sourceName || 'logs', data)
+    }  
   }
+  
   if (argv['rtailPort']) {
     var ts = data['@timestamp']
     delete data['@timestamp']
     delete data['originalLine']
     delete data['ts']
-    var type = data['@source']
+    var type = data['logSource']
     delete data['_type']
     var message = new Buffer(JSON.stringify({
       timestamp: ts || new Date(),
       content: data.message,
-      id: type || argv.name || 'logs'
+      id: type || argv.sourceName || 'logs'
     }))
     udpClient.send(message, 0, message.length, argv['rtailPort'], argv['rtailHost'] || 'localhost', function (err) {
       // udpClient.close()
@@ -446,7 +332,7 @@ function parseLine (line, sourceName, cbf) {
   bytes += line.length
   count++
   la.parseLine(line.replace(removeAnsiColor, ''),
-    argv.name || sourceName, cbf || log)
+    argv.sourceName || sourceName, cbf || log)
 }
 
 
@@ -462,19 +348,7 @@ function readStdIn () {
   
 }
 
-function rtailServer () {
-  // console.log(process.argv)
-  try {
-    process.argv = [process.argv[0], process.argv[1], '--web-port', String(argv['rtailWebPort']), '--web-host', argv['rtailWebHost']||'localhost','--udp-port', String(argv['rtailPort'])]
-    consoleLogger.log('start rtail server' + ' --web-port '+ argv['rtailWebPort'] + ' --web-host '+  argv['rtailWebHost']||'localhost'+' --udp-port '+ argv['rtailPort'])
-    require('rtail/cli/rtail-server.js')
-  } catch (err) {
-    consoleLogger.log(err.stack)
-    consoleLogger.log('rtail is not installed. To start rtail server with logagent run:')
-    consoleLogger.log('    npm i rtail -g')
-    setTimeout(process.exit, 300)
-  }
-}
+
 function formatObject(o) {
   var rv = ''
   Object.keys(o).forEach(function (key) {
@@ -553,8 +427,7 @@ function cli () {
     printStats()
   }
   if (argv['rtailWebPort']) {
-    consoleLogger.log('loading rtail')
-    rtailServer()
+    var rtailServer = require('../lib/cli/rtailServer')(argv)
   }
   if (argv.cfhttp) {
     var throng = require('throng')
@@ -586,7 +459,8 @@ function cli () {
   } 
   if (argv.udp) {
     try {
-      getSyslogServer(logseneToken, argv.udp)
+      var getSyslogServer = require('../lib/cli/syslog.js')
+      getSyslogServer(logseneToken, argv.udp, parseLine, log)
     } catch (err) {
       consoleLogger.error(err)
       process.exit(-1)

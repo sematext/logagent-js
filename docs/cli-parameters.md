@@ -5,24 +5,39 @@
 ```logagent [options] [file list]```
 
 | Options | Description |
-|-----------|-------------|
-| __-f__ patterns.yml | file with pattern definitions | 
-| __-y__ | prints parsed messages in YAML format to stdout|
-| __-p__ | pretty json output |
-| __-s__ | silent, print no logs, only throughput and memory usage on exit |
-| __--print_stats__ | print processing stats in the given interval in seconds, e.g. ```--print_stats 30```. Usefull with -s to see logagent activity on the console without printing the parsed logs.|
-| __-t__ token | [Logsene](http://sematext.com/logsene) App Token to insert parsed records into Logsene. |
-| __-g__ glob-pattern | use a [glob](https://www.npmjs.com/package/glob) pattern to watch log files e.g. ```-g "{/var/log/*.log,/Users/stefan/myapp/*.log}"```. The complete glob expression must be quoted, to avoid interpretation of special characters by the linux shell. |
-| __--logsene-tmp-dir__  path| directory to store buffered logs during network outage |
-| __-u__ UDP_PORT | starts a syslogd UDP listener on the given port to act as syslogd |
-| __-n__ name | name for the source only when stdin is used, important to make multi-line patterns working on stdin because the status is tracked by the source name.| 
-| __--heroku__ PORT | listens for Heroku logs (http drain / framed syslog over http) |
-| __--cfhttp__ PORT | listens for Cloud Foundry logs (syslog over http)|
-| __--rtail-port__  | forwards logs via UDP to [rtail](http://rtail.org/) server 
-| __--rtail-host__ hostname | [rtail](http://rtail.org/) server (UI for realtime logs), default: localhost|
-| __list of files__ | Every argument after the options list is interpreted as file name. All files in the file list (e.g. /var/log/*.log) are watched by [tail-forever](https://www.npmjs.com/package/tail-forever) starting at end of file|
+|---------|-------------|
+| __Genernal options__ | |
+| -h, --help | output logagent help |
+| -V, --version | output logagent version |
+| -v, --verbose | output activity report every minute |
+| --geoip <value> | true/false to enable/disable geoip lookups in patterns. |
+| --logsene-tmp-dir  path| directory to store status and buffered logs (during network outage) |
+| -f, --file <patternFile> | file with pattern definitions | 
+| -s, --suppress | silent, print no logs to stdout, prints only stats on exit |
+| --print_stats | print processing stats in the given interval in seconds, e.g. ```--print_stats 30``` to stderr. Usefull with -s to see logagent activity on the console without printing the parsed logs to stdout.|
+| __Log input options__| |
+| -g glob-pattern | use a [glob](https://www.npmjs.com/package/glob) pattern to watch log files e.g. ```-g "{/var/log/*.log,/Users/stefan/myapp/*.log}"```. The complete glob expression must be quoted, to avoid interpretation of special characters by the linux shell. |
+| --stdin | read from stdin, default if no other input like files or UDP are set|
+| -n name | name for the log source only when stdin is used, important to make multi-line patterns working on stdin because the status is tracked by the log source name.| 
+| -u UDP_PORT | starts a syslogd UDP listener on the given port to act as syslogd |
+| --heroku PORT | listens for Heroku logs (http drain / framed syslog over http) |
+| --cfhttp PORT | listens for Cloud Foundry logs (syslog over http)|
+| list of files | Every argument after the options list is interpreted as file name. All files in the file list (e.g. /var/log/*.log) are watched by [tail-forever](https://www.npmjs.com/package/tail-forever) starting at end of file|
+| __Output options__ | |
+| __standard output stream__ | combine logagent with any unix tool via pipes |
+| -y, --yaml | prints parsed messages in YAML format to stdout|
+| -p, --pretty | prints parsed messages in pretty json format to stdout|
+| -j, --ldjson | print parsed messages in line delimited JSON format to stdout |
+| __Elasticsearch / Logsene__| Log storage |
+| -e, --elasticsearch-host <url> | Elasticsearch url e.g. http://localhost:9200, default htpps://logsene-receiver.sematext.com:443'|
+| -t, --index <Logsene token/Elasticsearch index> | [Logsene](http://sematext.com/logsene) App Token to insert parsed records into Logsene or Elasticsearch index (see --elasticsearch-host) |
+| __rtail__ | Realtime log viewer|
+| --rtail-port  | forwards logs via UDP to [rtail](http://rtail.org/) server |
+| --rtail-host hostname | [rtail](http://rtail.org/) server (UI for realtime logs), default: localhost|
+| --rtail-web-port <port> | starts rtail UI webserver (if not installed install with: - npm i rtail -g) |
+| --rtail-web-host <host> | rtail UI webserver and bind hostname. E.g. ```logagent --rtail-web-port 9000 --rtail-port 8989  --rtail-web-host $(hostname) -g \'/var/log/**/*.log``` |
 
-The default output is line delimited JSON for parsed log lines, as long as no format options like -yml (YAML format), -p (pretty JSON), or -s (silent, no output to console) are specified. 
+The default output is line delimited JSON for parsed log lines, as long as no format options like -yaml (YAML format), -p (pretty JSON), or -s (silent, no output to console) are specified. 
 
 ## Environment variables
 |Variable|Description|
@@ -53,13 +68,15 @@ logagent -u 514 -y
 Use a [glob](https://www.npmjs.com/package/glob) pattern to build the file list 
 
 ```
-logagent -t LOGSENE_TOKEN -g "{/var/log/*.log,/opt/myapp/*.log}" 
+logagent -t LOGSENE_TOKEN -g '/var/log/**/*.log'
+# pass multiple glob patterns
+logagent -t LOGSENE_TOKEN -g '{/var/log/*.log,/opt/myapp/*.log}'
 ```
 
 Watch selective log output on console by passing logs via stdin and format in YAML
 
 ```
-tail -f /var/log/access.log | logagent -y 
+tail -f /var/log/access.log | logagent -y -n httpd
 tail -f /var/log/system.log | logagent -f my_own_patterns.yml  -y 
 ```
 

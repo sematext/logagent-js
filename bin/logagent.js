@@ -38,11 +38,15 @@ if (process.argv.length === 2) {
 }
 
 var argv = require('commander')
+argv.patternFiles=[]
+function addFile (file) {
+  argv.patternFiles.push(file)
+}
 argv
   .version(require('../package.json').version)
   .usage('[options] <logfiles ...>')
   .option('-v, --verbose', 'output activity report every minute')
-  .option('-f, --file <patternFile>', 'pattern definition file e.g. patterns.yml')
+  .option('-f, --file <patternFile>', 'pattern definition file e.g. patterns.yml', addFile)
   .option('-t, --index <indexName>', 'elasticsearch index or Logsene App Token')
   .option('-e, --elasticsearch-host <url>', 'elasticsearch url')
   .option('-n, --name <logSourceName>', 'name stdin log source to find patterns e.g. -n nginx to match nginx patterns')
@@ -51,7 +55,7 @@ argv
   .option('-y, --yaml', 'print parsed logs in YAML format to stdout')
   .option('-p, --pretty', 'print parsed logs in pretty JSON format to stdout')
   .option('-j, --ldjson', 'print parsed logs in line delimited JSON format to stdout')
-  .option('--geoip <value>', 'true/false to enable/disable geoip lookups in patterns')
+  .option('--geoip-enabled <value>', 'true/false to enable/disable geoip lookups in patterns')
   .option('--logsene-tmp-dir <directory>', 'directory store status and buffer logs to disk on network failures')
   .option('--https-proxy <url>', 'URL to a proxy server, which provides TLS on client side')
   .option('--http-proxy <url>', 'URL to a proxy server')
@@ -100,9 +104,8 @@ var udpClient = dgram.createSocket('udp4')
 var flat = require('flat')
 var logseneDiskBufferDir = argv['logseneTmpDir'] || process.env.LOGSENE_TMP_DIR || require('os').tmpdir()
 var mkpath = require('mkpath')
-process.env.GEOIP_ENABLED=argv.geoip||'false'
+process.env.GEOIP_ENABLED=argv.geoipEnabled||'false'
 var removeAnsiColor = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g
-
 
 mkpath(logseneDiskBufferDir, function (err) {
   if (err) {
@@ -116,7 +119,7 @@ if (argv.glob || argv.args.length>0) {
   fileManager = new TailFileManager({parseLine: parseLine, log: log})  
 }
 
-var la = new LogAnalyzer(argv.file, {}, function () {
+var la = new LogAnalyzer(argv.patternFiles, {}, function () {
   cli()
 }.bind(this))
 

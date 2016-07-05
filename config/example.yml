@@ -1,18 +1,26 @@
 options:
   print_stats: 60
-  suppress: 1
+  suppress: true
   geoipEnabled: false
 
 input:
   files:
     - /var/log/**/*.log
-    - /var/log/*.log
 
 patternFiles:
   - patterns.yml
 
 output:
   elasticsearch: 
-    index: TOKEN_HERE
+    url: https://logsene-receiver.sematext.com
     diskBufferDir: /tmp
+    index: TOKEN
+    indices: 
+      'test.log': TOKEN1_HERE
+      token-receiver: TOKEN2_HERE
   stdout: yaml
+  rtail:
+    udpPort: 3434
+    host: localhost
+    webPort: 8080
+    webHost: localhost

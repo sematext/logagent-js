@@ -40,8 +40,9 @@ This project contains a library and patterns for log parsing and cli tools and i
 Logagent doesn't lose data.  It stores parsed logs to a disk buffer if the network connection to the Elasticsearch API fails.  Logagent retries shipping logs later, when the network or Elasticsearch is available again.  
 
 ## Outputs
-- bulk inserts to [Logsene](http://sematext.com/logsene) / Elasticsearch API
-- JSON, line delimited JSON and YML to standard output  
+- bulk inserts to Elasticsearch and [Logsene](http://sematext.com/logsene) / Elasticsearch API
+- JSON, line delimited JSON and YAML to standard output 
+- UDP forwarding to rtail server for realtime log view 
 
 ## Deployment options
 - Deployable as a system service: systemd, upstart (Linux), or launchd (Mac OS X)

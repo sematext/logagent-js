@@ -31,6 +31,8 @@
 | __Elasticsearch / Logsene__| Log storage |
 | -e, --elasticsearch-host <url> | Elasticsearch url e.g. http://localhost:9200, default htpps://logsene-receiver.sematext.com:443'|
 | -t, --index <Logsene token/Elasticsearch index> | [Logsene](http://sematext.com/logsene) App Token to insert parsed records into Logsene or Elasticsearch index (see --elasticsearch-host) |
+| --http-proxy <url> | HTTP proxy url |
+| --https-proxy <url> | HTTPS proxy url |
 | __rtail__ | Realtime log viewer|
 | --rtail-port  | forwards logs via UDP to [rtail](http://rtail.org/) server |
 | --rtail-host hostname | [rtail](http://rtail.org/) server (UI for realtime logs), default: localhost|

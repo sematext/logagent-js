@@ -53,6 +53,8 @@ argv
   .option('-j, --ldjson', 'print parsed logs in line delimited JSON format to stdout')
   .option('--geoip <value>', 'true/false to enable/disable geoip lookups in patterns')
   .option('--logsene-tmp-dir <directory>', 'directory store status and buffer logs to disk on network failures')
+  .option('--https-proxy <url>', 'URL to a proxy server, which provides TLS on client side')
+  .option('--http-proxy <url>', 'URL to a proxy server')
   .option('--print_stats <period>', 'prints activity stats every N seconds, useful in comb. with -s to see activity', parseInt)
   .option('--stdin', 'read logs from stdin (default) when no other input is specified')  
   .option('-u, --udp <port>', 'starts UDP syslog listener to receive logs')
@@ -61,12 +63,18 @@ argv
   .option('--rtail-port <port>', 'forward logs to rtail-server with given udp port')
   .option('--rtail-host <hostname>', 'hostname to forward logs to rtail-server')
   .option('--rtail-web-port <port>', 'starts rtail UI webserver (if installed) - npm i rtail -g)')
-  .option('--rtail-web-host <port>', 'rtail UI webserver and bind hostname\n\t\t\t\tExample: logagent --rtail-web-port 9000 --rtail-port 8989  --rtail-web-host $(hostname) -g \'/var/log/**/*.log\'')
+  .option('--rtail-web-host <hostname>', 'rtail UI webserver and bind hostname\n\t\t\t\tExample: logagent --rtail-web-port 9000 --rtail-port 8989  --rtail-web-host $(hostname) -g \'/var/log/**/*.log\'')
   .parse(process.argv)
 
 if (argv.elasticsearchHost) {
   process.env.LOGSENE_URL=argv.elasticsearchHost + '/_bulk'
   process.env.LOGSENE_RECEIVER_URL=argv.elasticsearchHost + '/_bulk'
+}
+if (argv.httpProxy) {
+  process.env.HTTP_PROXY = argv.httpProxy 
+}
+if (argv.httpsProxy) {
+  process.env.HTTPS_PROXY=argv.httpsProxy 
 }
 var https = require('https')
 var http = require('http')

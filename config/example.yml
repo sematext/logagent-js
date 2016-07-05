@@ -1,0 +1,18 @@
+options:
+  print_stats: 60
+  suppress: 1
+  geoipEnabled: false
+
+input:
+  files:
+    - /var/log/**/*.log
+    - /var/log/*.log
+
+patternFiles:
+  - patterns.yml
+
+output:
+  elasticsearch: 
+    index: TOKEN_HERE
+    diskBufferDir: /tmp
+  stdout: yaml

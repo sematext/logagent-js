@@ -10,7 +10,7 @@
 | -h, --help | output logagent help |
 | -V, --version | output logagent version |
 | -v, --verbose | output activity report every minute |
-| --geoip <value> | true/false to enable/disable geoip lookups in patterns. |
+| --geoip-enabled <value> | true/false to enable/disable geoip lookups in patterns. |
 | --logsene-tmp-dir  path| directory to store status and buffered logs (during network outage) |
 | -f, --file <patternFile> | file with pattern definitions | 
 | -s, --suppress | silent, print no logs to stdout, prints only stats on exit |

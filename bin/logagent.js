@@ -41,11 +41,9 @@ var WORKERS = process.env.WEB_CONCURRENCY || 1
 
 var udpClient = dgram.createSocket('udp4')
 
-var logseneDiskBufferDir = argv['logseneTmpDir'] || process.env.LOGSENE_TMP_DIR || require('os').tmpdir()
 
-process.env.GEOIP_ENABLED=argv.geoipEnabled||'false'
 var removeAnsiColor = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g
-
+var logseneDiskBufferDir = argv['logseneTmpDir'] || process.env.LOGSENE_TMP_DIR || require('os').tmpdir()   
 mkpath(logseneDiskBufferDir, function (err) {
   if (err) {
     console.error('ERROR: create directory LOGSENE_TMP_DIR (' + logseneDiskBufferDir + '): ' + err.message)
@@ -280,11 +278,11 @@ function log (err, data) {
   if (argv.indices) {
     var tokenForSource = argv.indices[data.logSource] || argv.index
     if (tokenForSource) {
-      logToLogsene(logseneToken, data['_type'] || argv.sourceName || 'logs', data)  
+      logToLogsene(tokenForSource, data['_type'] || 'logs', data)  
     }
   } else {
     if (argv.index) {
-      logToLogsene(logseneToken, data['_type'] || argv.sourceName || 'logs', data)
+      logToLogsene(argv.index, data['_type'] || 'logs', data)
     }  
   }
   

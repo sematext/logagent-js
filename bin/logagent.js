@@ -57,7 +57,7 @@ mkpath(logseneDiskBufferDir, function (err) {
 var fileManager = null
 // create fileManager only for tail files mode
 if (argv.glob || argv.args.length>0) {
-  fileManager = new TailFileManager({parseLine: parseLine, log: log})  
+  fileManager = new TailFileManager({parseLine: parseLine, log: log, logseneTmpDir: argv.logseneTmpDir})  
 }
 
 var la = new LogAnalyzer(argv.patternFiles, {}, function () {
@@ -392,6 +392,7 @@ function printStats () {
   }
   
 }
+
 process.once('SIGINT', function () { terminate('SIGINT') })
 process.once('SIGQUIT', function () { terminate('SIGQUIT') })
 process.once('SIGTERM', function () { terminate('SIGTERM') })

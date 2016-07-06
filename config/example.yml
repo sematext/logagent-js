@@ -1,26 +1,60 @@
+# Global options
 options:
-  print_stats: 60
-  suppress: true
+  # print stats every 60 seconds 
+  printStats: 60
+  # don't write parsed logs to stdout
+  suppress: false
+  # Enalbe/disable GeoIP lookups
+  # Startup of logagent might be slower, when downloading the GeoIP database
   geoipEnabled: false
+  # Directory to store Logagent status nad temporary files
+  diskBufferDir: ./tmp
 
 input:
+  # a list of glob patterns to watch files to tail
   files:
-    - /var/log/**/*.log
+      - ./*.log
+  # listen to udp syslog protocol  
+  #syslog: 
+  #  port: 514
+  # listen to http to receive data from Heroku  log drains  
+  #heroku: 
+  #  port: 9999
+  # listen to http to receive data from Cloud Foundry drains  
+  #cloudFoundry:
+  #  port: 8888
 
+# load a list of pattern files to parse logs
+# later files overwrite settings from provious files
+# optional, if not specified default patterns are used
 patternFiles:
   - patterns.yml
 
 output:
+  # index logs in Elasticsearch or Logsene
   elasticsearch: 
     url: https://logsene-receiver.sematext.com
-    diskBufferDir: /tmp
-    index: TOKEN
+    # default index to use
+    index: YOUR_DEFAULT_INDEX
+    # specific index to use per logSource field of parsed logs
+    # logSource is by default the basename of the log file
+    # but it can be modified by JS transforms functions in the patterns.yml file
     indices: 
-      'test.log': TOKEN1_HERE
-      token-receiver: TOKEN2_HERE
-  stdout: yaml
+      4f70a0c7-9458-43e2-bbc5-xxx: 
+      # list of RegEx mathich logSource / filename  
+      # all logs from this source will be indexed to above index
+        - .*test.*
+        - .*consumer|producer.*
+      999532c9-18f1-4c4b-8753-xxx: 
+        - test2|coreos
+  # print parsed logs in YAML format to stdout if supress is set false    
+  stdout: yaml # use 'pretty' for pretty json and 'ldjson' for line delimited json (default)
+  # forward logs to rtail realtime log viewer
   rtail:
-    udpPort: 3434
+    # rtail host to send logs to
     host: localhost
-    webPort: 8080
-    webHost: localhost
+    # rtails port to send logs to 
+    udpPort: 3434
+    # start rtail Server with given http port and bind to hostname
+    # webPort: 8080
+    # webHost: localhost

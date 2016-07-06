@@ -52,6 +52,7 @@
     "prettyjson": "^1.1.2",
     "rtail": "^0.2.1",
     "split": "^1.0.0",
+    "spm-agent-nodejs": "^1.30.0",
     "stackman": "^1.2.6",
     "syslogd": "^1.1.2",
     "tail-forever": "^0.3.11",

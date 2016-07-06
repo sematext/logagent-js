@@ -10,6 +10,10 @@
  * This source code is to be used exclusively by users and customers of Sematext.
  * Please see the full license (found in LICENSE in this distribution) for details on its license and the licenses of its dependencies.
  */
+ if (process.env.SPM_TOKEN && process.env.NODE_ENV==='production') {
+    // in production we monitor this node.js process
+    var spmAgentNodeJs = require('spm-agent-nodejs')
+ }
 var consoleLogger = require('../lib/logger.js')
 var fs = require('fs')
 var argv = require('../lib/cli/cliArgs.js')
@@ -59,11 +63,6 @@ if (argv.glob || argv.args.length>0) {
 var la = new LogAnalyzer(argv.patternFiles, {}, function () {
   cli()
 }.bind(this))
-
-process.on('beforeExit', terminate)
-
-
-
 
 function getLogger (token, type) {
   var loggerName = token + '_' + type
@@ -275,8 +274,8 @@ function log (err, data) {
     return
   }
 
-  if (argv.indices) {
-    var tokenForSource = argv.indices[data.logSource] || argv.index
+  if (argv.tokenMapper) {
+    var tokenForSource = argv.tokenMapper.findToken([data.logSource]) || argv.index
     if (tokenForSource) {
       logToLogsene(tokenForSource, data['_type'] || 'logs', data)  
     }
@@ -396,6 +395,7 @@ function printStats () {
 process.once('SIGINT', function () { terminate('SIGINT') })
 process.once('SIGQUIT', function () { terminate('SIGQUIT') })
 process.once('SIGTERM', function () { terminate('SIGTERM') })
+process.once('beforeExit', terminate)
 
 function terminate (reason) {
   consoleLogger.log('terminate reason: ' + reason)

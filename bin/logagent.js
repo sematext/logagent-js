@@ -10,21 +10,20 @@
  * This source code is to be used exclusively by users and customers of Sematext.
  * Please see the full license (found in LICENSE in this distribution) for details on its license and the licenses of its dependencies.
  */
- if (process.env.SPM_TOKEN && process.env.NODE_ENV==='production') {
-    // in production we monitor this node.js process
-    var spmAgentNodeJs = require('spm-agent-nodejs')
- }
+if (process.env.SPM_TOKEN && process.env.NODE_ENV === 'production') {
+  // in production we monitor this node.js process
+  var spmAgentNodeJs = require('spm-agent-nodejs')
+}
 var consoleLogger = require('../lib/logger.js')
 var fs = require('fs')
 var argv = require('../lib/cli/cliArgs.js')
 var https = require('https')
 var http = require('http')
-var TailFileManager = require ('../lib/fileManager')
+var TailFileManager = require('../lib/fileManager')
 var prettyjson = require('prettyjson')
 var LogAnalyzer = require('../lib/index.js')
 var readline = require('readline')
 var Logsene = require('logsene-js')
-var http = require('http')
 var dgram = require('dgram')
 var mkpath = require('mkpath')
 var flat = require('flat')
@@ -35,7 +34,7 @@ var logsShipped = 0
 var httpFailed = 0
 var emptyLines = 0
 var bytes = 0
-var retransmit=0
+var retransmit = 0
 
 var globPattern = argv.glob || process.env.GLOB_PATTERN
 var logseneToken = argv.index || process.env.LOGSENE_TOKEN
@@ -45,24 +44,45 @@ var WORKERS = process.env.WEB_CONCURRENCY || 1
 
 var udpClient = dgram.createSocket('udp4')
 
-
 var removeAnsiColor = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g
-var logseneDiskBufferDir = argv['logseneTmpDir'] || process.env.LOGSENE_TMP_DIR || require('os').tmpdir()   
-mkpath(logseneDiskBufferDir, function (err) {
-  if (err) {
-    console.error('ERROR: create directory LOGSENE_TMP_DIR (' + logseneDiskBufferDir + '): ' + err.message)
-  }
-})
 
+var logseneDiskBufferDir = null
 var fileManager = null
-// create fileManager only for tail files mode
-if (argv.glob || argv.args.length>0) {
-  fileManager = new TailFileManager({parseLine: parseLine, log: log, logseneTmpDir: argv.logseneTmpDir})  
-}
+var la = null
 
-var la = new LogAnalyzer(argv.patternFiles, {}, function () {
-  cli()
-}.bind(this))
+function initState () {
+  consoleLogger.warn('reload logagent state')
+  var logseneDiskBufferDir = argv['logseneTmpDir'] || process.env.LOGSENE_TMP_DIR || require('os').tmpdir()
+  mkpath(logseneDiskBufferDir, function (err) {
+    if (err) {
+      console.error('ERROR: create directory LOGSENE_TMP_DIR (' + logseneDiskBufferDir + '): ' + err.message)
+    }
+  })
+  // create fileManager only for tail files mode
+  if (argv.glob || argv.args.length > 0) {
+    if (!fileManager) {
+      fileManager = new TailFileManager({parseLine: parseLine, log: log, logseneTmpDir: argv.logseneTmpDir})
+    }
+  }
+  la = new LogAnalyzer(argv.patternFiles, {}, function (lp) {
+    if (argv.patterns && (argv.patterns instanceof Array)) {
+      lp.patterns = argv.patterns.concat(lp.patterns)
+    }
+    cli()
+  })
+}
+initState()
+
+function watchConfigChange () {
+  // not activated, experimental
+  if (argv.config) {
+    fs.watch(argv.config, function (event, file) {
+      if (event === 'change') {
+        initState()
+      }
+    })
+  }
+}
 
 function getLogger (token, type) {
   var loggerName = token + '_' + type
@@ -75,7 +95,7 @@ function getLogger (token, type) {
     logger.on('error', function (err) {
       httpFailed++
       if (argv.verbose) {
-        consoleLogger.error('Error in Logsene request: ' + formatObject(err))  
+        consoleLogger.error('Error in Logsene request: ' + formatObject(err))
       }
     })
     logger.on('rt', function (data) {
@@ -94,13 +114,13 @@ function getLogger (token, type) {
 function _logToLogsene () {
   var logger = getLogger(String(this.token), this.type)
   var data = this.data
-  logger.log(data.level || data.severity || 'info', data.message || data.msg || data.MESSAGE, data) 
+  logger.log(data.level || data.severity || 'info', data.message || data.msg || data.MESSAGE, data)
 }
 function logToLogsene (logToken, logType, data) {
   setImmediate(_logToLogsene.bind({
-    token: logToken, 
-    data: data, 
-    logType: logType}))
+    token: logToken,
+    data: data,
+  logType: logType}))
 }
 
 function getLoggerForToken (token, logtype) {
@@ -108,8 +128,8 @@ function getLoggerForToken (token, logtype) {
     if (!err && data) {
       delete data.ts
       // delete data.ts
-      data['_type'] = ('' + type).replace('_' +token, '')
-      data['logSource'] = ('' + data['logSource']).replace('_' +token, '')
+      data['_type'] = ('' + type).replace('_' + token, '')
+      data['logSource'] = ('' + data['logSource']).replace('_' + token, '')
       var msg = data
       log(err, msg)
       if (/heroku/.test(logtype)) {
@@ -165,17 +185,17 @@ function herokuHandler (req, res) {
           return
         }
         try {
-          parseLine(line, 'heroku_'+token, function (err, data) {
+          parseLine(line, 'heroku_' + token, function (err, data) {
             if (data) {
               if (process.env.ENABLE_MESSAGE_PARSER !== 'true') {
-                getLoggerForToken(token, 'heroku_'+token)(err, data)
+                getLoggerForToken(token, 'heroku_' + token)(err, data)
               } else {
-                parseLine(data.message, (data.app || 'undefined')+ '_' + token, function (e, d) {
+                parseLine(data.message, (data.app || 'undefined') + '_' + token, function (e, d) {
                   if (d) {
-                    data.message=d.message
+                    data.message = d.message
                     data.parsed_message = d
                   }
-                  getLoggerForToken(token, 'heroku_'+token)(err, data)
+                  getLoggerForToken(token, 'heroku_' + token)(err, data)
                 })
               }
             }
@@ -231,17 +251,17 @@ function cloudFoundryHandler (req, res) {
   })
   req.on('end', function () {
     try {
-      parseLine(body, 'cloudfoundry_'+token, function (err, data) {
+      parseLine(body, 'cloudfoundry_' + token, function (err, data) {
         if (data) {
           if (process.env.ENABLE_MESSAGE_PARSER !== 'true') {
-            getLoggerForToken(token, 'cloudfoundry_'+token)(err, data)
+            getLoggerForToken(token, 'cloudfoundry_' + token)(err, data)
           } else {
             parseLine(data.message, (data.app || 'undefined') + '_' + token, function (e, d) {
               if (d) {
-                data.message=d.message
+                data.message = d.message
                 data.parsed_message = d
               }
-              getLoggerForToken(token, 'cloudfoundry_'+token)(err, data)
+              getLoggerForToken(token, 'cloudfoundry_' + token)(err, data)
             })
           }
         }
@@ -277,14 +297,14 @@ function log (err, data) {
   if (argv.tokenMapper) {
     var tokenForSource = argv.tokenMapper.findToken([data.logSource]) || argv.index
     if (tokenForSource) {
-      logToLogsene(tokenForSource, data['_type'] || 'logs', data)  
+      logToLogsene(tokenForSource, data['_type'] || 'logs', data)
     }
   } else {
     if (argv.index) {
       logToLogsene(argv.index, data['_type'] || 'logs', data)
-    }  
+    }
   }
-  
+
   if (argv['rtailPort']) {
     var ts = data['@timestamp']
     delete data['@timestamp']
@@ -332,8 +352,6 @@ function parseLine (line, sourceName, cbf) {
     argv.sourceName || sourceName, cbf || log)
 }
 
-
-
 function readStdIn () {
   var tr = require('through2')
   var split = require('split')
@@ -342,11 +360,9 @@ function readStdIn () {
     parseLine(chunk.toString())
     setImmediate(callback)
   }))
-  
 }
 
-
-function formatObject(o) {
+function formatObject (o) {
   var rv = ''
   Object.keys(o).forEach(function (key) {
     rv = rv + ' ' + key + '=' + o[key]
@@ -371,26 +387,25 @@ function printStats () {
     heapTotalMB: (process.memoryUsage().heapTotal / (1024 * 1024)).toFixed(0),
     memoryRssMB: (process.memoryUsage().rss / (1024 * 1024)).toFixed(0)
   })
-  consoleLogger.log('Logagent report: pid['+process.pid + ']' + ' ' + duration + ' ms ' + count + ' lines parsed.  ' + throughput.toFixed(0) + ' lines/s ' + throughputBytes.toFixed(3) + ' MB/s - empty lines: ' + emptyLines)
+  consoleLogger.log('Logagent report: pid[' + process.pid + ']' + ' ' + duration + ' ms ' + count + ' lines parsed.  ' + throughput.toFixed(0) + ' lines/s ' + throughputBytes.toFixed(3) + ' MB/s - empty lines: ' + emptyLines)
   consoleLogger.log('Logagent stats:' + logStatsMsg)
   consoleLogger.log('Memory stats: ' + memStats)
   begin = now
   begin = now
   count = 0
   bytes = 0
-  logsShipped=0
-  httpFailed=0
-  retransmit=0
+  logsShipped = 0
+  httpFailed = 0
+  retransmit = 0
   if (fileManager) {
     var msg = formatObject(fileManager.stats)
     if (msg) {
-      consoleLogger.log('Lines read: ' + msg)  
+      consoleLogger.log('Lines read: ' + msg)
     }
     Object.keys(fileManager.stats).forEach(function (file) {
-      fileManager.stats[file]=0
-    })  
+      fileManager.stats[file] = 0
+    })
   }
-  
 }
 
 process.once('SIGINT', function () { terminate('SIGINT') })
@@ -404,7 +419,7 @@ function terminate (reason) {
     return
   }
   if (fileManager) {
-    fileManager.terminate()  
+    fileManager.terminate()
   }
   if (argv.suppress) {
     printStats()
@@ -420,7 +435,7 @@ function terminate (reason) {
   }, Number(process.env.SIGTERM_TIMEOUT) || 5000)
 }
 
-function cli () { 
+function cli () {
   if (argv.print_stats || argv.verbose) {
     setInterval(printStats, ((Number(argv.print_stats)) || 60) * 1000)
     printStats()
@@ -452,20 +467,20 @@ function cli () {
   if (globPattern) {
     // checks for file list and start tail for all files
     // remove quotes and spaces
-    globPattern=globPattern.replace(/"/g, '').replace(/'/g,'').replace(/\s/g, '')
+    globPattern = globPattern.replace(/"/g, '').replace(/'/g, '').replace(/\s/g, '')
     consoleLogger.log('using glob pattern: ' + globPattern)
     fileManager.tailFilesFromGlob(globPattern, 60000)
-  } 
+  }
   if (argv.udp) {
     try {
       var getSyslogServer = require('../lib/cli/syslog.js')
-      getSyslogServer(logseneToken, argv.udp, parseLine, log)
+      var syslogServer = getSyslogServer(logseneToken, argv.udp, parseLine, log)
     } catch (err) {
       consoleLogger.error(err)
       process.exit(-1)
     }
-  } 
-  if (!argv.glob && !argv.udp && !(argv.args.length>0)) {
+  }
+  if (!argv.glob && !argv.udp && !(argv.args.length > 0)) {
     readStdIn()
   }
 }

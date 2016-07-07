@@ -11,7 +11,7 @@
 
 # set this to false when auothash fields
 # the original line might include sensitive data!
-originalLine: true
+originalLine: false
 
 # Please note when geoIP: true
 # There will be a slight delay during first start of logagent while maxmind

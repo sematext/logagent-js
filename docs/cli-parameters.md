@@ -12,7 +12,9 @@
 | --config <configFileName> | path to logagent config file (see below) |
 | --geoip-enabled <value> | true/false to enable/disable geoip lookups in patterns. |
 | --logsene-tmp-dir  path| directory to store status and buffered logs (during network outage) |
-| -f, --file <patternFile> | file with pattern definitions | 
+| --logsene-tmp-dir  path| directory to store status and buffered logs (during network outage) |
+| --include-original-line | includes the original message in parsed logs |
+| -f, --file <patternFile> | file with pattern definitions, use multiple -f options multiple files| 
 | -s, --suppress | silent, print no logs to stdout, prints only stats on exit |
 | --print_stats | print processing stats in the given interval in seconds, e.g. ```--print_stats 30``` to stderr. Usefull with -s to see logagent activity on the console without printing the parsed logs to stdout.|
 | __Log input options__| |

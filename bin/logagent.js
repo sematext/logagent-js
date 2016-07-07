@@ -51,7 +51,6 @@ var fileManager = null
 var la = null
 
 function initState () {
-  consoleLogger.warn('reload logagent state')
   var logseneDiskBufferDir = argv['logseneTmpDir'] || process.env.LOGSENE_TMP_DIR || require('os').tmpdir()
   mkpath(logseneDiskBufferDir, function (err) {
     if (err) {
@@ -67,6 +66,9 @@ function initState () {
   la = new LogAnalyzer(argv.patternFiles, {}, function (lp) {
     if (argv.patterns && (argv.patterns instanceof Array)) {
       lp.patterns = argv.patterns.concat(lp.patterns)
+    }
+    if (argv.includeOriginalLine) {
+      lp.cfg.originalLine = (argv.includeOriginalLine === 'true')
     }
     cli()
   })

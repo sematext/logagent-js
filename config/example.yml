@@ -29,7 +29,7 @@ input:
 parser:
   patternFiles:
     # load a list of pattern files to parse logs
-    # later files overwrite settings from provious files
+    # later files overwrite settings from previous files
     - patterns1.yml
     - patterns2.yml
   # inline pattern definitions, to put on top of patterns list

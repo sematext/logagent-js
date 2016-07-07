@@ -16,7 +16,7 @@ start on runlevel [2345]
 stop on runlevel [06]
 respawn
 chdir  /tmp
-exec $1 " > /etc/init/${SERVICE_NAME}.conf
+exec $1 --config $SPM_AGENT_CONFIG_FILE " > /etc/init/${SERVICE_NAME}.conf
 runCommand "initctl reload-configuration"
 stop $SERVICE_NAME 2> /dev/null
 runCommand "start ${SERVICE_NAME}"
@@ -32,7 +32,7 @@ After=network.target
 
 [Service]
 Restart=always\nRestartSec=10
-ExecStart=$1
+ExecStart=$1 --config $SPM_AGENT_CONFIG_FILE
 
 [Install]
 WantedBy=multi-user.target" > $SYSTEMD_SERVICE_FILE
@@ -53,6 +53,41 @@ function runCommand ()
 	$1
 }
 
+function generate_la_cfg() 
+{
+# make a backup of original config file 
+if [ -f $SPM_AGENT_CONFIG_FILE ]; then  
+  mv  $SPM_AGENT_CONFIG_FILE "${SPM_AGENT_CONFIG_FILE}.bak"
+fi
+echo -e \
+"
+# Global options
+options:
+  # print stats every 60 seconds 
+  printStats: 60
+  # don't write parsed logs to stdout
+  suppress: true
+  # Enalbe/disable GeoIP lookups
+  # Startup of logagent might be slower, when downloading the GeoIP database
+  geoipEnabled: false
+  # Directory to store Logagent status and temporary files
+  # this is equals to LOGSNE_TMP_DIR env variable 
+  diskBufferDir: /tmp
+
+input:
+  # a list of glob patterns to watch files to tail
+  files:
+    - $2
+
+output:
+  # index logs in Elasticsearch or Logsene
+  elasticsearch: 
+    #url: https://logsene-receiver.sematext.com
+    # default index (Logsene token) to use:
+    index: $1
+" > $SPM_AGENT_CONFIG_FILE
+}
+
 function generate_launchctl() 
 {
 echo -e \
@@ -71,6 +106,8 @@ echo -e \
     <key>ProgramArguments</key>
     <array>
         <string>$1</string>
+        <string>--config</string>
+        <string>/etc/sematext/logagent.conf</string>
     </array>
     <key>StandardErrorPath</key>
           <string>/Library/Logs/logagent.log</string>
@@ -95,7 +132,8 @@ function install_script ()
 	export SPM_AGENT_CONFIG_FILE="/etc/sematext/logagent.conf"
 	mkdir -p /etc/sematext
 
-echo "-s --logsene-tmp-dir /tmp -t $2 -g $3" > $SPM_AGENT_CONFIG_FILE
+generate_la_cfg $2 $3
+# echo "-s --logsene-tmp-dir /tmp -t $2 -g $3" > $SPM_AGENT_CONFIG_FILE
 runCommand "chown root $SPM_AGENT_CONFIG_FILE"
 runCommand "chmod 0600 $SPM_AGENT_CONFIG_FILE"
 
@@ -124,11 +162,11 @@ echo $command
 if [ -n "$1" ] ; then
   token=$1
   if [ -n "$2" ] ; then
-    pattern=$2
+    pattern="'$2'"
   else
-    pattern='/var/log/**/*.log'
+    pattern="'/var/log/**/*.log'"
   fi
-  install_script $command $token "$pattern";
+  install_script $command $token "${pattern}";
 else 
 	echo "${COLORred}Missing paramaters. Usage:"
 	echo `basename $0` "LOGSENE_TOKEN filepattern (/var/log/**/*.log)"

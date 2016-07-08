@@ -85,7 +85,7 @@ initState()
 function getLogger (token, type) {
   var loggerName = token + '_' + type
   if (!loggers[loggerName]) {
-    var logger = new Logsene(token, type, null,
+    var logger = new Logsene(token, type, argv.elasticsearchUrl,
       logseneDiskBufferDir)
     logger.on('log', function (data) {
       logsShipped += (Number(data.count) || 0)

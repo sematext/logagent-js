@@ -2,10 +2,9 @@
 ':' // ; export MAX_MEM="--max-old-space-size=500"; exec "$(command -v node || command -v nodejs)" --harmony "${NODE_OPTIONS:-$MAX_MEM}" "$0" "$@" 
 'use strict'
 /*
- * Licensed to Sematext under one or more contributor
- * license agreements. See the NOTICE file distributed with
- * this work for additional information regarding copyright
- * ownership. Sematext licenses this file to you under
+ * See the NOTICE.txt file distributed with this work for additional information 
+ * regarding copyright ownership. 
+ * Sematext licenses logagent-js to you under
  * the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -56,7 +55,7 @@ var fileManager = null
 var la = null
 
 function initState () {
-  var logseneDiskBufferDir = argv['logseneTmpDir'] || process.env.LOGSENE_TMP_DIR || require('os').tmpdir()
+  var logseneDiskBufferDir = argv['diskBufferDir'] || process.env.LOGSENE_TMP_DIR || require('os').tmpdir()
   mkpath(logseneDiskBufferDir, function (err) {
     if (err) {
       console.error('ERROR: create directory LOGSENE_TMP_DIR (' + logseneDiskBufferDir + '): ' + err.message)
@@ -65,7 +64,7 @@ function initState () {
   // create fileManager only for tail files mode
   if (argv.glob || argv.args.length > 0) {
     if (!fileManager) {
-      fileManager = new TailFileManager({parseLine: parseLine, log: log, logseneTmpDir: argv.logseneTmpDir})
+      fileManager = new TailFileManager({parseLine: parseLine, log: log, logseneTmpDir: argv.diskBufferDir})
     }
   }
   la = new LogAnalyzer(argv.patternFiles, {}, function (lp) {

@@ -109,9 +109,9 @@ parser:
 
 ### Section: output
 
-Logs could be shipped to ELasticsearch/Logsene or to rtail for realtime log view. 
+Logs could be shipped to Elasticsearch or to rtail for realtime log view. 
 The Elasticsearch output supports HTTPS, username/password in the url. 
-In addtion it is possible to route logs from different files to different indicies in Elasticsearch/Logsene. All logs, which don't match the rules in the indices section are routed to the default index (elasticsearch.index). 
+In addtion it is possible to route logs from different files to different indicies in Elasticsearch. All logs, which don't match the rules in the indices section are routed to the default index (elasticsearch.index). 
 
 ```
 output:
@@ -172,10 +172,10 @@ output:
 ```
 # Be Evil: parse all logs 
 # stream logs to Logsene 1-Click ELK stack 
-logagent -t LOGSENE_TOKEN /var/log/*.log 
+logagent -i LOGSENE_TOKEN /var/log/*.log 
 
 # Act as syslog server on UDP and forward messages to Logsene
-logagent -u 514 -t LOGSENE_TOKEN  
+logagent -u 514 -i LOGSENE_TOKEN  
 
 # Act as syslog server on UDP and write YAML formatted messages to console
 logagent -u 514 -y  
@@ -184,9 +184,9 @@ logagent -u 514 -y
 Use a [glob](https://www.npmjs.com/package/glob) pattern to build the file list 
 
 ```
-logagent -t LOGSENE_TOKEN -g '/var/log/**/*.log'
+logagent -i LOGSENE_TOKEN -g '/var/log/**/*.log'
 # pass multiple glob patterns
-logagent -t LOGSENE_TOKEN -g '{/var/log/*.log,/opt/myapp/*.log}'
+logagent -i LOGSENE_TOKEN -g '{/var/log/*.log,/opt/myapp/*.log}'
 ```
 
 Watch selective log output on console by passing logs via stdin and format in YAML
@@ -200,14 +200,14 @@ Ship logs to rtail and Logsene to view logs in real-time in rtail and store logs
 
 ```
 # rtail don't need to be installed, logagent uses the rtail protocol
-logagent -t $LOGSENE_TOKEN --rtail-host myrtailserver --rtail-port 9999 /var/log/*.log
+logagent -i $LOGSENE_TOKEN --rtail-host myrtailserver --rtail-port 9999 /var/log/*.log
 ```
 
 Logagent can start the rtail web-server (in-process, saving memory), open browser with http://localhost:8080
 ```
 # logagent has no dependency to rtail, to keep the package small
 sudo npm i rtail -g
-logagent -s -t $LOGSENE_TOKEN --rtail-web-port 8080 --rtail-port 9999 /var/log/*.log
+logagent -s -i $LOGSENE_TOKEN --rtail-web-port 8080 --rtail-port 9999 /var/log/*.log
 ```
 
 And of course you can combine rtail and Logagent in the traditional way, simply connect both via unix pipes. An example with rtail and Logsene storage and charts:

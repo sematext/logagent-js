@@ -75,13 +75,13 @@ npm i logagent-js -g
 
 # Be Evil: parse all logs 
 # stream logs to Logsene 1-Click ELK stack 
-logagent -t LOGSENE_TOKEN /var/log/*.log 
+logagent --index LOGSENE_TOKEN /var/log/*.log 
 
 # Act as syslog server on UDP and write YAML formatted messages to console
 logagent -u 514 -y  
 
 # Act as syslog server on UDP and forward messages to Logsene
-logagent -u 514 -t LOGSENE_TOKEN
+logagent -u 514 --index LOGSENE_TOKEN
 
 # Install the service (Linux, Mac OS X)
 sudo logagent-setup LOGSENE_TOKEN

@@ -26,11 +26,9 @@ var http = require('http')
 var TailFileManager = require('../lib/fileManager')
 var prettyjson = require('prettyjson')
 var LogAnalyzer = require('../lib/index.js')
-var readline = require('readline')
 var Logsene = require('logsene-js')
 var dgram = require('dgram')
 var mkpath = require('mkpath')
-var flat = require('flat')
 
 var begin = new Date().getTime()
 var count = 0
@@ -53,8 +51,12 @@ var removeAnsiColor = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-
 var logseneDiskBufferDir = null
 var fileManager = null
 var la = null
+var throng = null
 
 function initState () {
+  if (argv.heroku || argv.cfhttp) {
+    throng = require('throng')
+  }
   var logseneDiskBufferDir = argv['diskBufferDir'] || process.env.LOGSENE_TMP_DIR || require('os').tmpdir()
   mkpath(logseneDiskBufferDir, function (err) {
     if (err) {
@@ -79,16 +81,6 @@ function initState () {
 }
 initState()
 
-function watchConfigChange () {
-  // not activated, experimental
-  if (argv.config) {
-    fs.watch(argv.config, function (event, file) {
-      if (event === 'change') {
-        initState()
-      }
-    })
-  }
-}
 
 function getLogger (token, type) {
   var loggerName = token + '_' + type
@@ -134,7 +126,7 @@ function getLoggerForToken (token, logtype) {
     if (!err && data) {
       delete data.ts
       // delete data.ts
-      data['_type'] = ('' + type).replace('_' + token, '')
+      data['_type'] = ('' + logtype).replace('_' + token, '')
       data['logSource'] = ('' + data['logSource']).replace('_' + token, '')
       var msg = data
       log(err, msg)
@@ -339,15 +331,6 @@ function log (err, data) {
   }
 }
 
-function prettyJs (o) {
-  var rv = ''
-  var f = flat(o)
-  Object.keys(f).forEach(function (key, i) {
-    rv += key + ': ' + f[key] + ' '
-  })
-  return rv
-}
-
 function parseLine (line, sourceName, cbf) {
   if (!line && cbf) {
     return cbf(new Error('empty line passed to parseLine()'))
@@ -450,14 +433,12 @@ function cli () {
     var rtailServer = require('../lib/cli/rtailServer')(argv)
   }
   if (argv.cfhttp) {
-    var throng = require('throng')
     throng({
       workers: WORKERS,
       lifetime: Infinity
     }, startCloudfoundryServer)
   }
   if (argv.heroku) {
-    var throng = require('throng')
     throng({
       workers: WORKERS,
       lifetime: Infinity

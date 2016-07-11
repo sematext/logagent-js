@@ -19,10 +19,7 @@
  * under the License.
  */
 var consoleLogger = require('../lib/logger.js')
-var fs = require('fs')
-var argv = require('../lib/cli/cliArgs.js')
-var https = require('https')
-var http = require('http')
+var StatsPrinter = require('../lib/cli/printStats.js')
 var TailFileManager = require('../lib/fileManager')
 var prettyjson = require('prettyjson')
 var LogAnalyzer = require('../lib/index.js')
@@ -30,280 +27,114 @@ var Logsene = require('logsene-js')
 var dgram = require('dgram')
 var mkpath = require('mkpath')
 
-var begin = new Date().getTime()
-var count = 0
-var logsShipped = 0
-var httpFailed = 0
-var emptyLines = 0
-var bytes = 0
-var retransmit = 0
 
-var globPattern = argv.glob || process.env.GLOB_PATTERN
-var logseneToken = argv.index || process.env.LOGSENE_TOKEN
-
-var loggers = {}
-var WORKERS = process.env.WEB_CONCURRENCY || 1
-
-var udpClient = dgram.createSocket('udp4')
-
-var removeAnsiColor = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g
-
-var logseneDiskBufferDir = null
-var fileManager = null
-var la = null
-var throng = null
-
-function initState () {
-  if (argv.heroku || argv.cfhttp) {
-    throng = require('throng')
-  }
-  var logseneDiskBufferDir = argv['diskBufferDir'] || process.env.LOGSENE_TMP_DIR || require('os').tmpdir()
-  mkpath(logseneDiskBufferDir, function (err) {
-    if (err) {
-      console.error('ERROR: create directory LOGSENE_TMP_DIR (' + logseneDiskBufferDir + '): ' + err.message)
-    }
-  })
-  // create fileManager only for tail files mode
-  if (argv.glob || argv.args.length > 0) {
-    if (!fileManager) {
-      fileManager = new TailFileManager({parseLine: parseLine, log: log, logseneTmpDir: argv.diskBufferDir})
-    }
-  }
-  la = new LogAnalyzer(argv.patternFiles, {}, function (lp) {
-    if (argv.patterns && (argv.patterns instanceof Array)) {
-      lp.patterns = argv.patterns.concat(lp.patterns)
-    }
-    if (argv.includeOriginalLine) {
-      lp.cfg.originalLine = (argv.includeOriginalLine === 'true')
-    }
-    cli()
-  })
+function LaCli (options) {
+  this.logseneDiskBufferDir = null
+  this.fileManager = null
+  this.la = null
+  this.throng = null
+  this.argv = options || require('../lib/cli/cliArgs.js')
+  this.globPattern = this.argv.glob || process.env.GLOB_PATTERN
+  this.logseneToken = this.argv.index || process.env.LOGSENE_TOKEN
+  this.loggers = {}
+  this.WORKERS = process.env.WEB_CONCURRENCY || 1
+  this.udpClient = dgram.createSocket('udp4')
+  this.removeAnsiColor = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g
+  this.laStats = new StatsPrinter()
+  this.initState()
 }
-initState()
 
+LaCli.prototype.initState = function () {
+  if (this.argv.heroku || this.argv.cfhttp) {
+    this.throng = require('throng')
+    this.httpInputs = require('../lib/cli/httpInputs.js')
+  }
+  this.logseneDiskBufferDir = this.argv['diskBufferDir'] || process.env.LOGSENE_TMP_DIR || require('os').tmpdir()
+  mkpath(this.logseneDiskBufferDir, function (err) {
+    if (err) {
+      console.error('ERROR: create diskBufferDir (' + this.logseneDiskBufferDir + '): ' + err.message)
+    }
+  }.bind(this))
+  // create fileManager only for tail files mode
+  if (this.argv.glob || this.argv.args.length > 0) {
+    if (!this.fileManager) {
+      this.fileManager = new TailFileManager({parseLine: this.parseLine.bind(this), log: this.log.bind(this), logseneTmpDir: this.argv.diskBufferDir})
+      this.laStats.fileManger = this.fileManager
+    }
+  }
+  this.la = new LogAnalyzer(this.argv.patternFiles, {}, function (lp) {
+    if (this.argv.patterns && (this.argv.patterns instanceof Array)) {
+      lp.patterns = this.argv.patterns.concat(lp.patterns)
+    }
+    if (this.argv.includeOriginalLine) {
+      lp.cfg.originalLine = (this.argv.includeOriginalLine === 'true')
+    }
+    this.cli()
+  }.bind(this))
+  process.once('SIGINT', function () { this.terminate('SIGINT') }.bind(this))
+  process.once('SIGQUIT', function () { this.terminate('SIGQUIT') }.bind(this))
+  process.once('SIGTERM', function () { this.terminate('SIGTERM') }.bind(this))
+  process.once('beforeExit', this.terminate.bind(this))
+}
 
-function getLogger (token, type) {
+LaCli.prototype.getLogger = function (token, type) {
   var loggerName = token + '_' + type
-  if (!loggers[loggerName]) {
-    var logger = new Logsene(token, type, argv.elasticsearchUrl,
-      logseneDiskBufferDir)
+  if (!this.loggers[loggerName]) {
+    var logger = new Logsene(token, type, this.argv.elasticsearchUrl,
+      this.logseneDiskBufferDir)
+    this.laStats.usedTokens.push(token)
     logger.on('log', function (data) {
-      logsShipped += (Number(data.count) || 0)
-    })
+      this.laStats.logsShipped += (Number(data.count) || 0)
+    }.bind(this))
     logger.on('error', function (err) {
-      httpFailed++
-      if (argv.verbose) {
-        consoleLogger.error('Error in Logsene request: ' + formatObject(err))
-      }
-    })
+      this.laStats.httpFailed++
+      // if (this.argv.verbose) {
+      consoleLogger.error('Error in Logsene request: ' + formatObject(err) + ' / ' + formatObject(err.err))
+      // }
+    }.bind(this))
     logger.on('rt', function (data) {
       consoleLogger.warn('Retransmit ' + data.file + ' to ' + data.url)
-      retransmit++
-      logsShipped += data.count
-    })
+      this.laStats.retransmit += 1
+      this.laStats.logsShipped += data.count
+    }.bind(this))
     if (process.env.LOG_NEW_TOKENS) {
       consoleLogger.log('create logger for token: ' + token)
     }
-    loggers[loggerName] = logger
+    this.loggers[loggerName] = logger
   }
-  return loggers[loggerName]
+  return this.loggers[loggerName]
 }
 
 function _logToLogsene () {
-  var logger = getLogger(String(this.token), this.type)
+  var logger = this.laCli.getLogger(String(this.token), this.logType)
   var data = this.data
   logger.log(data.level || data.severity || 'info', data.message || data.msg || data.MESSAGE, data)
 }
-function logToLogsene (logToken, logType, data) {
+
+LaCli.prototype.logToLogsene = function (logToken, logType, data) {
   setImmediate(_logToLogsene.bind({
     token: logToken,
     data: data,
-  logType: logType}))
+    logType: logType,
+  laCli: this}))
 }
 
-function getLoggerForToken (token, logtype) {
-  return function (err, data) {
-    if (!err && data) {
-      delete data.ts
-      // delete data.ts
-      data['_type'] = ('' + logtype).replace('_' + token, '')
-      data['logSource'] = ('' + data['logSource']).replace('_' + token, '')
-      var msg = data
-      log(err, msg)
-      if (/heroku/.test(logtype)) {
-        msg = {
-          message: data.message,
-          app: data.app,
-          host: data.host,
-          process_type: data.process_type,
-          originalLine: data.originalLine,
-          severity: data.severity,
-          facility: data.facility
-        }
-        var optionalFields = ['method', 'path', 'host', 'request_id', 'fwd', 'dyno', 'connect', 'service', 'status', 'bytes']
-        optionalFields.forEach(function (f) {
-          if (data[f]) {
-            msg[f] = data[f]
-          }
-        })
-        if (!data['@timestamp']) {
-          msg['@timestamp'] = new Date()
-        }
-      }
-      logToLogsene(token, logtype, msg)
-    }
-  }
-}
-
-function herokuHandler (req, res) {
-  try {
-    var path = req.url.split('/')
-    var token = null
-    if (path.length > 1) {
-      if (path[1] && path[1].length > 31 && /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/.test(path[1])) {
-        token = path[1]
-      } else {
-        // console.log('Bad Url: ' + path)
-        // console.log(JSON.stringify(req.headers))
-      }
-    }
-    if (!token) {
-      res.end('<html><head><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"</head><body><div class="alert alert-danger" role="alert">Error: Missing Logsene Token ' +
-        req.url + '. Please use /LOGSENE_TOKEN. More info: <ul><li><a href="https://github.com/sematext/logagent-js#logagent-as-heroku-log-drain">Heroku Log Drain for Logsene</a> </li><li><a href="https://www.sematext.com/logsene/">Logsene Log Management by Sematext</a></li></ul></div></body><html>')
-      return
-    }
-    var body = ''
-    req.on('data', function (data) {
-      body += data
-    })
-    req.on('end', function () {
-      var lines = body.split('\n')
-      lines.forEach(function (line) {
-        if (!line) {
-          return
-        }
-        try {
-          parseLine(line, 'heroku_' + token, function (err, data) {
-            if (data) {
-              if (process.env.ENABLE_MESSAGE_PARSER !== 'true') {
-                getLoggerForToken(token, 'heroku_' + token)(err, data)
-              } else {
-                parseLine(data.message, (data.app || 'undefined') + '_' + token, function (e, d) {
-                  if (d) {
-                    data.message = d.message
-                    data.parsed_message = d
-                  }
-                  getLoggerForToken(token, 'heroku_' + token)(err, data)
-                })
-              }
-            }
-          })
-        } catch (unknownError) {
-          consoleLogger.log(unknownError + ' ' + unknownError.stack)
-        }
-      })
-      res.end('ok\n')
-    })
-  } catch (err) {
-    consoleLogger.error(new Date() + ': ' + err)
-  }
-}
-
-// heroku start function for WEB_CONCURENCY
-function startHerokuServer () {
-  getHttpServer(Number(argv.heroku), herokuHandler)
-  process.once('SIGTERM', function () {
-    terminate('exitWorker')
-    consoleLogger.log('Worker exiting')
-  })
-}
-
-// heroku start function for WEB_CONCURENCY
-function startCloudfoundryServer () {
-  getHttpServer(Number(argv.cfhttp), cloudFoundryHandler)
-  process.once('SIGTERM', function () {
-    terminate('exitWorker')
-    consoleLogger.log('Worker exiting')
-  })
-}
-
-function cloudFoundryHandler (req, res) {
-  var path = req.url.split('/')
-  var token = null
-  if (path.length > 1) {
-    if (path[1] && path[1].length > 31 && /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/.test(path[1])) {
-      token = path[1]
-    } else {
-      // console.log('Bad Url: ' + path)
-      // console.log(JSON.stringify(req.headers))
-    }
-  }
-  if (!token) {
-    res.end('<html><head><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"</head><body><div class="alert alert-danger" role="alert">Error: Missing Logsene Token ' +
-      req.url + '. Please use /LOGSENE_TOKEN. More info: <ul><li><a href="https://github.com/sematext/logagent-js">CloudFoundry Log Drain for Logsene</a> </li><li><a href="https://www.sematext.com/logsene/">Logsene Log Management by Sematext</a></li></ul></div></body><html>')
-    return
-  }
-  var body = ''
-  req.on('data', function (data) {
-    body += data
-  })
-  req.on('end', function () {
-    try {
-      parseLine(body, 'cloudfoundry_' + token, function (err, data) {
-        if (data) {
-          if (process.env.ENABLE_MESSAGE_PARSER !== 'true') {
-            getLoggerForToken(token, 'cloudfoundry_' + token)(err, data)
-          } else {
-            parseLine(data.message, (data.app || 'undefined') + '_' + token, function (e, d) {
-              if (d) {
-                data.message = d.message
-                data.parsed_message = d
-              }
-              getLoggerForToken(token, 'cloudfoundry_' + token)(err, data)
-            })
-          }
-        }
-      })
-      res.end()
-    } catch (unknownError) {
-      consoleLogger.log(unknownError.stack)
-      res.end()
-    }
-  })
-}
-function getHttpServer (aport, handler) {
-  var _port = aport || process.env.PORT
-  if (aport === true) { // a commadn line flag was set but no port given
-    _port = process.env.PORT
-  }
-  var server = http.createServer(handler)
-  try {
-    server = server.listen(_port)
-    consoleLogger.log('Logagent listening (http): ' + _port + ', process id: ' + process.pid)
-    return server
-  } catch (err) {
-    consoleLogger.log('Port in use (' + _port + '): ' + err)
-  }
-}
-
-function log (err, data) {
+LaCli.prototype.log = function (err, data) {
   if (err && !data) {
-    emptyLines++
+    this.laStats.emptyLines++
     return
   }
-
-  if (argv.tokenMapper) {
-    var tokenForSource = argv.tokenMapper.findToken([data.logSource]) || argv.index
+  if (this.argv.tokenMapper) {
+    var tokenForSource = this.argv.tokenMapper.findToken([data.logSource]) || this.argv.index
     if (tokenForSource) {
-      logToLogsene(tokenForSource, data['_type'] || 'logs', data)
+      this.logToLogsene(tokenForSource, data['_type'] || 'logs', data)
     }
   } else {
-    if (argv.index) {
-      logToLogsene(argv.index, data['_type'] || 'logs', data)
+    if (this.argv.index) {
+      this.logToLogsene(this.argv.index, data['_type'] || 'logs', data)
     }
   }
-
-  if (argv['rtailPort']) {
+  if (this.argv['rtailPort']) {
     var ts = data['@timestamp']
     delete data['@timestamp']
     delete data['originalLine']
@@ -313,42 +144,50 @@ function log (err, data) {
     var message = new Buffer(JSON.stringify({
       timestamp: ts || new Date(),
       content: data.message,
-      id: type || argv.sourceName || 'logs'
+      id: type || this.argv.sourceName || 'logs'
     }))
-    udpClient.send(message, 0, message.length, argv['rtailPort'], argv['rtailHost'] || 'localhost', function (err) {
+    this.udpClient.send(message, 0, message.length, this.argv['rtailPort'], this.argv['rtailHost'] || 'localhost', function (err) {
       // udpClient.close()
     })
   }
-  if (argv.suppress) {
+  if (this.argv.suppress) {
     return
   }
-  if (argv.pretty) {
+  if (this.argv.pretty) {
     console.log(JSON.stringify(data, null, '\t'))
-  } else if (argv.yaml) {
+  } else if (this.argv.yaml) {
     console.log(prettyjson.render(data, {noColor: false}) + '\n')
   } else {
     console.log(JSON.stringify(data))
   }
 }
 
-function parseLine (line, sourceName, cbf) {
+LaCli.prototype.parseLine = function (line, sourceName, cbf) {
   if (!line && cbf) {
     return cbf(new Error('empty line passed to parseLine()'))
   }
-  bytes += line.length
-  count++
-  la.parseLine(line.replace(removeAnsiColor, ''),
-    argv.sourceName || sourceName, cbf || log)
+  this.laStats.bytes = this.laStats.bytes + Buffer.byteLength(line, 'utf8')
+  this.laStats.count++
+  this.la.parseLine(line.replace(this.removeAnsiColor, ''),
+    this.argv.sourceName || sourceName, cbf || this.log.bind(this))
 }
 
-function readStdIn () {
+LaCli.prototype.parseChunks = function (chunk, enc, callback) {
+  console.log(''+chunk)
+  this.parseLine(chunk.toString())
+  callback()
+}
+LaCli.prototype.readStdIn = function () {
   var tr = require('through2')
   var split = require('split')
-  process.stdin.on('end', terminate)
-  process.stdin.pipe(split()).pipe(tr(function (chunk, enc, callback) {
-    parseLine(chunk.toString())
-    setImmediate(callback)
-  }))
+  process.stdin.on('end', this.terminate)
+  //process.stdin.pipe(split()).pipe(tr(
+  //  this.parseChunks.bind(this)
+  //))
+  process.stdin.pipe(split()).on('data', function (data) {
+    this.parseLine.bind(this)(data)
+    console.log(data)
+  }.bind(this))
 }
 
 function formatObject (o) {
@@ -359,115 +198,91 @@ function formatObject (o) {
   return rv
 }
 
-function printStats () {
-  var now = new Date().getTime()
-  var duration = now - begin
-  var throughput = count / (duration / 1000)
-  var throughputBytes = (bytes / 1024 / 1024) / (duration / 1000)
-  var logStatsMsg = formatObject({
-    usedTokens: Object.keys(loggers).length,
-    shippedLogs: logsShipped,
-    httpFailed: httpFailed,
-    httpRetransmit: retransmit,
-    throughputLinesPerSecond: throughput.toFixed(0)
-  })
-  var memStats = formatObject({
-    heapUsedMB: (process.memoryUsage().heapUsed / (1024 * 1024)).toFixed(0),
-    heapTotalMB: (process.memoryUsage().heapTotal / (1024 * 1024)).toFixed(0),
-    memoryRssMB: (process.memoryUsage().rss / (1024 * 1024)).toFixed(0)
-  })
-  consoleLogger.log('Logagent report: pid[' + process.pid + ']' + ' ' + duration + ' ms ' + count + ' lines parsed.  ' + throughput.toFixed(0) + ' lines/s ' + throughputBytes.toFixed(3) + ' MB/s - empty lines: ' + emptyLines)
-  consoleLogger.log('Logagent stats:' + logStatsMsg)
-  consoleLogger.log('Memory stats: ' + memStats)
-  begin = now
-  begin = now
-  count = 0
-  bytes = 0
-  logsShipped = 0
-  httpFailed = 0
-  retransmit = 0
-  if (fileManager) {
-    var msg = formatObject(fileManager.stats)
-    if (msg) {
-      consoleLogger.log('Lines read: ' + msg)
-    }
-    Object.keys(fileManager.stats).forEach(function (file) {
-      fileManager.stats[file] = 0
-    })
-  }
-}
-
-process.once('SIGINT', function () { terminate('SIGINT') })
-process.once('SIGQUIT', function () { terminate('SIGQUIT') })
-process.once('SIGTERM', function () { terminate('SIGTERM') })
-process.once('beforeExit', terminate)
-
-function terminate (reason) {
+LaCli.prototype.terminate = function (reason) {
   consoleLogger.log('terminate reason: ' + reason)
-  if (argv.heroku && reason !== 'exitWorker') {
+  if (this.argv.heroku && reason !== 'exitWorker') {
     return
   }
-  if (fileManager) {
-    fileManager.terminate()
+  if (this.fileManager) {
+    this.fileManager.terminate()
   }
-  if (argv.suppress) {
-    printStats()
+  if (this.argv.suppress) {
+    this.laStats.printStats()
   }
   process.nextTick(function () {
-    Object.keys(loggers).forEach(function (l, i) {
+    var count = Object.keys(this.loggers).length
+    Object.keys(this.loggers).forEach(function (l, i) {
       consoleLogger.log('send ' + l)
-      loggers[l].send()
-    })
-  })
-  setTimeout(function () {
-    process.exit()
-  }, Number(process.env.SIGTERM_TIMEOUT) || 5000)
+      this.loggers[l].send()
+      this.loggers[l].once('log', function () {
+        count = count -1
+        consoleLogger.log('flushed logs for ' + l)
+        if (count === 0) {
+          process.exit()
+        }
+      }.bind({loggerName: l}))
+      this.loggers[l].once('error', function () {
+        count = count -1
+        consoleLogger.error('flushed logs for ' + l + ' failed')
+        if (count === 0) {
+          process.exit()
+        }
+      })
+    }.bind(this))
+  }.bind(this))
 }
 
-function cli () {
-  if (argv.print_stats || argv.verbose) {
-    setInterval(printStats, ((Number(argv.print_stats)) || 60) * 1000)
-    printStats()
+LaCli.prototype.cli = function () {
+  if (this.argv.print_stats || this.argv.verbose) {
+    setInterval(this.laStats.printStats.bind(this.laStats), ((Number(this.argv.print_stats)) || 60) * 1000)
+    this.laStats.printStats()
   }
-  if (argv['rtailWebPort']) {
-    var rtailServer = require('../lib/cli/rtailServer')(argv)
+  if (this.argv['rtailWebPort']) {
+    var rtailServer = require('../lib/cli/rtailServer')(this.argv)
   }
-  if (argv.cfhttp) {
-    throng({
-      workers: WORKERS,
+  if (this.argv.cfhttp) {
+    this.throng({
+      workers: this.WORKERS,
       lifetime: Infinity
-    }, startCloudfoundryServer)
+    }, this.httpInputs.startCloudfoundryServer.bind(this))
   }
-  if (argv.heroku) {
-    throng({
-      workers: WORKERS,
+  if (this.argv.heroku) {
+    this.throng({
+      workers: this.WORKERS,
       lifetime: Infinity
-    }, startHerokuServer)
+    }, this.httpInputs.startHerokuServer.bind(this))
   }
-  if (argv.stdin) {
-    readStdIn()
+  if (this.argv.stdin) {
+    this.readStdIn()
   }
-  if (argv.args.length > 0) {
+  if (this.argv.args.length > 0) {
     // tail files
-    fileManager.tailFiles(argv.args)
+    this.fileManager.tailFiles(this.argv.args)
   }
-  if (globPattern) {
+  if (this.globPattern) {
     // checks for file list and start tail for all files
     // remove quotes and spaces
-    globPattern = globPattern.replace(/"/g, '').replace(/'/g, '').replace(/\s/g, '')
-    consoleLogger.log('using glob pattern: ' + globPattern)
-    fileManager.tailFilesFromGlob(globPattern, 60000)
+    this.globPattern = this.globPattern.replace(/"/g, '').replace(/'/g, '').replace(/\s/g, '')
+    consoleLogger.log('using glob pattern: ' + this.globPattern)
+    this.fileManager.tailFilesFromGlob(this.globPattern, 60000)
   }
-  if (argv.udp) {
+  if (this.argv.udp) {
     try {
       var getSyslogServer = require('../lib/cli/syslog.js')
-      var syslogServer = getSyslogServer(logseneToken, argv.udp, parseLine, log)
+      var syslogServer = getSyslogServer(this.logseneToken, this.argv.udp, this.parseLine.bind(this), this.log.bind(this))
     } catch (err) {
       consoleLogger.error(err)
       process.exit(-1)
     }
   }
-  if (!argv.glob && !argv.udp && !(argv.args.length > 0)) {
-    readStdIn()
+  if (!this.argv.glob && !this.argv.udp && !(this.argv.args.length > 0)) {
+    this.readStdIn()
   }
 }
+
+if (require.main === module) {
+  var logagent = new LaCli()
+} else {
+  module.exports = LaCli
+}
+

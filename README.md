@@ -46,8 +46,8 @@ Logagent doesn't lose data.  It stores parsed logs to a disk buffer if the netwo
 ## Deployment options
 - Deployable as a system service: systemd, upstart (Linux), or launchd (Mac OS X)
 - Docker Container to receive logs via syslog
-- Deployement to Heroku as Heroku Log drain
-- Deployement to Cloud Foundry as Cloud Foundry Log drain (thus usable with Pivotal, Bluemix, etc.)
+- Deployment to Heroku as Heroku Log drain
+- Deployment to Cloud Foundry as Cloud Foundry Log drain (thus usable with Pivotal, Bluemix, etc.)
 
 ## API 
 - Node.js module to integrate parsers into Node.js programs

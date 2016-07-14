@@ -191,9 +191,7 @@ function getLogger (token, type) {
     })
     logger.on('error', function (err) {
       httpFailed++
-      if (argv.verbose) {
-        consoleLogger.error('Error in Logsene request: ' + formatObject(err))  
-      }
+      consoleLogger.error('Error in Logsene request: ' + formatObject(err) + ' ' + formatObject(err.err))  
     })
     logger.on('rt', function (data) {
       consoleLogger.warn('Retransmit ' + data.file + ' to ' + data.url)

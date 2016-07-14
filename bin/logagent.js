@@ -233,8 +233,8 @@ LaCli.prototype.terminate = function (reason) {
 }
 
 LaCli.prototype.cli = function () {
-  if (this.argv.print_stats || this.argv.verbose) {
-    setInterval(this.laStats.printStats.bind(this.laStats), ((Number(this.argv.print_stats)) || 60) * 1000)
+  if (this.argv.printStats || this.argv.verbose) {
+    setInterval(this.laStats.printStats.bind(this.laStats), ((Number(this.argv.printStats)) || 60) * 1000)
     this.laStats.printStats()
   }
   if (this.argv['rtailWebPort']) {

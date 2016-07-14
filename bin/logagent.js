@@ -45,7 +45,7 @@ argv
   .option('-f, --file <patternFile>', 'pattern definition file e.g. patterns.yml')
   .option('-t, --index <indexName>', 'elasticsearch index or Logsene App Token')
   .option('-e, --elasticsearch-host <url>', 'elasticsearch url')
-  .option('-n, --name <logSourceName>', 'name stdin log source to find patterns e.g. -n nginx to match nginx patterns')
+  .option('-n, --name <logSourceName>', 'name stdin log source to find patterns e.g. -n nginx to match nginx patterns', function (n) {argv.sourceName=n})
   .option('-g, --glob <globPattern>', 'glob pattern to match file names')
   .option('-s, --suppress', 'supress output of parsed log lines')
   .option('-y, --yaml', 'print parsed logs in YAML format to stdout')
@@ -391,7 +391,7 @@ function log (err, data) {
     return
   }
   if (argv.index) {
-    logToLogsene(logseneToken, data['_type'] || argv.name || 'logs', data)
+    logToLogsene(logseneToken, data['_type'] || argv.sourceName || 'logs', data)
   }
   if (argv['rtailPort']) {
     var ts = data['@timestamp']
@@ -403,7 +403,7 @@ function log (err, data) {
     var message = new Buffer(JSON.stringify({
       timestamp: ts || new Date(),
       content: data.message,
-      id: type || argv.name || 'logs'
+      id: type || argv.sourceName || 'logs'
     }))
     udpClient.send(message, 0, message.length, argv['rtailPort'], argv['rtailHost'] || 'localhost', function (err) {
       // udpClient.close()
@@ -437,7 +437,7 @@ function parseLine (line, sourceName, cbf) {
   bytes += line.length
   count++
   la.parseLine(line.replace(removeAnsiColor, ''),
-    argv.name || sourceName, cbf || log)
+    argv.sourceName || sourceName, cbf || log)
 }
 
 

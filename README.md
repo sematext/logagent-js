@@ -4,6 +4,8 @@
 
 Smart and lightweight Log Parser and Log Shipper written in Node. It can ship logs to Elasticsearch and thus also to [Logsene](http://www.sematext.com/logsene/). See [Documentation](http://sematext.github.io/logagent-js/).
 
+![](https://nodei.co/npm/logagent-js.png?downloads=true&downloadRank=true&stars=true)
+
 # Features
 
 This project contains a library and patterns for log parsing and cli tools and installers to use logagent-js as log shipper with the following features: 
@@ -46,8 +48,8 @@ Logagent doesn't lose data.  It stores parsed logs to a disk buffer if the netwo
 ## Deployment options
 - Deployable as a system service: systemd, upstart (Linux), or launchd (Mac OS X)
 - Docker Container to receive logs via syslog
-- Deployement to Heroku as Heroku Log drain
-- Deployement to Cloud Foundry as Cloud Foundry Log drain (thus usable with Pivotal, Bluemix, etc.)
+- Deployment to Heroku as Heroku Log drain
+- Deployment to Cloud Foundry as Cloud Foundry Log drain (thus usable with Pivotal, Bluemix, etc.)
 
 ## API 
 - Node.js module to integrate parsers into Node.js programs

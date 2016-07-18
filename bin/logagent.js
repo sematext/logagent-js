@@ -166,9 +166,15 @@ LaCli.prototype.parseLine = function (line, sourceName, cbf) {
   if (!line && cbf) {
     return cbf(new Error('empty line passed to parseLine()'))
   }
+  var trimmedLine = line
+  if (line && Buffer.byteLength(line, 'utf8') > this.argv.maxLogSize) {
+    var cutMsg = new Buffer(this.argv.maxLogSize)
+    cutMsg.write(line)
+    trimmedLine = cutMsg.toString() 
+  }
   this.laStats.bytes = this.laStats.bytes + Buffer.byteLength(line, 'utf8')
   this.laStats.count++
-  this.la.parseLine(line.replace(this.removeAnsiColor, ''),
+  this.la.parseLine(trimmedLine.replace(this.removeAnsiColor, ''),
     this.argv.sourceName || sourceName, cbf || this.log.bind(this))
 }
 

@@ -92,7 +92,7 @@ Please note [Sematext Agent Docker](https://hub.docker.com/r/sematext/sematext-a
 
 You can forward your [Heroku](http://www.heroku.com) logs to Logsene using Heroku [Log Drain](https://devcenter.heroku.com/articles/log-drains) like this:
 ```
-heroku drain:add --app HerokuAppName URL
+heroku drains:add --app HerokuAppName URL
 ```
 Here are the steps:
 

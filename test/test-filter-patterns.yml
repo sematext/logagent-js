@@ -3,11 +3,15 @@ patterns:
   sourceName: !!js/regexp /testFilterFunction/i
   match:
     - type: testDropFilter
+      # parse only messages with "stats" in the raw log message 
       inputFilter: !!js/regexp /stats/i
+      # drop messages with "debug" in the raw log message 
       inputDrop: !!js/regexp /debug/i
       regex: !!js/regexp (.*)
       fields: [message:string]
+      # define a custom property, which can be used in filter function
       myCustomFilterProperty: !!js/regexp /.*/i
+      # create a custom filter function, true includes message, false drops the message
       filter: !!js/function >
         function filter (parsed, pattern) {
           if (pattern.myCustomFilterProperty.test(parsed.message)) {

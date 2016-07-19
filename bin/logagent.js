@@ -212,6 +212,9 @@ function _logToLogsene () {
   logger.log(data.level || data.severity || 'info', data.message || data.msg || data.MESSAGE, data) 
 }
 function logToLogsene (logToken, logType, data) {
+  if (!data) {
+    return
+  }
   setImmediate(_logToLogsene.bind({
     token: logToken, 
     data: data, 
@@ -289,8 +292,8 @@ function herokuHandler (req, res) {
                   if (d) {
                     data.message=d.message
                     data.parsed_message = d
+                    getLoggerForToken(token, 'heroku_'+token)(err, data)
                   }
-                  getLoggerForToken(token, 'heroku_'+token)(err, data)
                 })
               }
             }
@@ -355,8 +358,8 @@ function cloudFoundryHandler (req, res) {
               if (d) {
                 data.message=d.message
                 data.parsed_message = d
+                getLoggerForToken(token, 'cloudfoundry_'+token)(err, data)
               }
-              getLoggerForToken(token, 'cloudfoundry_'+token)(err, data)
             })
           }
         }
@@ -384,8 +387,11 @@ function getHttpServer (aport, handler) {
 }
 
 function log (err, data) {
-  if (err && !data) {
+  if (err && (!data)) {
     emptyLines++
+    return
+  }
+  if (!data) {
     return
   }
   if (argv.index) {
@@ -429,8 +435,13 @@ function prettyJs (o) {
 }
 
 function parseLine (line, sourceName, cbf) {
-  if (!line && cbf) {
-    return cbf(new Error('empty line passed to parseLine()'))
+  if (!line) {
+    emptyLines++
+    if (cbf) {
+      return cbf(new Error('empty line passed to parseLine()'))  
+    } else {
+      return null
+    }
   }
   bytes += line.length
   count++
@@ -559,9 +570,6 @@ function cli () {
       lifetime: Infinity
     }, startHerokuServer)
   }
-  if (argv.stdin) {
-    readStdIn()
-  }
   if (argv.args.length > 0) {
     // tail files
     fileManager.tailFiles(argv.args)
@@ -581,7 +589,7 @@ function cli () {
       process.exit(-1)
     }
   } 
-  if (!argv.glob && !argv.udp && !(argv.args.length>0)) {
+  if (argv.stdin || !argv.glob && !argv.udp && !(argv.args.length>0)) {
     readStdIn()
   }
 }

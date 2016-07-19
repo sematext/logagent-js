@@ -46,6 +46,25 @@ debug: false
 # A pattern name are things like 'kubernetes hyperkube' or 'Elasticsearch' or 'Apache Solr' below.
 
 patterns:
+ - 
+  sourceName: !!js/regexp /testFilterFunction/i
+  match:
+    - type: testDropFilter
+      inputFilter: !!js/regexp /stats/i
+      inputDrop: !!js/regexp /debug/i
+      regex: !!js/regexp (.*)
+      fields: [message:string]
+      myCustomFilterProperty: !!js/regexp /.*/i
+      filter: !!js/function >
+        function filter (parsed, pattern) {
+          if (pattern.myCustomFilterProperty.test(parsed.message)) {
+            // lets log whatever matched myCustomerFilterProperty
+            return true
+          } else {
+            // skip all others
+            return false
+          }
+        }
  - # kubernetes hyperkube
   sourceName: !!js/regexp /hyperkube/
   match:

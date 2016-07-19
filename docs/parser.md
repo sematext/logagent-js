@@ -79,10 +79,22 @@ patterns:
       dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
       # lookup geoip info for the field client_ip
       geoIP: client_ip
+      # parse only messages that match this regex
+      inputFilter: !!js/regexp /api|home|user/
+      # ignore messages matching inputDrop
+      inputDrop: !!js/regexp /127.0.0.1|\.css|\.js|\.png|\.jpg|\.jpeg/
+      # modify parsed object
       transform: !!js/function >
         function (p) {
           p.message = p.method + ' ' + p.path
         }
+      customPropertyMinStatusCode: 399
+      filter: !!js/function > 
+        function (p, pattern) {
+          // log only requests with status code > 399
+          return p.status_code > pattern.customPropertyMinStatusCode // 399
+        }
+
 ```
 
 The default patterns are [here](https://github.com/sematext/logagent-js/blob/master/patterns.yml) - contributions are welcome!

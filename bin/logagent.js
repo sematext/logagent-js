@@ -120,8 +120,11 @@ LaCli.prototype.logToLogsene = function (logToken, logType, data) {
 }
 
 LaCli.prototype.log = function (err, data) {
-  if (err && !data) {
+  if (err && (!data)) {
     this.laStats.emptyLines++
+    return
+  }
+  if (!data) {
     return
   }
   if (this.argv.tokenMapper) {
@@ -192,7 +195,7 @@ LaCli.prototype.readStdIn = function () {
   //))
   process.stdin.pipe(split()).on('data', function (data) {
     this.parseLine.bind(this)(data)
-    console.log(data)
+    // console.log(data)
   }.bind(this))
 }
 
@@ -250,16 +253,15 @@ LaCli.prototype.cli = function () {
     this.throng({
       workers: this.WORKERS,
       lifetime: Infinity
-    }, this.httpInputs.startCloudfoundryServer.bind(this))
+    }, function () {
+      this.httpInputs.startCloudfoundryServer(this)
+    }.bind(this))
   }
   if (this.argv.heroku) {
     this.throng({
       workers: this.WORKERS,
       lifetime: Infinity
     }, this.httpInputs.startHerokuServer.bind(this))
-  }
-  if (this.argv.stdin) {
-    this.readStdIn()
   }
   if (this.argv.args.length > 0) {
     // tail files
@@ -281,7 +283,7 @@ LaCli.prototype.cli = function () {
       process.exit(-1)
     }
   }
-  if (!this.argv.glob && !this.argv.udp && !(this.argv.args.length > 0)) {
+  if (this.argv.stdin || (!this.argv.glob && !this.argv.udp && !(this.argv.args.length > 0))) {
     this.readStdIn()
   }
 }

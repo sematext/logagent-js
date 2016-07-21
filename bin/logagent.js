@@ -47,6 +47,7 @@ argv
   .option('-e, --elasticsearch-host <url>', 'elasticsearch url')
   .option('-n, --name <logSourceName>', 'name stdin log source to find patterns e.g. -n nginx to match nginx patterns', function (n) {argv.sourceName=n})
   .option('-g, --glob <globPattern>', 'glob pattern to match file names')
+  .option('--tailStartPosition <pos>', '-1 tail from end of file, >=0 start from given position (in bytes)')
   .option('-s, --suppress', 'supress output of parsed log lines')
   .option('-y, --yaml', 'print parsed logs in YAML format to stdout')
   .option('-p, --pretty', 'print parsed logs in pretty JSON format to stdout')
@@ -113,7 +114,7 @@ mkpath(logseneDiskBufferDir, function (err) {
 var fileManager = null
 // create fileManager only for tail files mode
 if (argv.glob || argv.args.length>0) {
-  fileManager = new TailFileManager({parseLine: parseLine, log: log})  
+  fileManager = new TailFileManager({parseLine: parseLine, log: log, startPos: Number(argv.tailStartPosition)})  
 }
 
 var la = new LogAnalyzer(argv.file, {}, function () {

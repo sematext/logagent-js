@@ -382,7 +382,7 @@ patterns:
         }
 
  - # CloudFoundry Syslog Messages
-  sourceName: !!js/regexp /cloudfoundry|syslog_raw|heroku/ 
+  sourceName: !!js/regexp /cloudfoundry.*|syslog_raw/ 
   match:
     -
       type: cloudfoundry

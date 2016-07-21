@@ -39,6 +39,7 @@
   "dependencies": {
     "chalk": "^1.1.3",
     "commander": "^2.9.0",
+    "eventemitter2": "^2.0.0",
     "flat": "^2.0.0",
     "glob": "^7.0.3",
     "js-yaml": "^3.3.1",
@@ -52,6 +53,7 @@
     "rtail": "^0.2.1",
     "split": "^1.0.0",
     "stackman": "^1.2.6",
+    "syslog-protocol": "^1.0.0",
     "syslogd": "^1.1.2",
     "tail-forever": "^0.3.11",
     "throng": "^4.0.0",

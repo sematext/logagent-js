@@ -19,6 +19,7 @@
 | --print_stats | print processing stats in the given interval in seconds, e.g. ```--print_stats 30``` to stderr. Usefull with -s to see logagent activity on the console without printing the parsed logs to stdout.|
 | __Log input options__| |
 | -g glob-pattern | use a [glob](https://www.npmjs.com/package/glob) pattern to watch log files e.g. ```-g "{/var/log/*.log,/Users/stefan/myapp/*.log}"```. The complete glob expression must be quoted, to avoid interpretation of special characters by the linux shell. |
++| --tailStartPosition bytes | -1 tail from end of file, >=0 start from given position (in bytes).  This setting applys for new files, having no position saved (see --logsene-tmp-dir)|
 | --stdin | read from stdin, default if no other input like files or UDP are set|
 | -n name | name for the log source only when stdin is used, important to make multi-line patterns working on stdin because the status is tracked by the log source name.| 
 | -u UDP_PORT | starts a syslogd UDP listener on the given port to act as syslogd |

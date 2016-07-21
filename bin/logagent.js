@@ -20,7 +20,6 @@
  */
 var consoleLogger = require('../lib/logger.js')
 var StatsPrinter = require('../lib/cli/printStats.js')
-var TailFileManager = require('../lib/fileManager')
 var LogAnalyzer = require('../lib/index.js')
 
 
@@ -61,11 +60,11 @@ LaCli.prototype.initState = function () {
   this.initPugins([
     '../lib/cli/plugins/input/files',
     '../lib/cli/plugins/input/stdin', 
-    '../lib/cli/plugins/output/stdout',
-    '../lib/cli/plugins/output/elasticsearch',
     '../lib/cli/plugins/input/syslog',
     '../lib/cli/plugins/input/heroku',
-    '../lib/cli/plugins/input/cloudfoundry'
+    '../lib/cli/plugins/input/cloudfoundry',
+    '../lib/cli/plugins/output/elasticsearch',
+    '../lib/cli/plugins/output/stdout',
     ])
   this.logseneDiskBufferDir = this.argv['diskBufferDir'] || process.env.LOGSENE_TMP_DIR || require('os').tmpdir()
   mkpath(this.logseneDiskBufferDir, function (err) {

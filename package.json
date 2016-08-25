@@ -6,7 +6,7 @@
   "bin": {
     "logagent": "bin/logagent.js",
     "logagent-setup": "bin/logagent-setup.sh",
-    "logagent-uninstall": "bin/logagent-uninstall.sh",
+    "logagent-uninstall": "bin/logagent-uninstall.sh"
   },
   "directories": {
     "test": "test"

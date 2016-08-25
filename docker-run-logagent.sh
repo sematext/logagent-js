@@ -7,5 +7,5 @@ export LOGAGENT_OPTIONS=${LOGAGENT_OPTIONS:-"-s"}
 export PATTERN_FILE=${PATTERN_FILE:-"/src/patterns.yml"}
 export LOGSENE_TMP_DIR=/logagent-disk-buffer
 mkdir -p $LOGSENE_TMP_DIR
-echo "logagent -u 514 -t ${LOGSENE_TOKEN} -p $PATTERN_FILE ${LOGAGENT_OPTIONS}"
-logagent -u 514 -t ${LOGSENE_TOKEN} -p $PATTERN_FILE ${LOGAGENT_OPTIONS}
+echo "logagent -u 514 --index ${LOGSENE_TOKEN} -p $PATTERN_FILE ${LOGAGENT_OPTIONS}"
+logagent -u 514 --index ${LOGSENE_TOKEN} -p $PATTERN_FILE ${LOGAGENT_OPTIONS}

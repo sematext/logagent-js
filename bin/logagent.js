@@ -18,36 +18,35 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-var consoleLogger = require('../lib/logger.js')
-var StatsPrinter = require('../lib/cli/printStats.js')
-var LogAnalyzer = require('../lib/index.js')
-
+var consoleLogger = require('../lib/util/logger.js')
+var StatsPrinter = require('../lib/core/printStats.js')
+var LogAnalyzer = require('../lib/parser/parser.js')
 
 var mkpath = require('mkpath')
 
 function LaCli (options) {
-  this.eventEmitter = require('../lib/cli/logEventEmitter.js')
+  this.eventEmitter = require('../lib/core/logEventEmitter.js')
   this.logseneDiskBufferDir = null
   this.fileManager = null
   this.la = null
   this.throng = null
-  this.argv = options || require('../lib/cli/cliArgs.js')
+  this.argv = options || require('../lib/core/cliArgs.js')
   this.globPattern = this.argv.glob || process.env.GLOB_PATTERN
   this.logseneToken = this.argv.index || process.env.LOGSENE_TOKEN
   this.loggers = {}
   this.WORKERS = process.env.WEB_CONCURRENCY || 1
-  
+
   this.removeAnsiColor = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g
   this.laStats = StatsPrinter
   this.initState()
 }
 
 LaCli.prototype.initPugins = function (plugins) {
-  this.plugins=[]
+  this.plugins = []
   plugins.forEach(function (pluginName) {
     try {
       var Plugin = require(pluginName)
-      var p = new Plugin.plugin(this.argv) 
+      var p = new Plugin.plugin(this.argv)
       this.plugins.push(p)
       p.start()
     } catch (err) {
@@ -58,21 +57,21 @@ LaCli.prototype.initPugins = function (plugins) {
 
 LaCli.prototype.initState = function () {
   this.initPugins([
-    '../lib/cli/plugins/input/files',
-    '../lib/cli/plugins/input/stdin', 
-    '../lib/cli/plugins/input/syslog',
-    '../lib/cli/plugins/input/heroku',
-    '../lib/cli/plugins/input/cloudfoundry',
-    '../lib/cli/plugins/output/elasticsearch',
-    '../lib/cli/plugins/output/stdout',
-    ])
+    '../lib/plugins/input/files',
+    '../lib/plugins/input/stdin',
+    '../lib/plugins/input/syslog',
+    '../lib/plugins/input/heroku',
+    '../lib/plugins/input/cloudfoundry',
+    '../lib/plugins/output/elasticsearch',
+    '../lib/plugins/output/stdout',
+  ])
   this.logseneDiskBufferDir = this.argv['diskBufferDir'] || process.env.LOGSENE_TMP_DIR || require('os').tmpdir()
   mkpath(this.logseneDiskBufferDir, function (err) {
     if (err) {
       console.error('ERROR: create diskBufferDir (' + this.logseneDiskBufferDir + '): ' + err.message)
     }
   }.bind(this))
-  
+
   this.la = new LogAnalyzer(this.argv.patternFiles, {}, function (lp) {
     if (this.argv.patterns && (this.argv.patterns instanceof Array)) {
       lp.patterns = this.argv.patterns.concat(lp.patterns)
@@ -87,13 +86,13 @@ LaCli.prototype.initState = function () {
     if (line && Buffer.byteLength(line, 'utf8') > this.argv.maxLogSize) {
       var cutMsg = new Buffer(this.argv.maxLogSize)
       cutMsg.write(line)
-      trimmedLine = cutMsg.toString() 
+      trimmedLine = cutMsg.toString()
     }
     this.laStats.bytes = this.laStats.bytes + Buffer.byteLength(line, 'utf8')
     this.laStats.count++
-    this.la.parseLine (
+    this.la.parseLine(
       trimmedLine.replace(this.removeAnsiColor, ''),
-      context.sourceName || this.argv.sourceName, 
+      context.sourceName || this.argv.sourceName,
       function (err, data) {
         if (data) {
           if (context.enrichEvent) {
@@ -145,7 +144,7 @@ LaCli.prototype.parseLine = function (line, sourceName, cbf) {
   if (line && Buffer.byteLength(line, 'utf8') > this.argv.maxLogSize) {
     var cutMsg = new Buffer(this.argv.maxLogSize)
     cutMsg.write(line)
-    trimmedLine = cutMsg.toString() 
+    trimmedLine = cutMsg.toString()
   }
   this.laStats.bytes = this.laStats.bytes + Buffer.byteLength(line, 'utf8')
   this.laStats.count++
@@ -154,7 +153,7 @@ LaCli.prototype.parseLine = function (line, sourceName, cbf) {
 }
 
 LaCli.prototype.parseChunks = function (chunk, enc, callback) {
-  console.log(''+chunk)
+  console.log('' + chunk)
   this.parseLine(chunk.toString())
   callback()
 }
@@ -168,10 +167,9 @@ LaCli.prototype.terminate = function (reason) {
     this.laStats.printStats()
   }
   var terminateCounter = this.plugins.length
-  this.plugins.forEach(function(p) {
-    if(p.stop) {
-
-      try { 
+  this.plugins.forEach(function (p) {
+    if (p.stop) {
+      try {
         p.stop(function () {
           terminateCounter--
           if (terminateCounter == 0) {
@@ -194,7 +192,7 @@ LaCli.prototype.cli = function () {
   if (this.argv.printStats || this.argv.verbose) {
     setInterval(this.laStats.printStats.bind(this.laStats), ((Number(this.argv.printStats)) || 60) * 1000)
     this.laStats.printStats()
-  }  
+  }
 }
 
 if (require.main === module) {
@@ -202,4 +200,3 @@ if (require.main === module) {
 } else {
   module.exports = LaCli
 }
-

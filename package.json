@@ -2,7 +2,7 @@
   "name": "logagent-js",
   "version": "2.0.0",
   "description": "Smart log parser written in Node",
-  "main": "lib/index.js",
+  "main": "lib/parser/parser.js",
   "bin": {
     "logagent": "bin/logagent.js",
     "logagent-setup": "bin/logagent-setup.sh",

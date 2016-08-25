@@ -23,7 +23,6 @@ fi
 if [[ `/sbin/init --version` =~ upstart ]]>/dev/null; then 
 	echo "Uninstall upstart service ${SERVICE_NAME}"
 	runCommand "stop ${SERVICE_NAME}"
-	runCommand "service ${SERVICE_NAME} disable"
 	runCommand "rm /etc/init/${SERVICE_NAME}.conf"
 	runCommand "initctl reload-configuration"
 	return

@@ -9,6 +9,14 @@ function runCommand ()
 	echo $2 $1
 	$1
 }
+function remove_config_and_npm_package()
+{
+echo "Removing configuration file ${CONFIG_FILE}"
+runCommand "rm $CONFIG_FILE"
+runCommand "rm /tmp/logagentTailPointers.json"
+echo "Removing global npm package logagent-js"
+runCommand "npm rm logagent-js -g"
+}
 function uninstall_logagent_service() 
 {
 if [[ $PLATFORM = "Darwin" ]]; then
@@ -17,6 +25,7 @@ if [[ $PLATFORM = "Darwin" ]]; then
 	runCommand "launchctl unload -w -F $LAUNCHCTL_SERVICE_FILE" 1
 	runCommand "rm $LAUNCHCTL_SERVICE_FILE"
 	runCommand "rm /Library/Logs/${SERVICE_NAME}.log"
+	remove_config_and_npm_package
 	return
 fi
 
@@ -25,6 +34,7 @@ if [[ `/sbin/init --version` =~ upstart ]]>/dev/null; then
 	runCommand "stop ${SERVICE_NAME}"
 	runCommand "rm /etc/init/${SERVICE_NAME}.conf"
 	runCommand "initctl reload-configuration"
+	remove_config_and_npm_package
 	return
 fi
 if [[ `systemctl` =~ -\.mount ]]; then 
@@ -32,13 +42,8 @@ if [[ `systemctl` =~ -\.mount ]]; then
 	runCommand "systemctl stop ${SERVICE_NAME}"
 	runCommand "systemctl disable ${SERVICE_NAME}"
 	runCommand "rm ${SYSTEMD_SERVICE_FILE}"
+	remove_config_and_npm_package
 	return 
 fi
-echo "Removing configuration file ${CONFIG_FILE}"
-runCommand "rm $CONFIG_FILE"
-runCommand "rm /tmp/logagentTailPointers.json"
-echo "Removing global npm package logagent-js"
-runCommand "npm rm logagent-js -g"
-
 }
 uninstall_logagent_service

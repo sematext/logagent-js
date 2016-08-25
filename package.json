@@ -5,7 +5,8 @@
   "main": "lib/index.js",
   "bin": {
     "logagent": "bin/logagent.js",
-    "logagent-setup": "bin/logagent-setup.sh"
+    "logagent-setup": "bin/logagent-setup.sh",
+    "logagent-uninstall": "bin/logagent-uninstall.sh"
   },
   "directories": {
     "test": "test"

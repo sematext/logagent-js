@@ -44,6 +44,11 @@ Start/stop service:
 - systemd: ```systemctl stop/start logagent```
 - lauchnchd: ```launchctl start/stop com.sematext.logagent```
 
+Uninstall services: 
+The following command stops the logagent service, removes service and configuration files and uninstalls the global logagent-js npm package:
+```
+sudo logagent-uninstall 
+```
 
 ## Running Logagent in a Docker Container as Syslog Listener
 You can build a Docker image with logagent running in it and activing as a Syslog UDP listener.  Then you can run this as a container.  Once you have this "containerized logagent" you can start all yoour other containers with Syslog driver and point it to the "containerized logagent's" UDP port (514).  Here are the steps:

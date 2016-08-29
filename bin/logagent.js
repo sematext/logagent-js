@@ -42,11 +42,12 @@ function LaCli (options) {
 }
 
 LaCli.prototype.initPugins = function (plugins) {
+  var eventEmitter = require('../lib/core/logEventEmitter')
   this.plugins = []
   plugins.forEach(function (pluginName) {
     try {
       var Plugin = require(pluginName)
-      var p = new Plugin.plugin(this.argv)
+      var p = new Plugin(this.argv, eventEmitter)
       this.plugins.push(p)
       p.start()
     } catch (err) {

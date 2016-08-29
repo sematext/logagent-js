@@ -55,8 +55,16 @@ LaCli.prototype.initPugins = function (plugins) {
   }.bind(this))
 }
 
-LaCli.prototype.initState = function () {
-  this.initPugins([
+LaCli.prototype.loadInputPlugins = function (configFile, inputName) {
+  if (!configFile) {
+    return
+  }
+  if (configFile[inputName].module) {
+    plugin = require(configFile[inputName].module)
+  }
+}
+LaCli.prototype.loadPlugins = function (configFile) {
+  var plugins = [
     '../lib/plugins/input/files',
     '../lib/plugins/input/stdin',
     '../lib/plugins/input/syslog',
@@ -64,7 +72,31 @@ LaCli.prototype.initState = function () {
     '../lib/plugins/input/cloudfoundry',
     '../lib/plugins/output/elasticsearch',
     '../lib/plugins/output/stdout',
-  ])
+  ]
+  if (!configFile) {
+    return plugins
+  }
+
+  var inputSections = Object.keys(configFile.input)
+  inputSections.forEach(function (key) {
+    if (configFile.input[key].module) {
+      console.log('add ' + configFile.input[key].module + ' to plugin list')
+      plugins.push(configFile.input[key].module)
+    }
+  })
+  var outputSections = Object.keys(configFile.input)
+  outputSections.forEach(function (key) {
+    if (configFile.input[key].module) {
+      plugins.push(configFile.input[key].module)
+    }
+  })
+  return plugins
+}
+
+LaCli.prototype.initState = function () {
+  var plugins = this.loadPlugins(this.argv.configFile)
+  this.initPugins(plugins)
+
   this.logseneDiskBufferDir = this.argv['diskBufferDir'] || process.env.LOGSENE_TMP_DIR || require('os').tmpdir()
   mkpath(this.logseneDiskBufferDir, function (err) {
     if (err) {
@@ -72,7 +104,7 @@ LaCli.prototype.initState = function () {
     }
   }.bind(this))
 
-  this.la = new LogAnalyzer(this.argv.patternFiles, {}, function (lp) {
+  this.la = new LogAnalyzer(this.argv.patternFiles, {}, function laReadyCb (lp) {
     if (this.argv.patterns && (this.argv.patterns instanceof Array)) {
       lp.patterns = this.argv.patterns.concat(lp.patterns)
     }
@@ -81,7 +113,7 @@ LaCli.prototype.initState = function () {
     }
     this.cli()
   }.bind(this))
-  this.eventEmitter.on('data.raw', function (line, context) {
+  this.eventEmitter.on('data.raw', function parseRaw (line, context) {
     var trimmedLine = line
     if (line && Buffer.byteLength(line, 'utf8') > this.argv.maxLogSize) {
       var cutMsg = new Buffer(this.argv.maxLogSize)
@@ -93,7 +125,7 @@ LaCli.prototype.initState = function () {
     this.la.parseLine(
       trimmedLine.replace(this.removeAnsiColor, ''),
       context.sourceName || this.argv.sourceName,
-      function (err, data) {
+      function parserCb (err, data) {
         if (data) {
           if (context.enrichEvent) {
             Object.keys(context.enrichEvent).forEach(function (key) {
@@ -141,19 +173,21 @@ LaCli.prototype.parseLine = function (line, sourceName, cbf) {
     return cbf(new Error('empty line passed to parseLine()'))
   }
   var trimmedLine = line
-  if (line && Buffer.byteLength(line, 'utf8') > this.argv.maxLogSize) {
+  var bufLength = Buffer.byteLength(line, 'utf8')
+  if (line && bufLength > this.argv.maxLogSize) {
     var cutMsg = new Buffer(this.argv.maxLogSize)
     cutMsg.write(line)
     trimmedLine = cutMsg.toString()
   }
-  this.laStats.bytes = this.laStats.bytes + Buffer.byteLength(line, 'utf8')
+  this.laStats.bytes = this.laStats.bytes + bufLength
   this.laStats.count++
-  this.la.parseLine(trimmedLine.replace(this.removeAnsiColor, ''),
-    this.argv.sourceName || sourceName, cbf || this.log.bind(this))
+  this.la.parseLine(
+    trimmedLine.replace(this.removeAnsiColor, ''),
+    this.argv.sourceName || sourceName,
+    cbf || this.log.bind(this))
 }
 
 LaCli.prototype.parseChunks = function (chunk, enc, callback) {
-  console.log('' + chunk)
   this.parseLine(chunk.toString())
   callback()
 }
@@ -167,7 +201,7 @@ LaCli.prototype.terminate = function (reason) {
     this.laStats.printStats()
   }
   var terminateCounter = this.plugins.length
-  this.plugins.forEach(function (p) {
+  this.plugins.forEach(function pluginStop (p) {
     if (p.stop) {
       try {
         p.stop(function () {

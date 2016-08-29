@@ -237,7 +237,7 @@ patterns:
       geoIP: client_ip
       dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
       transform: !!js/function >
-        function (p) {
+        function transformMessage (p) {
           p.message = p.method + ' ' + p.path
           if(p.status_code === '-') {
             p.status_code = 0
@@ -253,7 +253,7 @@ patterns:
       dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
       geoIP: client_ip
       transform: !!js/function >
-        function (p) {
+        function transformMessage (p) {
           p.message = p.method + ' ' + p.path
           if(p.status_code === '-') {
             p.status_code = 0
@@ -269,7 +269,7 @@ patterns:
       geoIP: client_ip
       dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
       transform: !!js/function >
-        function (p) {
+        function transformMessage (p) {
           p.message = p.method + ' ' + p.path
           if(p.status_code === '-') {
             p.status_code = 0
@@ -285,7 +285,7 @@ patterns:
       geoIP: client_ip
       dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
       transform: !!js/function >
-        function (p) {
+        function transformMessage (p) {
           p.message = p.method + ' ' + p.path
           if(p.status_code === '-') {
             p.status_code = 0

@@ -72,7 +72,7 @@ options:
   geoipEnabled: false
   # Directory to store Logagent status and temporary files
   # this is equals to LOGSNE_TMP_DIR env variable 
-  diskBufferDir: /tmp
+  diskBufferDir: /tmp/sematext-logagent
 
 input:
   # a list of glob patterns to watch files to tail
@@ -82,7 +82,7 @@ input:
 output:
   # index logs in Elasticsearch or Logsene
   elasticsearch: 
-    #url: https://logsene-receiver.sematext.com
+    # url: https://logsene-receiver.sematext.com
     # default index (Logsene token) to use:
     index: $1
 " > $SPM_AGENT_CONFIG_FILE

@@ -54,6 +54,7 @@
     "rtail": "^0.2.1",
     "split": "^1.0.0",
     "stackman": "^1.2.6",
+    "stream-throttle": "^0.1.3",
     "syslog-protocol": "^1.0.0",
     "syslogd": "^1.1.2",
     "tail-forever": "^0.3.11",

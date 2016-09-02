@@ -95,37 +95,40 @@ LaCli.prototype.loadPlugins = function (configFile) {
 }
 
 LaCli.prototype.initState = function () {
-  var plugins = this.loadPlugins(this.argv.configFile)
-  this.initPugins(plugins)
+  var eventEmitter = this.eventEmitter
+  var self = this
+  var plugins = self.loadPlugins(this.argv.configFile)
+  self.initPugins(plugins)
 
-  this.logseneDiskBufferDir = this.argv['diskBufferDir'] || process.env.LOGSENE_TMP_DIR || require('os').tmpdir()
-  mkpath(this.logseneDiskBufferDir, function (err) {
+  self.logseneDiskBufferDir = self.argv['diskBufferDir'] || process.env.LOGSENE_TMP_DIR || require('os').tmpdir()
+  mkpath(self.logseneDiskBufferDir, function (err) {
     if (err) {
-      console.error('ERROR: create diskBufferDir (' + this.logseneDiskBufferDir + '): ' + err.message)
+      console.error('ERROR: create diskBufferDir (' + self.logseneDiskBufferDir + '): ' + err.message)
     }
-  }.bind(this))
+  })
 
-  this.la = new LogAnalyzer(this.argv.patternFiles, {}, function laReadyCb (lp) {
-    if (this.argv.patterns && (this.argv.patterns instanceof Array)) {
-      lp.patterns = this.argv.patterns.concat(lp.patterns)
+  this.la = new LogAnalyzer(self.argv.patternFiles, {}, function laReadyCb (lp) {
+    if (self.argv.patterns && (self.argv.patterns instanceof Array)) {
+      lp.patterns = self.argv.patterns.concat(lp.patterns)
     }
-    if (this.argv.includeOriginalLine) {
-      lp.cfg.originalLine = (this.argv.includeOriginalLine === 'true')
+    if (self.argv.includeOriginalLine) {
+      lp.cfg.originalLine = (self.argv.includeOriginalLine === 'true')
     }
-    this.cli()
-  }.bind(this))
-  this.eventEmitter.on('data.raw', function parseRaw (line, context) {
+    self.cli()
+  })
+  self.eventEmitter.on('data.raw', function parseRaw (line, context) {
     var trimmedLine = line
-    if (line && Buffer.byteLength(line, 'utf8') > this.argv.maxLogSize) {
-      var cutMsg = new Buffer(this.argv.maxLogSize)
+    if (line && Buffer.byteLength(line, 'utf8') > self.argv.maxLogSize) {
+      var cutMsg = new Buffer(self.argv.maxLogSize)
       cutMsg.write(line)
       trimmedLine = cutMsg.toString()
     }
-    this.laStats.bytes = this.laStats.bytes + Buffer.byteLength(line, 'utf8')
-    this.laStats.count++
-    this.la.parseLine(
-      trimmedLine.replace(this.removeAnsiColor, ''),
-      context.sourceName || this.argv.sourceName,
+    self.laStats.bytes = self.laStats.bytes + Buffer.byteLength(line, 'utf8')
+    self.laStats.count++
+
+    self.la.parseLine(
+      trimmedLine.replace(self.removeAnsiColor, ''),
+      context.sourceName || self.argv.sourceName,
       function parserCb (err, data) {
         if (data) {
           if (context.enrichEvent) {
@@ -138,15 +141,15 @@ LaCli.prototype.initState = function () {
             filteredData = context.filter(data, context)
           }
           if (filteredData) {
-            this.eventEmitter.parsedEvent(filteredData, context)
+            eventEmitter.parsedEvent(filteredData, context)
           }
         }
-      }.bind(this))
-  }.bind(this))
-  process.once('SIGINT', function () { this.terminate('SIGINT') }.bind(this))
-  process.once('SIGQUIT', function () { this.terminate('SIGQUIT') }.bind(this))
-  process.once('SIGTERM', function () { this.terminate('SIGTERM') }.bind(this))
-  process.once('beforeExit', this.terminate.bind(this))
+      })
+  })
+  process.once('SIGINT', function () { self.terminate('SIGINT') })
+  process.once('SIGQUIT', function () { self.terminate('SIGQUIT')})
+  process.once('SIGTERM', function () { self.terminate('SIGTERM')})
+  process.once('beforeExit', self.terminate)
 }
 
 LaCli.prototype.log = function (err, data) {
@@ -201,16 +204,28 @@ LaCli.prototype.terminate = function (reason) {
   if (this.argv.suppress) {
     this.laStats.printStats()
   }
-  var terminateCounter = this.plugins.length
+  var terminateCounter = this.plugins.length - 1
+  function callBackWithATimeout (callback, timeout) {
+    var run, timer
+    run = function () {
+      if (timer) {
+        clearTimeout(timer)
+        timer = null
+        callback.apply(this, arguments)
+      }
+    }
+    timer = setTimeout(run, timeout, 'timeout')
+    return run
+  }
   this.plugins.forEach(function pluginStop (p) {
     if (p.stop) {
       try {
-        p.stop(function () {
+        p.stop(callBackWithATimeout(function () {
           terminateCounter--
           if (terminateCounter == 0) {
             process.exit()
           }
-        })
+        }, 5000))
       } catch (err) {
         consoleLogger.error('Error stopping plugin ' + err)
       }
@@ -221,6 +236,7 @@ LaCli.prototype.terminate = function (reason) {
       }
     }
   })
+  setTimeout(process.exit, 10000)
 }
 
 LaCli.prototype.cli = function () {

@@ -34,7 +34,7 @@ function LaCli (options) {
   this.globPattern = this.argv.glob || process.env.GLOB_PATTERN
   this.logseneToken = this.argv.index || process.env.LOGSENE_TOKEN
   this.loggers = {}
-  this.WORKERS = process.env.WEB_CONCURRENCY || 0
+  this.WORKERS = process.env.WEB_CONCURRENCY || 1
 
   this.removeAnsiColor = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g
   this.laStats = StatsPrinter

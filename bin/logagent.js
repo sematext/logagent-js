@@ -34,7 +34,7 @@ function LaCli (options) {
   this.globPattern = this.argv.glob || process.env.GLOB_PATTERN
   this.logseneToken = this.argv.index || process.env.LOGSENE_TOKEN
   this.loggers = {}
-  this.WORKERS = process.env.WEB_CONCURRENCY || 1
+  this.WORKERS = process.env.WEB_CONCURRENCY || 0
 
   this.removeAnsiColor = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g
   this.laStats = StatsPrinter
@@ -42,9 +42,11 @@ function LaCli (options) {
 }
 
 LaCli.prototype.initPugins = function (plugins) {
+  consoleLogger.log('init plugins')
   var eventEmitter = require('../lib/core/logEventEmitter')
   this.plugins = []
   plugins.forEach(function (pluginName) {
+    consoleLogger.log(pluginName)
     try {
       var Plugin = require(pluginName)
       var p = new Plugin(this.argv, eventEmitter)
@@ -56,14 +58,6 @@ LaCli.prototype.initPugins = function (plugins) {
   }.bind(this))
 }
 
-LaCli.prototype.loadInputPlugins = function (configFile, inputName) {
-  if (!configFile) {
-    return
-  }
-  if (configFile[inputName].module) {
-    plugin = require(configFile[inputName].module)
-  }
-}
 LaCli.prototype.loadPlugins = function (configFile) {
   var plugins = [
     '../lib/plugins/input/files',
@@ -72,7 +66,7 @@ LaCli.prototype.loadPlugins = function (configFile) {
     '../lib/plugins/input/heroku',
     '../lib/plugins/input/cloudfoundry',
     '../lib/plugins/output/elasticsearch',
-    '../lib/plugins/output/stdout',
+    '../lib/plugins/output/stdout'
   ]
   if (!configFile) {
     return plugins
@@ -85,10 +79,10 @@ LaCli.prototype.loadPlugins = function (configFile) {
       plugins.push(configFile.input[key].module)
     }
   })
-  var outputSections = Object.keys(configFile.input)
+  var outputSections = Object.keys(configFile.output)
   outputSections.forEach(function (key) {
-    if (configFile.input[key].module) {
-      plugins.push(configFile.input[key].module)
+    if (configFile.output[key].module) {
+      plugins.push(configFile.output[key].module)
     }
   })
   return plugins

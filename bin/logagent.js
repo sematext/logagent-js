@@ -111,12 +111,25 @@ LaCli.prototype.initState = function () {
     if (self.argv.patterns && (self.argv.patterns instanceof Array)) {
       lp.patterns = self.argv.patterns.concat(lp.patterns)
     }
-    if (self.argv.includeOriginalLine) {
-      lp.cfg.originalLine = (self.argv.includeOriginalLine === 'true')
+    if (self.argv.includeOriginalLine !== undefined) {
+      lp.cfg.originalLine = self.argv.includeOriginalLine
+      console.log('originalLine enabled ' + lp.cfg.originalLine)
     }
     self.cli()
   })
+  self.eventEmitter.on('input.stdin.end', function endOnStdinEof (line, context) {
+    self.terminateRequest = true
+    self.terminateReason = 'stdin closed'
+  })
+
+  self.tid = setInterval(function () {
+    if (self.terminateRequest && Date.now() - self.lastParsedTS > 1500) {
+      self.terminate(self.terminateReason)
+    }
+  }, 1000)
+
   self.eventEmitter.on('data.raw', function parseRaw (line, context) {
+    self.lastParsedTS = Date.now()
     var trimmedLine = line
     if (line && Buffer.byteLength(line, 'utf8') > self.argv.maxLogSize) {
       var cutMsg = new Buffer(self.argv.maxLogSize)

@@ -1,0 +1,76 @@
+# Global options
+options:
+  includeOriginalLine: true
+
+input:
+  heroku: 
+   port: 9999
+
+# we use here inline patterns, loaded after patterns.yml 
+parser:
+  patterns:
+    - # Heroku Messages are in syslog format 
+      sourceName: !!js/regexp /heroku|syslog_framed/ 
+      match:
+        -
+          type: heroku
+          regex: !!js/regexp \d*\s{0,1}<(\d+)>(\d+)\s(\S+)\s(\S+)\s(\S+)\s(\S+)\.{0,1}(\d*)\s+-\s(.*)
+          fields: [prio,version,ts,host,app,process_type,dyno,message]
+          dateFormat: YYYY-MM-DDTHH:mm:ssZ
+          SEVERITY: 
+            - emerg
+            - alert
+            - crit
+            - err
+            - warning
+            - notice
+            - info
+            - debug
+          FACILITY:
+            - kern
+            - user
+            - mail
+            - daemon
+            - auth
+            - syslog
+            - lpr
+            - news
+            - uucp
+            - cron
+            - authpriv
+            - ftp
+            - ntp
+            - logaudit
+            - logalert
+            - clock
+            - local0
+            - local1
+            - local2
+            - local3
+            - local4
+            - local5
+            - local6
+            - local7
+
+          transform: !!js/function >
+            function (parsed, pattern) {
+              parsed.facility = pattern.FACILITY[parsed.prio>>3] || String(parsed.prio>>3)
+              parsed.severity = pattern.SEVERITY[parsed.prio&7] || String(parsed.prio&7)
+              // handle app specific message formats, e.g. from heroku router
+              if (parsed.process_type === 'router')
+              {
+                try { 
+                  var keyValue = parsed.message.trim().split(' ')
+                  keyValue.forEach (function (kv) {
+                    var kvs = kv.split ('=')
+                    parsed[kvs[0].trim()] = kvs[1].trim()
+                  })
+                } catch (err) {
+                  // ignore
+                }
+              }
+            }
+output:
+  # print parsed logs in YAML format to stdout if supress is set false    
+  stdout: yaml # use 'pretty' for pretty json and 'ldjson' for line delimited json (default)
+  

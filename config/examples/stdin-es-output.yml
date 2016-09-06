@@ -1,0 +1,17 @@
+# Global options
+options:
+  includeOriginalLine: false
+  printStats: 10
+
+input:
+  stdin: true
+  originalLine: true
+
+output:
+  # print parsed logs in YAML format to stdout if supress is set false    
+  stdout: yaml # use 'pretty' for pretty json and 'ldjson' for line delimited json (default)
+  # Start Elasticsearch before, e.g. 
+  # docker run --name la-test-es -d -p 9200:9200 elasticsearch
+  elasticsearch:
+    index: logagent_test
+    url: http://localhost:9200

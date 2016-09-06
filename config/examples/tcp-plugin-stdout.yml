@@ -1,0 +1,17 @@
+# Global options
+options:
+  includeOriginalLine: false
+
+input:
+  stdin: true
+  tcp: 
+    # external modules must be installed with npm i megastef/logagent-tcp-input -g 
+    module: logagent-tcp-input # LA will call requre('logagent-tcp-input')
+    port: 45900                # plugin specific settings
+    bindAddress: 0.0.0.0
+    sourceName: tcpTest
+
+output:
+  # print parsed logs in YAML format to stdout if supress is set false    
+  stdout: yaml # use 'pretty' for pretty json and 'ldjson' for line delimited json (default)
+  

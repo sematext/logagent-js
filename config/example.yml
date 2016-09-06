@@ -12,11 +12,11 @@ options:
 
 input:
   # a list of glob patterns to watch files to tail
-  files:
-      - '/var/log/**/*.log'
+  #files:
+  #    - '/var/log/**/*.log'
   # listen to udp syslog protocol  
-  #syslog: 
-  #  port: 514
+  syslog: 
+    port: 514
   # listen to http to receive data from Heroku  log drains  
   #heroku: 
   #  port: 9999
@@ -27,11 +27,11 @@ input:
 
 # optional, if not specified default patterns are used
 parser:
-  patternFiles:
+  #patternFiles:
     # load a list of pattern files to parse logs
     # later files overwrite settings from previous files
-    - patterns1.yml
-    - patterns2.yml
+    #- patterns1.yml
+    #- patterns2.yml
   # inline pattern definitions, to put on top of patterns list
   # loaded from files or default librarary  
   patterns:
@@ -47,7 +47,7 @@ parser:
 output:
   # index logs in Elasticsearch or Logsene
   elasticsearch: 
-    url: https://logsene-receiver.sematext.com
+    url: https://localhost:9200
     # default index to use, for all logs that don't match later in indices section
     index: 0a835c75-9847-4f74-xxxx
     # specific index to use per logSource field of parsed logs
@@ -66,11 +66,11 @@ output:
   # print parsed logs in YAML format to stdout if supress is set false    
   stdout: yaml # use 'pretty' for pretty json and 'ldjson' for line delimited json (default)
   # forward logs to rtail realtime log viewer
-  rtail:
+  #rtail:
     # rtail host to send logs to
-    #host: localhost
+    # host: localhost
     # rtails port to send logs to 
-    #udpPort: 3434
+    # udpPort: 3434
     # start rtail Server with given http port and bind to hostname
     #webPort: 8080
     #webHost: localhost

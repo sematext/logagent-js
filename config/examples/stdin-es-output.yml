@@ -2,6 +2,7 @@
 options:
   includeOriginalLine: false
   printStats: 10
+  maxInputRate: 1mb # per second
 
 input:
   stdin: true

@@ -136,6 +136,9 @@ LaCli.prototype.initState = function () {
       trimmedLine.replace(self.removeAnsiColor, ''),
       context.sourceName || self.argv.sourceName,
       function parserCb (err, data) {
+        if (err && !data) {
+          consoleLogger.error('error during parsing: ' + err)
+        }
         if (data) {
           if (context.enrichEvent) {
             Object.keys(context.enrichEvent).forEach(function (key) {
@@ -153,8 +156,8 @@ LaCli.prototype.initState = function () {
       })
   })
   process.once('SIGINT', function () { self.terminate('SIGINT') })
-  process.once('SIGQUIT', function () { self.terminate('SIGQUIT')})
-  process.once('SIGTERM', function () { self.terminate('SIGTERM')})
+  process.once('SIGQUIT', function () { self.terminate('SIGQUIT') })
+  process.once('SIGTERM', function () { self.terminate('SIGTERM') })
   process.once('beforeExit', self.terminate)
 }
 

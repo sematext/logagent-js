@@ -43,6 +43,7 @@
     "eventemitter3": "^1.2.0",
     "fast-safe-stringify": "^1.0.10",
     "flat": "^2.0.0",
+    "flatstr": "^1.0.3",
     "glob": "^7.0.3",
     "js-yaml": "^3.3.1",
     "logsene-js": "^1.1.17",

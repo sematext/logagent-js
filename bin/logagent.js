@@ -107,7 +107,6 @@ LaCli.prototype.initState = function () {
     }
     if (self.argv.includeOriginalLine !== undefined) {
       lp.cfg.originalLine = self.argv.includeOriginalLine
-      console.log('originalLine enabled ' + lp.cfg.originalLine)
     }
     self.cli()
   })

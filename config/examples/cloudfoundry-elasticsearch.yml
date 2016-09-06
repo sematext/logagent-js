@@ -9,7 +9,7 @@ input:
 # we use here inline patterns, loaded after patterns.yml 
 parser:
   patterns:
-    - # Heroku Messages are in syslog format 
+    - # Cloudfoundry messages 
       sourceName: !!js/regexp /cloudfoundry.*|syslog_raw/ 
       match:
         - type: cloudfoundry

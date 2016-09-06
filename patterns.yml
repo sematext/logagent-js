@@ -7,7 +7,9 @@
 # Sensitive data can be replaced with a hashcode (sha1)
 # it applies to fields matching the field names by a regular expression
 # Note: this function is not optimized (yet) and might cause 10-15% performance hit
-# autohash: !!js/regexp /user|client_ip|password|email|credit_card_number|payment_info/i
+#autohash: !!js/regexp /user|client_ip|password|email|credit_card_number|payment_info/i
+# set the hash function (default sha256), sha256,sha512
+#hashFunction: sha512
 
 # set this to false when auothash fields
 # the original line might include sensitive data!
@@ -388,7 +390,7 @@ patterns:
       type: cloudfoundry
       regex: !!js/regexp \d*\s{0,1}<(\d+)>(\d+)\s([\d|-]+T[\d|\:|.|\+]+)\s(\S+)\s(.+?)\s\[(.+)\]\s-\s-\s(.+)
       fields: [prio,version,ts,host,applicationID,processID,message]
-      dateFormat: YYYY-MM-DDTHH:mm:ssZ
+      dateFormat: YYYY-MM-DDTHH:mm:ss.SSSZ
       transform: !!js/function >
         function (p) {
           const SEVERITY = [
@@ -528,5 +530,4 @@ dateFormats: [
     'YYYYMMDDTHHmmZ',
     'YYYYMMDDTHHmmZ',
     'YYYYMMDDTHHmmssZ',
-    'YYYYMMDDTHH:mmZ'
-  ]
+    'YYYYMMDDTHH:mmZ']

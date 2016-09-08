@@ -9,7 +9,7 @@ sudo apt-get install -y nodejs
 
 # Install Logagent
 ```
-npm i logagent-js -g
+npm i -g @sematext/logagent 
 # Test logs reading parsed with timestamps - output on console in YAML format (-y)
 # tail mode, parse only new lines
 logagent -y /var/log/*.log  
@@ -26,12 +26,12 @@ Logagent detects the init system and installs systemd or upstart service scripts
 On Mac OS X it creates a launchd service. Simply run:
 ```
 # install logagent package globally 
-sudo npm i logagent-js -g 
+sudo npm i -g @sematext/logagent
 sudo logagent-setup LOGSENE_TOKEN
 ```
 
 The setup script generates a configuraton file in ```/etc/sematext/logagent.conf```.
-This file includes the [CLI parameters for logagent](http://sematext.github.io/logagent-js/cli-parameters/) running as service.
+This file includes the [configuration options for logagent](http://sematext.github.io/logagent-js/cli-parameters/cli-parameters/#config-file) running as service.
 The default settings ship all logs from ```/var/log/**/*.log``` to Logsene. 
 
 Location of service scripts:

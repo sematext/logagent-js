@@ -173,6 +173,8 @@ output:
 # Be Evil: parse all logs 
 # stream logs to Logsene 1-Click ELK stack 
 logagent -i LOGSENE_TOKEN /var/log/*.log 
+# stream logs to local Elasticsearch  
+logagent -e http://localhost:9200 -i myindex /var/log/*.log 
 
 # Act as syslog server on UDP and forward messages to Logsene
 logagent -u 514 -i LOGSENE_TOKEN  
@@ -200,14 +202,14 @@ Ship logs to rtail and Logsene to view logs in real-time in rtail and store logs
 
 ```
 # rtail don't need to be installed, logagent uses the rtail protocol
-logagent -i $LOGSENE_TOKEN --rtail-host myrtailserver --rtail-port 9999 /var/log/*.log
+logagent -i $LOGSENE_TOKEN --rtailHost myrtailserver --rtailPort 9999 /var/log/*.log
 ```
 
 Logagent can start the rtail web-server (in-process, saving memory), open browser with http://localhost:8080
 ```
 # logagent has no dependency to rtail, to keep the package small
 sudo npm i rtail -g
-logagent -s -i $LOGSENE_TOKEN --rtail-web-port 8080 --rtail-port 9999 /var/log/*.log
+logagent -s -i $LOGSENE_TOKEN --rtailWebPort 8080 --rtailPort 9999 /var/log/*.log
 ```
 
 And of course you can combine rtail and Logagent in the traditional way, simply connect both via unix pipes. An example with rtail and Logsene storage and charts:

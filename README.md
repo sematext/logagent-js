@@ -56,7 +56,7 @@ Logagent doesn't lose data.  It stores parsed logs to a disk buffer if the netwo
 
 # Documentation
 
-The documentation is available [here](http://sematext.github.io/logagent-js/). 
+The documentation is available [here](http://megastef.github.io/logagent-js/). 
 
 # Quickstart 
 

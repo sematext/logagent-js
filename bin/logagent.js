@@ -21,8 +21,9 @@
 var consoleLogger = require('../lib/util/logger.js')
 var StatsPrinter = require('../lib/core/printStats.js')
 var LogAnalyzer = require('../lib/parser/parser.js')
-
 var mkpath = require('mkpath')
+process.setMaxListeners(0)
+
 
 function LaCli (options) {
   this.eventEmitter = require('../lib/core/logEventEmitter.js')
@@ -35,13 +36,13 @@ function LaCli (options) {
   this.logseneToken = this.argv.index || process.env.LOGSENE_TOKEN
   this.loggers = {}
   this.WORKERS = process.env.WEB_CONCURRENCY || 1
-
   this.removeAnsiColor = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g
   this.laStats = StatsPrinter
   this.initState()
 }
 
 LaCli.prototype.initPugins = function (plugins) {
+  
   consoleLogger.log('init plugins')
   var eventEmitter = require('../lib/core/logEventEmitter')
   this.plugins = []
@@ -60,18 +61,35 @@ LaCli.prototype.initPugins = function (plugins) {
 
 LaCli.prototype.loadPlugins = function (configFile) {
   var plugins = [
-    '../lib/plugins/input/files',
-    '../lib/plugins/input/stdin',
-    '../lib/plugins/input/syslog',
-    '../lib/plugins/input/heroku',
-    '../lib/plugins/input/cloudfoundry',
-    '../lib/plugins/output/elasticsearch',
+	'../lib/plugins/input/stdin',
     '../lib/plugins/output/stdout'
   ]
+  this.argv.stdinExitEnabled = true
+  if (this.argv.udp) {
+  	plugins.push ('../lib/plugins/input/syslog')
+  	this.argv.stdinExitEnabled  = false
+  }
+  if (this.argv.heroku) {
+  	plugins.push ('../lib/plugins/input/heroku')
+  	this.argv.stdinExitEnabled  = false
+  }
+  if (this.argv.cfhttp) {
+  	plugins.push ('../lib/plugins/input/cloudfoundry')
+  	this.argv.stdinExitEnabled  = false
+  }
+  if (this.argv.index || this.argv.elasticsearchUrl || this.argv.indices) {
+  	plugins.push ('../lib/plugins/output/elasticsearch')
+  	this.argv.stdinExitEnabled  = false
+  }
+  if ((this.argv.args &&  this.argv.args.length>0) || this.argv.glob) {
+  	plugins.push ('../lib/plugins/input/files')
+  	this.argv.stdinExitEnabled  = false
+  }
+
   if (!configFile) {
     return plugins
   }
-
+  // load 3rd paty modules
   var inputSections = Object.keys(configFile.input)
   inputSections.forEach(function (key) {
     if (configFile.input[key].module) {
@@ -89,8 +107,8 @@ LaCli.prototype.loadPlugins = function (configFile) {
 }
 
 LaCli.prototype.initState = function () {
-  var eventEmitter = this.eventEmitter
   var self = this
+  var eventEmitter = self.eventEmitter
   var plugins = self.loadPlugins(this.argv.configFile)
   self.initPugins(plugins)
 

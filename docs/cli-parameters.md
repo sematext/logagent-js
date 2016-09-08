@@ -10,13 +10,12 @@
 | -V, --version | output logagent version |
 | -v, --verbose | output activity report every minute |
 | --config <configFileName> | path to logagent config file (see below) |
-| --geoip-enabled <value> | true/false to enable/disable geoip lookups in patterns. |
-| --logsene-tmp-dir  path| directory to store status and buffered logs (during network outage) |
-| --logsene-tmp-dir  path| directory to store status and buffered logs (during network outage) |
-| --include-original-line | includes the original message in parsed logs |
+| --geoipEnabled <value> | true/false to enable/disable geoip lookups in patterns. |
+| --diskBufferDir  path| directory to store status and buffered logs (during network outage) |
+| --includeOriginalLine | includes the original message in parsed logs |
 | -f, --file <patternFile> | file with pattern definitions, use multiple -f options multiple files| 
 | -s, --suppress | silent, print no logs to stdout, prints only stats on exit |
-| --print_stats | print processing stats in the given interval in seconds, e.g. ```--print_stats 30``` to stderr. Usefull with -s to see logagent activity on the console without printing the parsed logs to stdout.|
+| --printStats | print processing stats in the given interval in seconds, e.g. ```--print_stats 30``` to stderr. Usefull with -s to see logagent activity on the console without printing the parsed logs to stdout.|
 | __Log input options__| |
 | -g glob-pattern | use a [glob](https://www.npmjs.com/package/glob) pattern to watch log files e.g. ```-g "{/var/log/*.log,/Users/stefan/myapp/*.log}"```. The complete glob expression must be quoted, to avoid interpretation of special characters by the linux shell. |
 +| --tailStartPosition bytes | -1 tail from end of file, >=0 start from given position (in bytes).  This setting applys for new files, having no position saved (see --logsene-tmp-dir)|
@@ -34,13 +33,13 @@
 | __Elasticsearch / Logsene__| Log storage |
 | -e, --elasticsearch-host <url> | Elasticsearch url e.g. http://localhost:9200, default htpps://logsene-receiver.sematext.com:443'|
 | -t, --index <Logsene token/Elasticsearch index> | [Logsene](http://sematext.com/logsene) App Token to insert parsed records into Logsene or Elasticsearch index (see --elasticsearch-host) |
-| --http-proxy <url> | HTTP proxy url |
-| --https-proxy <url> | HTTPS proxy url |
+| --httpProxy <url> | HTTP proxy url |
+| --httpsProxy <url> | HTTPS proxy url |
 | __rtail__ | Realtime log viewer|
-| --rtail-port  | forwards logs via UDP to [rtail](http://rtail.org/) server |
-| --rtail-host hostname | [rtail](http://rtail.org/) server (UI for realtime logs), default: localhost|
-| --rtail-web-port <port> | starts rtail UI webserver (if not installed install with: - npm i rtail -g) |
-| --rtail-web-host <host> | rtail UI webserver and bind hostname. E.g. ```logagent --rtail-web-port 9000 --rtail-port 8989  --rtail-web-host $(hostname) -g \'/var/log/**/*.log``` |
+| --rtailPort  | forwards logs via UDP to [rtail](http://rtail.org/) server |
+| --rtailHost hostname | [rtail](http://rtail.org/) server (UI for realtime logs), default: localhost|
+| --rtailWebPort <port> | starts rtail UI webserver (if not installed install with: - npm i rtail -g) |
+| --rtailWebHost <host> | rtail UI webserver and bind hostname. E.g. ```logagent --rtailWebPort 9000 --rtailPort 8989  --rtailWebHost $(hostname) -g \'/var/log/**/*.log``` |
 
 The default output is line delimited JSON for parsed log lines, as long as no format options like -yaml (YAML format), -p (pretty JSON), or -s (silent, no output to console) are specified. 
 

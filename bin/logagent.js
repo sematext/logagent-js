@@ -155,7 +155,7 @@ LaCli.prototype.initState = function () {
       context.sourceName || self.argv.sourceName,
       function parserCb (err, data) {
         if (err && !data) {
-          consoleLogger.error('error during parsing: ' + err)
+          // consoleLogger.error('error during parsing: ' + err)
         }
         if (data) {
           if (context.enrichEvent) {

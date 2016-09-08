@@ -1,10 +1,45 @@
 [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/sematext/logagent-js) - [read more](http://blog.sematext.com/2016/02/18/how-to-ship-heroku-logs-to-logsene-managed-elk-stack/)
 
-# logagent-js
+# Logagent
 
 Smart and lightweight Log Parser and Log Shipper written in Node. It can ship logs to Elasticsearch and thus also to [Logsene](http://www.sematext.com/logsene/). See [Documentation](http://sematext.github.io/logagent-js/).
 
 ![](https://nodei.co/npm/logagent-js.png?downloads=true&downloadRank=true&stars=true)
+
+# Status of this package
+
+This is the repository for [logagent v2.x|(https://github.com/sematext/logagent-js), currently in beta. 
+See [logagent 2.x features and status](https://github.com/sematext/logagent-js/milestone/1)
+
+Please use [logagent-js 1.x](https://www.npmjs.com/package/logagent-js) for production. 
+Source code for [logagent-js 1.x](https://github.com/sematext/logagent-js/tree/1.x)
+
+## Major changes to 1.x
+- new config format in YAML format
+- log routing to multiple elasticsearch indices by event source name 
+- naming of command line options run logagent --help to see all options
+- support for plugins as 3rd party npm modules
+
+# Quickstart 
+
+## Install Node.js 
+
+Official Node.js [downloads and instructions](https://nodejs.org/en/download/).
+E.g. for Debian/Ubuntu:
+```
+curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+
+# Install logagent-js with npm
+```
+sudo npm i -g @sematext/logagent 
+# install systemd, upstart, lauchd servers (depending on your operating system)
+sudo logagent-setup LOGSENE_TOKEN
+# edit the config file in /etc/sematext/logagent.conf
+# by default it ships all logs from /var/log/**/*.log to Logsene
+sudo service logagent restart # upstart
+```
 
 # Features
 
@@ -60,37 +95,7 @@ Logagent doesn't lose data.  It stores parsed logs to a disk buffer if the netwo
 
 The documentation is available [here](http://sematext.github.io/logagent-js/). 
 
-# Quickstart 
 
-## Install Node.js 
-
-Official Node.js [downloads and instructions](https://nodejs.org/en/download/).
-E.g. for Debian/Ubuntu:
-```
-curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
-sudo apt-get install -y nodejs
-```
-
-# Install logagent-js with npm
-```
-npm i logagent-js -g
-
-# Be Evil: parse all logs 
-# stream logs to Logsene 1-Click ELK stack 
-logagent --index LOGSENE_TOKEN /var/log/*.log 
-
-# Act as syslog server on UDP and write YAML formatted messages to console
-logagent -u 514 -y  
-
-# Act as syslog server on UDP and forward messages to Logsene
-logagent -u 514 --index LOGSENE_TOKEN
-
-# Install the service (Linux, Mac OS X)
-sudo logagent-setup LOGSENE_TOKEN
-
-# Adjust CLI parameters for your needs
-vi /etc/sematext/logagent.conf
-```
 
 # Related packages
 

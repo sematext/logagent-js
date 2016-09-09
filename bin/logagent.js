@@ -64,6 +64,21 @@ LaCli.prototype.loadPlugins = function (configFile) {
 	'../lib/plugins/input/stdin',
     '../lib/plugins/output/stdout'
   ]
+  // load 3rd paty modules
+  var inputSections = Object.keys(configFile.input)
+  inputSections.forEach(function (key) {
+    if (configFile.input[key].module) {
+      console.log('add ' + configFile.input[key].module + ' to plugin list')
+      plugins.push(configFile.input[key].module)
+    }
+  })
+  var outputSections = Object.keys(configFile.output)
+  outputSections.forEach(function (key) {
+    if (configFile.output[key].module) {
+      plugins.push(configFile.output[key].module)
+    }
+  })
+  
   this.argv.stdinExitEnabled = true
   if (this.argv.udp) {
   	plugins.push ('../lib/plugins/input/syslog')
@@ -89,20 +104,7 @@ LaCli.prototype.loadPlugins = function (configFile) {
   if (!configFile) {
     return plugins
   }
-  // load 3rd paty modules
-  var inputSections = Object.keys(configFile.input)
-  inputSections.forEach(function (key) {
-    if (configFile.input[key].module) {
-      console.log('add ' + configFile.input[key].module + ' to plugin list')
-      plugins.push(configFile.input[key].module)
-    }
-  })
-  var outputSections = Object.keys(configFile.output)
-  outputSections.forEach(function (key) {
-    if (configFile.output[key].module) {
-      plugins.push(configFile.output[key].module)
-    }
-  })
+  
   return plugins
 }
 

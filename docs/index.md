@@ -4,7 +4,7 @@
 
 Smart and lightweight Log Parser and Log Shipper written in Node. It can ship logs to Elasticsearch and thus also to [Logsene](http://www.sematext.com/logsene/). See [Documentation](http://sematext.github.io/logagent-js/).
 
-Note: Previous documentation [v1.x](http://megstef.github.io/logagent-js/)
+Note: Previous documentation [v1.x](http://megastef.github.io/logagent-js/)
 
 # Features
 

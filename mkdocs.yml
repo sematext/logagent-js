@@ -4,7 +4,7 @@ theme: readthedocs
 pages:
 - Features and Overview: index.md
 - Installation: installation.md
-- Configuration Options: cli-parameters.md
+- Command line arguments: cli-parameters.md
+- Configuration file: config-file.md
 - Log Parser and pattern definitions: parser.md
-- Node.js API: nodejs-api.md
-
+- Plugins: plugins.md

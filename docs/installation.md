@@ -10,14 +10,9 @@ sudo apt-get install -y nodejs
 # Install Logagent
 ```
 npm i -g @sematext/logagent 
-# Test logs reading parsed with timestamps - output on console in YAML format (-y)
-# tail mode, parse only new lines
-logagent -y /var/log/*.log  
-# parse complete file
-cat /var/log/httpd/access.log | logagent -y -n apache 
 ```
 
-## Linux or Mac OS X service for Logsene
+## Install service (Linux, Mac OS X)
 
 1. Get a free account at [sematext.com/spm](https://apps.sematext.com/users-web/register.do)
 2. [create a Logsene App](https://apps.sematext.com/logsene-reports/registerApplication.do) to obtain an App Token for [Logsene](http://www.sematext.com/logsene/) 
@@ -30,8 +25,7 @@ sudo npm i -g @sematext/logagent
 sudo logagent-setup LOGSENE_TOKEN
 ```
 
-The setup script generates a configuraton file in ```/etc/sematext/logagent.conf```.
-This file includes the [configuration options for logagent](http://sematext.github.io/logagent-js/cli-parameters/cli-parameters/#config-file) running as service.
+The setup script generates the configuraton file in ```/etc/sematext/logagent.conf```.
 The default settings ship all logs from ```/var/log/**/*.log``` to Logsene. 
 
 Location of service scripts:
@@ -45,7 +39,7 @@ Start/stop service:
 - lauchnchd: ```launchctl start/stop com.sematext.logagent```
 
 
-## Running Logagent in a Docker Container as Syslog Listener
+## Logagent in a Docker Container as Syslog Listener
 You can build a Docker image with logagent running in it and activing as a Syslog UDP listener.  Then you can run this as a container.  Once you have this "containerized logagent" you can start all yoour other containers with Syslog driver and point it to the "containerized logagent's" UDP port (514).  Here are the steps:
 
 Build the docker image, and then run logagent inside it with the given LOGSENE_TOKEN

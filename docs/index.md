@@ -21,9 +21,9 @@ This project contains a library and patterns for log parsing and cli tools and i
 ## Command Line Tool
 
 - log format converter (e.g. text to JSON, line delimited JSON or YAML)
-- log shipper for [Logsene](http://www.sematext.com/logsene/)
+- log shipper for [Logsene](http://www.sematext.com/logsene/) and Elasticsearch
 
-  - including cli, launchd (Mac OS X), upstart and systemd (Linux) service installer
+  - service installer for launchd (Mac OS X), upstart and systemd (Linux) 
   - disk buffer for failed inserts during network outage
 
 ## Inputs

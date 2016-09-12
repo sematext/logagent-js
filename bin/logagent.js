@@ -24,7 +24,6 @@ var LogAnalyzer = require('../lib/parser/parser.js')
 var mkpath = require('mkpath')
 process.setMaxListeners(0)
 
-
 function LaCli (options) {
   this.eventEmitter = require('../lib/core/logEventEmitter.js')
   this.logseneDiskBufferDir = null
@@ -42,7 +41,6 @@ function LaCli (options) {
 }
 
 LaCli.prototype.initPugins = function (plugins) {
-  
   consoleLogger.log('init plugins')
   var eventEmitter = require('../lib/core/logEventEmitter')
   this.plugins = []
@@ -61,50 +59,54 @@ LaCli.prototype.initPugins = function (plugins) {
 
 LaCli.prototype.loadPlugins = function (configFile) {
   var plugins = [
-	'../lib/plugins/input/stdin',
+    '../lib/plugins/input/stdin',
     '../lib/plugins/output/stdout'
   ]
   // load 3rd paty modules
-  var inputSections = Object.keys(configFile.input)
-  inputSections.forEach(function (key) {
-    if (configFile.input[key].module) {
-      console.log('add ' + configFile.input[key].module + ' to plugin list')
-      plugins.push(configFile.input[key].module)
-    }
-  })
-  var outputSections = Object.keys(configFile.output)
-  outputSections.forEach(function (key) {
-    if (configFile.output[key].module) {
-      plugins.push(configFile.output[key].module)
-    }
-  })
-  
+  if (configFile && configFile.input) {
+    var inputSections = Object.keys(configFile.input)
+    inputSections.forEach(function (key) {
+      if (configFile.input[key].module) {
+        console.log('add ' + configFile.input[key].module + ' to plugin list')
+        plugins.push(configFile.input[key].module)
+      }
+    })
+  }
+  if (configFile && configFile.output) {
+    var outputSections = Object.keys(configFile.output)
+    outputSections.forEach(function (key) {
+      if (configFile.output[key].module) {
+        plugins.push(configFile.output[key].module)
+      }
+    })
+  }
+
   this.argv.stdinExitEnabled = true
   if (this.argv.udp) {
-  	plugins.push ('../lib/plugins/input/syslog')
-  	this.argv.stdinExitEnabled  = false
+    plugins.push('../lib/plugins/input/syslog')
+    this.argv.stdinExitEnabled = false
   }
   if (this.argv.heroku) {
-  	plugins.push ('../lib/plugins/input/heroku')
-  	this.argv.stdinExitEnabled  = false
+    plugins.push('../lib/plugins/input/heroku')
+    this.argv.stdinExitEnabled = false
   }
   if (this.argv.cfhttp) {
-  	plugins.push ('../lib/plugins/input/cloudfoundry')
-  	this.argv.stdinExitEnabled  = false
+    plugins.push('../lib/plugins/input/cloudfoundry')
+    this.argv.stdinExitEnabled = false
   }
-  if (this.argv.index || this.argv.elasticsearchUrl || this.argv.indices) {
-  	plugins.push ('../lib/plugins/output/elasticsearch')
-  	this.argv.stdinExitEnabled  = false
+  if (this.argv.index || this.argv.elasticsearchUrl || this.argv.indices) {
+    plugins.push('../lib/plugins/output/elasticsearch')
+    this.argv.stdinExitEnabled = false
   }
-  if ((this.argv.args &&  this.argv.args.length>0) || this.argv.glob) {
-  	plugins.push ('../lib/plugins/input/files')
-  	this.argv.stdinExitEnabled  = false
+  if ((this.argv.args && this.argv.args.length > 0) || this.argv.glob) {
+    plugins.push('../lib/plugins/input/files')
+    this.argv.stdinExitEnabled = false
   }
 
   if (!configFile) {
     return plugins
   }
-  
+
   return plugins
 }
 

@@ -30,12 +30,20 @@ sudo apt-get install -y nodejs
 ```
 
 # Install logagent-js with npm
+
 ```
 sudo npm i -g @sematext/logagent 
-# install systemd, upstart, lauchd servers (depending on your operating system)
+```
+
+Install service for logagent using [systemd, upstart, lauchd](http://sematext.github.io/logagent-js/installation/#install-service-linux-mac-os-x)
+
+```
 sudo logagent-setup LOGSENE_TOKEN
-# edit the config file in /etc/sematext/logagent.conf
-# by default it ships all logs from /var/log/**/*.log to Logsene
+```
+
+Edit the config file in /etc/sematext/logagent.conf - by default all logs from /var/log/**/*.log are shipped to Logsene.
+
+```
 sudo service logagent restart # upstart
 ```
 

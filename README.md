@@ -32,7 +32,7 @@ curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
 
-# Install logagent-js with npm
+# Install logagent with npm
 
 ```
 sudo npm i -g @sematext/logagent 
@@ -52,7 +52,7 @@ sudo service logagent restart # upstart
 
 # Features
 
-This project contains a library and patterns for log parsing and cli tools and installers to use logagent-js as log shipper with the following features: 
+This project contains a library and patterns for log parsing and cli tools and installers to use logagent as log shipper with the following features: 
 
 ## Parser
 - log format detection and intelligent pattern matching 
@@ -73,12 +73,12 @@ This project contains a library and patterns for log parsing and cli tools and i
 ## Inputs
 - Standard input (stdin) that can read the output stream from any Linux cli tool
   - patterns are applied to each incoming text line; includes support for multi-line patters, e.g. for Java Stack Traces and JSON input.
-- Syslog Server (UDP) listener - logagent-js can also act as a syslog server and receive Syslog messages via UDP. The parser is applied to the message field. 
+- Syslog Server (UDP) listener - logagent can also act as a syslog server and receive Syslog messages via UDP. The parser is applied to the message field. 
 - [Heroku Log Drain](https://github.com/sematext/logagent-js#logagent-as-heroku-log-drain) makes it easy to ship Heroku logs to Elasticsearch or [Logsene](http://www.sematext.com/logsene/)
 - Cloud Foundry Log Drain
 
 ## Processing
-- logagent-js applies patterns defined in patterns.yml to all logs and creates structured logs from plain-text log lines
+- logagent applies patterns defined in patterns.yml to all logs and creates structured logs from plain-text log lines
 - GeoIP lookups for IP address fields, including automatic download and update of the GeoIP lite database from Maxmind
 
 ## Reliable log shipping with disk buffer
@@ -97,7 +97,7 @@ Logagent doesn't lose data.  It stores parsed logs to a disk buffer if the netwo
 
 ## API 
 - Node.js module to integrate parsers into Node.js programs
-- logagent-js is a part of [SPM for Docker](https://github.com/sematext/sematext-agent-docker) to parse Container Logs
+- logagent is a part of [SPM for Docker](https://github.com/sematext/sematext-agent-docker) to parse Container Logs
 
 
 # Documentation
@@ -108,7 +108,7 @@ The documentation is available [here](http://sematext.github.io/logagent-js/).
 
 # Related packages
 
-- [Sematext Agent for Docker](https://github.com/sematext/sematext-agent-docker) - collects metrics, events and logs from Docker API and CoreOS. Logagent-js is a component of sematext-agent-docker. More Information: [Innovative Docker Log Management](http://blog.sematext.com/2015/08/12/docker-log-management/)
+- [Sematext Agent for Docker](https://github.com/sematext/sematext-agent-docker) - collects metrics, events and logs from Docker API and CoreOS. Logagentis a component of sematext-agent-docker. More Information: [Innovative Docker Log Management](http://blog.sematext.com/2015/08/12/docker-log-management/)
 - [Logsene-CLI](https://github.com/sematext/logsene-cli) - Enables searching Logsene log entries from the command-line. 
 - [SPM Agent for Node.js](https://github.com/sematext/spm-agent-nodejs) - collects performance metrics for Node and io.js applications
 - [Custom Metrics](https://github.com/sematext/spm-metrics-js) - Custom Metrics for SPM 

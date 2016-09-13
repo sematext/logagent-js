@@ -1,4 +1,4 @@
-site_name: @sematext/logagent
+site_name: "@sematext/logagent"
 repo_url: https://github.com/sematext/logagent-js
 theme: readthedocs
 pages:

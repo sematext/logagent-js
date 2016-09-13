@@ -11,7 +11,8 @@
 # set the hash function (default sha256), sha256,sha512
 #hashFunction: sha512
 
-# set this to false when auothash fields
+
+# set originalLine to false when auothash fields
 # the original line might include sensitive data!
 originalLine: false
 
@@ -24,8 +25,22 @@ geoIP: true
 # The database is stored in a temporary directory
 # The path could be modified via env. variable MAXMIND_DB_DIR
 maxmindDbDir: /tmp/
-
 debug: false
+
+# post process all JSON input
+#json:
+#  autohashFields:
+#    _HOSTNAME: true
+#  removeFields:
+#    - _SOURCE_REALTIME_TIMESTAMP
+#  transform: !!js/function >
+#   function (sourceName, parsedObject, config) {
+#     for (var i=0; i<config.removeFields.length; i++) {
+#       console.log('delete ' + config.removeFields[i])
+#       delete parsedObject[config.removeFields[i]]
+#     }
+#   }
+
 
 # The global transform function is called for each parsed line.
 # A good place to do add global fields, custom date processing, or special parsers.

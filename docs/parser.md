@@ -102,11 +102,12 @@ The following example masks fields in JSON and removes fields from the parsed ev
 
 ```
 hashFunction: sha512
-json: # post process journald JSON format
-  # logagent feature to hash fields
+# post process journald JSON format
+# logagent feature to hash fields
+# and a custom property 'removeFields', used in the transform function
+json: 
   autohashFields: 
-    _HOSTNAME: true
-  # custom property, used in the transform function
+    - _HOSTNAME: true
   removeFields: 
     - _SOURCE_REALTIME_TIMESTAMP
     - __MONOTONIC_TIMESTAMP
@@ -117,7 +118,7 @@ json: # post process journald JSON format
        delete parsedObject[config.removeFields[i]]
      }
    }
-```
+``
 
 The default patterns are [here](https://github.com/sematext/logagent-js/blob/master/patterns.yml) - contributions are welcome!
 

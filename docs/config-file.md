@@ -6,6 +6,12 @@ To use the config file run:
 logagent --config configFileName.yml
 ```
 
+When logagent is istalled as [system service](http://sematext.github.io/logagent-js/installation/#install-service-linux-mac-os-x) the default config file is located in 
+```
+/etc/sematext/logagent.conf
+```
+
+
 ### Section: options
 
 ```
@@ -55,7 +61,7 @@ parser:
     - patterns1.yml
     - patterns2.yml
   # inline pattern definitions, to put on top of patterns list
-  # loaded from files or default librarary  
+  # loaded from files or default librarary. For inline patterns hot reload is not available.  
   patterns:
     - # timestamped messages from /var/log/*.log on Mac OS X
       sourceName: !!js/regexp /\system\.log/ # catch all system.log files  
@@ -114,4 +120,6 @@ output:
     #webPort: 8080
     #webHost: localhost
 ```
+
+A collection of exmaple config files are [here](https://github.com/sematext/logagent-js/tree/master/config/examples)
 

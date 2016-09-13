@@ -1,10 +1,10 @@
-site_name: logagent-js
+site_name: @sematext/logagent
 repo_url: https://github.com/sematext/logagent-js
 theme: readthedocs
 pages:
-- Features and Overview: index.md
 - Installation: installation.md
-- Command line arguments: cli-parameters.md
+- Features and Overview: index.md
+- Usage: cli-parameters.md
 - Configuration file: config-file.md
 - Log Parser and pattern definitions: parser.md
 - Plugins: plugins.md

@@ -13,7 +13,8 @@ Source code for [logagent-js 1.x](https://github.com/sematext/logagent-js/tree/1
 
 ## Major changes to 1.x
 - new [config file format](http://sematext.github.io/logagent-js/config-file) (YAML)
-- [log routing to multiple elasticsearch indices](http://sematext.github.io/logagent-js/config-file/#section-output) by event source name 
+   - support for multiple pattern definition files (including hot reload)
+   - [log routing to multiple elasticsearch indices](http://sematext.github.io/logagent-js/config-file/#section-output) by event source name 
 - support for [plugins](http://sematext.github.io/logagent-js/plugins/) as 3rd party npm modules
 - naming of [command line arguments](http://sematext.github.io/logagent-js/cli-parameters/) run logagent --help to see all options
 

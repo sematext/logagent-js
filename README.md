@@ -12,14 +12,14 @@ This is the repository for [logagent v2.x](https://github.com/sematext/logagent-
 Source code for [logagent-js 1.x](https://github.com/sematext/logagent-js/tree/1.x)**
 
 ## Release notes 
-- new [config file format](http://sematext.github.io/logagent-js/config-file) (YAML)
+- New [config file format](http://sematext.github.io/logagent-js/config-file) (YAML)
    - support for multiple pattern definition files (including hot reload)
    - [log routing to multiple elasticsearch indices](http://sematext.github.io/logagent-js/config-file/#section-output) by event source name 
-- support for [plugins](http://sematext.github.io/logagent-js/plugins/) as 3rd party npm modules, e.g.:
+- Support for [plugins](http://sematext.github.io/logagent-js/plugins/) as 3rd party npm modules, e.g.:
   - [logagent-tcp-input](https://www.npmjs.com/package/@sematext/logagent-tcp-input) - accepting logs via tcp port from remote machines
   - [logagent-nodejs-monitor](https://www.npmjs.com/package/@sematext/logagent-nodejs-monitor) - to monitor logagent process itself and CPU, memory, disk IO usage of the the server machine
-- naming of [command line arguments](http://sematext.github.io/logagent-js/cli-parameters/) run logagent --help to see all options
-- new package name "@sematext/logagent" for version 2.x. Logagent version 1.x is till available with the package name [logagent-js](https://www.npmjs.com/package/logagent-js) on npm. 
+- Changed [command line arguments](http://sematext.github.io/logagent-js/cli-parameters/)
+- New package name "@sematext/logagent" for version 2.x. Logagent version 1.x is till available with the package name [logagent-js](https://www.npmjs.com/package/logagent-js) on npm. 
 
 # Quickstart 
 

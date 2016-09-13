@@ -6,7 +6,7 @@ Smart and lightweight Log Parser and Log Shipper written in Node. It can ship lo
 
 # Status of this package
 
-This is the repository for [logagent v2.x|(https://github.com/sematext/logagent-js), currently in beta. 
+This is the repository for [logagent v2.x](https://github.com/sematext/logagent-js), currently in beta. 
 - See [logagent 2.x features and status](https://github.com/sematext/logagent-js/milestone/1)
 - **Please use [logagent-js 1.x](https://www.npmjs.com/package/logagent-js) for production. 
 Source code for [logagent-js 1.x](https://github.com/sematext/logagent-js/tree/1.x)**

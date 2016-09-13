@@ -32,7 +32,10 @@
     "sematext",
     "logsene",
     "log parser",
-    "logging"
+    "logging",
+    "log shipper", 
+    "elasticsearch", 
+    "indexing"
   ],
   "homepage": "https://www.sematext.com",
   "author": "Stefan Thies <stefan.thies@sematext.com> (https://github.com/megastef) ",

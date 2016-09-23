@@ -67,7 +67,7 @@ patterns:
   sourceName: !!js/regexp /hyperkube/
   match:
     - type: hyperkube
-      regex: !!js/regexp /\S+\s(\S+)\s+\S+\s+\S+\s([GET|POST|PUT|DELETE|HEAD|OPTIONS]+)\s+(\/.+)\:\s\(([\d|\.]+)(\S+)\)\s(\d+\s)(.*hyperkube.+)\s(.+)\:(\d+)\]/i
+      regex: !!js/regexp /^\S+\s(\S+)\s+\S+\s+\S+\s([GET|POST|PUT|DELETE|HEAD|OPTIONS]+)\s+(\/.+)\:\s\(([\d|\.]+)(\S+)\)\s(\d+\s)(.*hyperkube.+)\s(.+)\:(\d+)\]/i
       fields: [ts,method,url,duration,duration_unit,status_code,info,ip,port]
       dateFormat: HH:mm:ss:S
  - # Elasticsearch 
@@ -75,11 +75,11 @@ patterns:
   sourceName: !!js/regexp /elasticsearch/
   match:
     - type: elasticsearch
-      regex: !!js/regexp \[(\d{4}-\d{2}-\d{2}\s[\d+|\:]+.\d+)\]\[(.+?)\]\[(.+?)\s*\]\s*\[(.+?)\]\s([\s|\S]+)
+      regex: !!js/regexp ^\[(\d{4}-\d{2}-\d{2}\s[\d+|\:]+.\d+)\]\[(.+?)\]\[(.+?)\s*\]\s*\[(.+?)\]\s([\s|\S]+)
       fields: [ts,severity,source,node_name,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
     - type: elasticsearch
-      regex: !!js/regexp \[(\d{4}-\d{2}-\d{2}\s[\d+|\:]+.\d+)\]\[(.+?)\]\[(.+?)\s*\]\s*\s([\s|\S]+)
+      regex: !!js/regexp ^\[(\d{4}-\d{2}-\d{2}\s[\d+|\:]+.\d+)\]\[(.+?)\]\[(.+?)\s*\]\s*\s([\s|\S]+)
       fields: [ts,severity,source,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
 
@@ -88,7 +88,7 @@ patterns:
   sourceName: !!js/regexp /solr/i
   match:
     - type: apache_solr
-      regex: !!js/regexp (\S+)\s+-\s(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3});\s\[\s*(.+?)]\s(\S+);\s.*.*webapp=(\S+)\spath=(.+?)\sparams={(.*)}.*hits=(\d+)\sstatus=(\d+)\sQTime=(\d+)
+      regex: !!js/regexp ^(\S+)\s+-\s(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3});\s\[\s*(.+?)]\s(\S+);\s.*.*webapp=(\S+)\spath=(.+?)\sparams={(.*)}.*hits=(\d+)\sstatus=(\d+)\sQTime=(\d+)
       fields: [severity,ts,application,class,webapp,path,params,hits,status,qtime]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
     - type: apache_solr_v5_1
@@ -114,15 +114,15 @@ patterns:
           }
         }
     - type: apache_solr
-      regex: !!js/regexp (\S+)\s+-\s+(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3});\s+(\S+);\s+(.+Exception:\s[\s|\S]+)
+      regex: !!js/regexp ^(\S+)\s+-\s+(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3});\s+(\S+);\s+(.+Exception:\s[\s|\S]+)
       fields: [severity,ts,class,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
     - type: apache_solr
-      regex: !!js/regexp (\S+)\s+-\s+(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3});\s+(\S+);\s([\s|\S]+)
+      regex: !!js/regexp ^(\S+)\s+-\s+(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3});\s+(\S+);\s([\s|\S]+)
       fields: [severity,ts,class,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
     - type: apache_solr_5_generic
-      regex: !!js/regexp (\S+)\s+-\s+(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3});\s(.*)
+      regex: !!js/regexp ^(\S+)\s+-\s+(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3});\s(.*)
       fields: [severity,ts,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
     - type: apache_solr4
@@ -133,25 +133,25 @@ patterns:
   sourceName: !!js/regexp /kafka/
   match:
     - type: apache_kafka
-      regex: !!js/regexp \[(\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+)\]\s(\S+)\s(.+)
+      regex: !!js/regexp ^\[(\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+)\]\s(\S+)\s(.+)
       fields: [ts,severity,message]
       dateFormat: YYYY-MM-DD HH:mm:ss
 
  - # Apache HDFS Data Node
-  blockStart: !!js/regexp \d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+\s(\S+)\s/
+  blockStart: !!js/regexp ^\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+\s(\S+)\s/
   sourceName: !!js/regexp /hdfs/
   match:
     - type: apache_hdfs_data_node
-      regex: !!js/regexp (\d{4}-\d{2}-\d{2}\s+[\d|\:]+,\d+)\s+(\S+)\s(\S+):\s([\s|\S]+)
+      regex: !!js/regexp ^(\d{4}-\d{2}-\d{2}\s+[\d|\:]+,\d+)\s+(\S+)\s(\S+):\s([\s|\S]+)
       fields: [ts,severity,class,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
 
  - # Apache HBase Region Server
-  blockStart: !!js/regexp \d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+\s(\S+)\s/
+  blockStart: !!js/regexp ^\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+\s(\S+)\s/
   sourceName: !!js/regexp /hbase/
   match:
     - type: apache_hbase_region_server
-      regex: !!js/regexp (\d{4}-\d{2}-\d{2}\s+[\d|\:]+,\d+)\s+(\S+)\s+\[(.+)\]\s(\S+):\s([\s|\S]+)
+      regex: !!js/regexp ^(\d{4}-\d{2}-\d{2}\s+[\d|\:]+,\d+)\s+(\S+)\s+\[(.+)\]\s(\S+):\s([\s|\S]+)
       fields: [ts,severity,thread,class,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
 
@@ -159,7 +159,7 @@ patterns:
   sourceName: !!js/regexp /yarn/
   match:
     - type: apache_hadoop_yarn_node_manager
-      regex: !!js/regexp (\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+)\s(\S+)\s(\S+):\s([\S|\s]+)
+      regex: !!js/regexp ^(\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+)\s(\S+)\s(\S+):\s([\S|\s]+)
       fields: [ts,severity,class_name,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
 
@@ -178,7 +178,7 @@ patterns:
   blockStart: !!js/regexp ^\S+\s\[.+\]\s\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+\s
   match:
     - type: apache_cassandra
-      regex: !!js/regexp (\S+)\s\[(.+)\]\s(\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+)\s(.+.java)\s+\(line\s(\d+).+\n\s+(.*)
+      regex: !!js/regexp ^(\S+)\s\[(.+)\]\s(\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+)\s(.+.java)\s+\(line\s(\d+).+\n\s+(.*)
       fields: [severity,module,ts,java_file,code_line,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
 
@@ -211,10 +211,10 @@ patterns:
  - # Sonatype Nexus
   sourceName: !!js/regexp /nexus/
   # YYYY-MM-DD starts a new log entry
-  blockStart: !!js/regexp \d{4}-\d{2}-\d{2}
+  blockStart: !!js/regexp ^\d{4}-\d{2}-\d{2}
   match:
     - type: nexus
-      regex: !!js/regexp /([\d|\-|\s|\:|\.|\,|\+]+)\s+([A-Z]+)\s+[^\[]*\[\s*([^\]]+)\]\s(\*?\w+)\s+([\w|\.]+)\W+(.+)/
+      regex: !!js/regexp /^([\d|\-|\s|\:|\.|\,|\+]+)\s+([A-Z]+)\s+[^\[]*\[\s*([^\]]+)\]\s(\*?\w+)\s+([\w|\.]+)\W+(.+)/
       fields: [ts,severity,thread,user,class,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SSSZ
 
@@ -223,11 +223,11 @@ patterns:
   match:
   - type: nodebb_forum
     fields: [ts,severity,module,message]
-    regex: !!js/regexp /(\d{4}\-\d{2}\-\d{1,2}T\d\d:\d\d:\d\d\.\d+Z)\s-\s(\w+):\s\[(\S+)]\s(.*)/
+    regex: !!js/regexp /^(\d{4}\-\d{2}\-\d{1,2}T\d\d:\d\d:\d\d\.\d+Z)\s-\s(\w+):\s\[(\S+)]\s(.*)/
     dateFormat: YYYY-MM-DDTHH:mm:ss.S
   - type: nodebb_forum
     fields: [ts,severity,message]
-    regex: !!js/regexp /(\d{4}\-\d{2}\-\d{1,2}T\d\d:\d\d:\d\d\.\d+Z)\s-\s(\w+):\s(.*)/
+    regex: !!js/regexp /^(\d{4}\-\d{2}\-\d{1,2}T\d\d:\d\d:\d\d\.\d+Z)\s-\s(\w+):\s(.*)/
  - # mysql
   # 2015-07-25 14:11:35 0 [Note] mysqld (mysqld 5.6.26) starting as process 1 ...
   sourceName: !!js/regexp /mysql/ 
@@ -241,7 +241,7 @@ patterns:
   sourceName: !!js/regexp nsqio\/nsq
   match:
     - type: nsq
-      regex: !!js/regexp (\d{4}\/\d{2}\/\d{2}\s[\d|\:]+)\s(\S+)\s+(\d+)\s+\[(\S+)\]\s+(.+)
+      regex: !!js/regexp (^\d{4}\/\d{2}\/\d{2}\s[\d|\:]+)\s(\S+)\s+(\d+)\s+\[(\S+)\]\s+(.+)
       fields: [ts, level, pid, module, message]
       dateFormat: YYYY/MM/DD HH:mm:ss
 
@@ -264,7 +264,7 @@ patterns:
           }
         } 
     # nginx proxy jwilder/nginx-proxy
-    - regex: !!js/regexp /(\S+)\s+\|\s(\S+)\s+([0-9a-f.:]+)\s+(-|.+?)\s+(-|.+?)\s\[(.*)\]\s"(.+?)\s(.+?)\s(.+?)"\s(\d+)\s(\d+)\s"(.+?)"\s"(.+?)"/i
+    - regex: !!js/regexp /^(\S+)\s+\|\s(\S+)\s+([0-9a-f.:]+)\s+(-|.+?)\s+(-|.+?)\s\[(.*)\]\s"(.+?)\s(.+?)\s(.+?)"\s(\d+)\s(\d+)\s"(.+?)"\s"(.+?)"/i
       type: access_common
       fields:       [proxy_service,virtual_host,client_ip,remote_id,user,ts,method,path,http_version,status_code,size,url,user_agent]
       dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
@@ -341,7 +341,7 @@ patterns:
     -
       type: heroku
       # blockStart: !!js/regexp \^+\s<(\d+)>(\d+)\s/
-      regex: !!js/regexp \d*\s{0,1}<(\d+)>(\d+)\s(\S+)\s(\S+)\s(\S+)\s(\S+)\.{0,1}(\d*)\s+-\s(.*)
+      regex: !!js/regexp ^\d*\s{0,1}<(\d+)>(\d+)\s(\S+)\s(\S+)\s(\S+)\s(\S+)\.{0,1}(\d*)\s+-\s(.*)
       fields: [prio,version,ts,host,app,process_type,dyno,message]
       dateFormat: YYYY-MM-DDTHH:mm:ssZ
       transform: !!js/function >
@@ -403,7 +403,7 @@ patterns:
   match:
     -
       type: cloudfoundry
-      regex: !!js/regexp \d*\s{0,1}<(\d+)>(\d+)\s([\d|-]+T[\d|\:|.|\+]+)\s(\S+)\s(.+?)\s\[(.+)\]\s-\s-\s(.+)
+      regex: !!js/regexp ^\d*\s{0,1}<(\d+)>(\d+)\s([\d|-]+T[\d|\:|.|\+]+)\s(\S+)\s(.+?)\s\[(.+)\]\s-\s-\s(.+)
       fields: [prio,version,ts,host,applicationID,processID,message]
       dateFormat: YYYY-MM-DDTHH:mm:ss.SSSZ
       transform: !!js/function >
@@ -453,11 +453,11 @@ patterns:
   match:
     -
       type: docker
-      regex: !!js/regexp /time="(.*)\slevel=(\S+)\smsg="(.+?)"\saddr="(.+?)"\sdiscovery="(.+?)"/
+      regex: !!js/regexp /^time="(.*)\slevel=(\S+)\smsg="(.+?)"\saddr="(.+?)"\sdiscovery="(.+?)"/
       fields: [ts,severity,message,address,discovery]
     -
       type: docker
-      regex: !!js/regexp /time="(.*)\slevel=(\S+)\smsg="(.+?)/
+      regex: !!js/regexp /^time="(.*)\slevel=(\S+)\smsg="(.+?)/
       fields: [ts,severity,message]
    
  - # timestamped messages from /var/log/*.log on Mac OS X
@@ -465,37 +465,37 @@ patterns:
   match:
     -
       type: system_log
-      regex: !!js/regexp /([\w|\s]+\s+\d{2}\s[\d|\:]+)\s(.+?)\s(.+?)\s<(.+)>(.*)/
+      regex: !!js/regexp /^([\w|\s]+\s+\d{2}\s[\d|\:]+)\s(.+?)\s(.+?)\s<(.+)>(.*)/
       fields: [ts,host,service,severity,message]
       dateFormat: MMM DD HH:mm:ss
     -
       type: system_log
-      regex: !!js/regexp /([\w|\s]+\s+\d{1,2}\s[\d|\:]+)\s(\S+)\s(\S+)\[(\d+)\]\s{0,4}<(.+)>\:\s{0,2}(.+)/
+      regex: !!js/regexp /^([\w|\s]+\s+\d{1,2}\s[\d|\:]+)\s(\S+)\s(\S+)\[(\d+)\]\s{0,4}<(.+)>\:\s{0,2}(.+)/
       fields: [ts,host,service,pid,severity,message]
       dateFormat: MMM DD HH:mm:ss
     -
       type: system_log
-      regex: !!js/regexp /([\w|\s]+\s+\d{1,2}\s[\d|\:]+)\s(\S+)\s(\S+)\[(\d+)\]\:\s(.+)/
+      regex: !!js/regexp /^([\w|\s]+\s+\d{1,2}\s[\d|\:]+)\s(\S+)\s(\S+)\[(\d+)\]\:\s(.+)/
       fields: [ts,host,service,pid,message]
       dateFormat: MMM DD HH:mm:ss
     -
       type: system_log
-      regex: !!js/regexp /([\w|\s]+\s+\d{1,2}\s[\d|\:|\.]+)\s+(\S+)\s+(.*)\:\s(.*)/
+      regex: !!js/regexp /^([\w|\s]+\s+\d{1,2}\s[\d|\:|\.]+)\s+(\S+)\s+(.*)\:\s(.*)/
       fields: [ts,host,service,message]
       dateFormat: MMM DD HH:mm:ss
     - 
       type: log
-      regex: !!js/regexp /([\w|\s]+\s\d{2}\s[\d|\:|\.]+)\s+(<.+?>)\s(.*)/
+      regex: !!js/regexp /^([\w|\s]+\s\d{2}\s[\d|\:|\.]+)\s+(<.+?>)\s(.*)/
       fields: [ts,service,message]
       dateFormat: MMM D HH:mm:ss
     - 
       type: log
-      regex: !!js/regexp /(\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2},\d+)\s\[(\S+)]\s(.+)/
+      regex: !!js/regexp /^(\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2},\d+)\s\[(\S+)]\s(.+)/
       fields: [ts,severity,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,S
     - 
       type: log
-      regex: !!js/regexp /(\d{4}[\-|\d{2}]+\s[\d|\:]+\s\+\d{4})\:\s+(.+)/
+      regex: !!js/regexp /^(\d{4}[\-|\d{2}]+\s[\d|\:]+\s\+\d{4})\:\s+(.+)/
       fields: [ts,message]
       dateFormat: YYYY-MM-DD HH:mm:ss ZZ
 
@@ -504,7 +504,7 @@ patterns:
   match:    
     -
       type: logagent-js
-      regex: !!js/regexp /(\[\d|\:|\-]+Z)\s([\S|\s]+)/
+      regex: !!js/regexp /^(\[\d|\:|\-]+Z)\s([\S|\s]+)/
       fields: [ts,message]
       dateFormat: YYYY-MM-DDTHHmmss
 

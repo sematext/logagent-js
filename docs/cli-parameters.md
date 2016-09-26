@@ -31,7 +31,7 @@
 | -p, --pretty | prints parsed messages in pretty json format to stdout|
 | -j, --ldjson | print parsed messages in line delimited JSON format to stdout |
 | __Elasticsearch / Logsene__| Log storage |
-| -e, --elasticsearch-host <url> | Elasticsearch url e.g. http://localhost:9200, default htpps://logsene-receiver.sematext.com:443'|
+| -e, --elasticsearchUrl <url> | Elasticsearch url e.g. http://localhost:9200, default htpps://logsene-receiver.sematext.com:443'|
 | -t, --index <Logsene token/Elasticsearch index> | [Logsene](http://sematext.com/logsene) App Token to insert parsed records into Logsene or Elasticsearch index (see --elasticsearch-host) |
 | --httpProxy <url> | HTTP proxy url |
 | --httpsProxy <url> | HTTPS proxy url |

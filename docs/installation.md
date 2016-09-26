@@ -9,7 +9,7 @@ sudo apt-get install -y nodejs
 
 # Install Logagent
 ```
-npm i -g @sematext/logagent 
+sudo npm i -g @sematext/logagent 
 ```
 
 ## Install service (Linux, Mac OS X)

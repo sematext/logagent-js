@@ -1,9 +1,9 @@
 #!/bin/sh
-':' // ; export MAX_MEM="--max-old-space-size=500"; exec "$(command -v node || command -v nodejs)" --harmony "${NODE_OPTIONS:-$MAX_MEM}" "$0" "$@" 
+':' // ; export MAX_MEM="--max-old-space-size=500"; exec "$(command -v node || command -v nodejs)" --harmony "${NODE_OPTIONS:-$MAX_MEM}" "$0" "$@"
 'use strict'
 /*
- * See the NOTICE.txt file distributed with this work for additional information 
- * regarding copyright ownership. 
+ * See the NOTICE.txt file distributed with this work for additional information
+ * regarding copyright ownership.
  * Sematext licenses logagent-js to you under
  * the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ var StatsPrinter = require('../lib/core/printStats.js')
 var LogAnalyzer = require('../lib/parser/parser.js')
 var mkpath = require('mkpath')
 process.setMaxListeners(0)
+var sync = require('synchronize')
 
 function LaCli (options) {
   this.eventEmitter = require('../lib/core/logEventEmitter.js')
@@ -39,7 +40,31 @@ function LaCli (options) {
   this.laStats = StatsPrinter
   this.initState()
 }
-
+LaCli.prototype.initFilter = function (type, filterFunctions) {
+  consoleLogger.log('init plugins')
+  var eventEmitter = require('../lib/core/logEventEmitter')
+  this[type] = []
+  for (var i = 0; i < filterFunctions.length; i++) {
+    try {
+      var filterName = filterFunctions[i].name || filterFunctions[i].module || 'plugin #' + i
+      var ff = null
+      if (typeof filterFunctions[i].module === 'function') {
+        ff = filterFunctions[i].module
+        filterName = String(filterFunctions[i].name)
+      } else {
+        ff = require(filterFunctions[i].module)
+      }
+      var filter = {
+        func: ff,
+        config: filterFunctions[i].config || {}
+      }
+      this[type].push(filter)
+      consoleLogger.log('load ' + type + ': ' + i + ' ' + filterName)
+    } catch (err) {
+      consoleLogger.error('Error loading plugin: ' + i + ' ' + (filterName || 'undefined') + ' ' + err.message)
+    }
+  }
+}
 LaCli.prototype.initPugins = function (plugins) {
   consoleLogger.log('init plugins')
   var eventEmitter = require('../lib/core/logEventEmitter')
@@ -72,14 +97,34 @@ LaCli.prototype.loadPlugins = function (configFile) {
       }
     })
   }
+  var inputFilter = []
+  if (configFile && configFile.inputFilter) {
+    var outputFilterSections = Object.keys(configFile.inputFilter)
+    outputFilterSections.forEach(function (key) {
+      if (configFile.inputFilter[key].module) {
+        inputFilter.push(configFile.inputFilter[key])
+      }
+    })
+  }
+  this.initFilter('inputFilter', inputFilter)
   if (configFile && configFile.output) {
     var outputSections = Object.keys(configFile.output)
     outputSections.forEach(function (key) {
       if (configFile.output[key].module) {
-        plugins.push(configFile.output[key].module)
+        plugins.push(configFile.output[key])
       }
     })
   }
+  var outputFilter = []
+  if (configFile && configFile.outputFilter) {
+    var inputFilterSections = Object.keys(configFile.outputFilter)
+    inputFilterSections.forEach(function (key) {
+      if (configFile.outputFilter[key].module) {
+        outputFilter.push(configFile.outputFilter[key])
+      }
+    })
+  }
+  this.initFilter('outputFilter', outputFilter)
 
   this.argv.stdinExitEnabled = true
   if (this.argv.udp) {
@@ -153,29 +198,44 @@ LaCli.prototype.initState = function () {
     }
     self.laStats.bytes = self.laStats.bytes + Buffer.byteLength(line, 'utf8')
     self.laStats.count++
-
-    self.la.parseLine(
-      trimmedLine.replace(self.removeAnsiColor, ''),
-      context.sourceName || self.argv.sourceName,
-      function parserCb (err, data) {
-        if (err && !data) {
-          // consoleLogger.error('error during parsing: ' + err)
-        }
-        if (data) {
-          if (context.enrichEvent) {
-            Object.keys(context.enrichEvent).forEach(function (key) {
-              data[key] = context.enrichEvent[key]
+    sync.fiber(function () {
+      for (var i = 0; i < self.inputFilter.length; i++) {
+        trimmedLine = sync.await(self.inputFilter[i].func(context.sourceName || self.argv.sourceName, self.inputFilter[i].config, trimmedLine, sync.defer()))
+      }
+      if (!trimmedLine) {
+        return
+      }
+      self.la.parseLine(
+        trimmedLine.replace(self.removeAnsiColor, ''),
+        context.sourceName || self.argv.sourceName,
+        function parserCb (err, data) {
+          if (err && !data) {
+            // consoleLogger.error('error during parsing: ' + err)
+          }
+          if (data) {
+            var filteredData = data
+            sync.fiber(function () {
+              for (var i = 0; i < self.outputFilter.length; i++) {
+                filteredData = sync.await(self.outputFilter[i].func(context, self.outputFilter[i].config, eventEmitter, filteredData, sync.defer()))
+              }
+              if (!filteredData) {
+                return
+              }
+              if (context.enrichEvent) {
+                Object.keys(context.enrichEvent).forEach(function (key) {
+                  data[key] = context.enrichEvent[key]
+                })
+              }
+              if (context.filter) {
+                filteredData = context.filter(data, context)
+              }
+              if (filteredData) {
+                self.eventEmitter.parsedEvent(filteredData, context)
+              }
             })
           }
-          var filteredData = data
-          if (context.filter) {
-            filteredData = context.filter(data, context)
-          }
-          if (filteredData) {
-            eventEmitter.parsedEvent(filteredData, context)
-          }
-        }
-      })
+        })
+    })
   })
   process.once('SIGINT', function () { self.terminate('SIGINT') })
   process.once('SIGQUIT', function () { self.terminate('SIGQUIT') })
@@ -253,7 +313,7 @@ LaCli.prototype.terminate = function (reason) {
       try {
         p.stop(callBackWithATimeout(function () {
           terminateCounter--
-          if (terminateCounter == 0) {
+          if (terminateCounter === 0) {
             process.exit()
           }
         }, 5000))
@@ -262,7 +322,7 @@ LaCli.prototype.terminate = function (reason) {
       }
     } else {
       terminateCounter--
-      if (terminateCounter == 0) {
+      if (terminateCounter === 0) {
         process.exit()
       }
     }

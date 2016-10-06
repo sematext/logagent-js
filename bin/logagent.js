@@ -23,7 +23,7 @@ var StatsPrinter = require('../lib/core/printStats.js')
 var LogAnalyzer = require('../lib/parser/parser.js')
 var mkpath = require('mkpath')
 process.setMaxListeners(0)
-var sync = require('synchronize')
+var co = require('co')
 
 function LaCli (options) {
   this.eventEmitter = require('../lib/core/logEventEmitter.js')
@@ -198,10 +198,13 @@ LaCli.prototype.initState = function () {
     }
     self.laStats.bytes = self.laStats.bytes + Buffer.byteLength(line, 'utf8')
     self.laStats.count++
-    sync.fiber(function () {
+    co(function * processInput () {
       for (var i = 0; i < self.inputFilter.length; i++) {
-        trimmedLine = sync.await(self.inputFilter[i].func(context.sourceName || self.argv.sourceName, self.inputFilter[i].config, trimmedLine, sync.defer()))
+        trimmedLine = yield function (callback) {
+          self.inputFilter[i].func(context.sourceName || self.argv.sourceName, self.inputFilter[i].config, trimmedLine, callback)
+        }
       }
+    }).then(function () {
       if (!trimmedLine) {
         return
       }
@@ -214,10 +217,13 @@ LaCli.prototype.initState = function () {
           }
           if (data) {
             var filteredData = data
-            sync.fiber(function () {
+            co(function * () {
               for (var i = 0; i < self.outputFilter.length; i++) {
-                filteredData = sync.await(self.outputFilter[i].func(context, self.outputFilter[i].config, eventEmitter, filteredData, sync.defer()))
+                filteredData = yield function (callback) {
+                  self.outputFilter[i].func(context, self.outputFilter[i].config, eventEmitter, filteredData, callback)
+                }
               }
+            }).then(function () {
               if (!filteredData) {
                 return
               }
@@ -232,11 +238,16 @@ LaCli.prototype.initState = function () {
               if (filteredData) {
                 self.eventEmitter.parsedEvent(filteredData, context)
               }
+            }, function (e) {
+              consoleLogger.error(e.stack)
             })
           }
         })
+    }, function (e) {
+      consoleLogger.error(e.stack)
     })
   })
+
   process.once('SIGINT', function () { self.terminate('SIGINT') })
   process.once('SIGQUIT', function () { self.terminate('SIGQUIT') })
   process.once('SIGTERM', function () { self.terminate('SIGTERM') })

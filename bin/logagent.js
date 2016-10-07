@@ -239,12 +239,12 @@ LaCli.prototype.initState = function () {
                 self.eventEmitter.parsedEvent(filteredData, context)
               }
             }, function (e) {
-              consoleLogger.error(e.stack)
+              // consoleLogger.error(e.stack)
             })
           }
         })
     }, function (e) {
-      consoleLogger.error(e.stack)
+      // consoleLogger.error(e.stack)
     })
   })
 

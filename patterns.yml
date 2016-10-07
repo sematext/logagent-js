@@ -28,7 +28,8 @@ maxmindDbDir: /tmp/
 debug: false
 
 # post process all JSON input
-#json:
+json:
+  enabled: true 
 #  autohashFields:
 #    _HOSTNAME: true
 #  removeFields:

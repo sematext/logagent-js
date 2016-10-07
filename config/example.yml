@@ -16,7 +16,7 @@ input:
   #    - '/var/log/**/*.log'
   # listen to udp syslog protocol  
   syslog: 
-    port: 514
+    port: 1514
   # listen to http to receive data from Heroku  log drains  
   #heroku: 
   #  port: 9999

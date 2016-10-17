@@ -141,7 +141,9 @@ LaCli.prototype.loadPlugins = function (configFile) {
   }
   if (this.argv.index || this.argv.elasticsearchUrl || this.argv.indices) {
     plugins.push('../lib/plugins/output/elasticsearch')
-    this.argv.stdinExitEnabled = false
+  }
+  if (this.argv.rtailPort) {
+    plugins.push('../lib/plugins/output/rtail')
   }
   if ((this.argv.args && this.argv.args.length > 0) || this.argv.glob) {
     plugins.push('../lib/plugins/input/files')

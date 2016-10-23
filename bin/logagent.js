@@ -27,6 +27,9 @@ var co = require('co')
 
 function LaCli (options) {
   this.eventEmitter = require('../lib/core/logEventEmitter.js')
+  this.eventEmitter.on('error', function (err) {
+    consoleLogger.error(err)
+  })
   this.logseneDiskBufferDir = null
   this.fileManager = null
   this.la = null
@@ -43,6 +46,7 @@ function LaCli (options) {
 LaCli.prototype.initFilter = function (type, filterFunctions) {
   consoleLogger.log('init plugins')
   var eventEmitter = require('../lib/core/logEventEmitter')
+
   this[type] = []
   for (var i = 0; i < filterFunctions.length; i++) {
     try {
@@ -97,6 +101,7 @@ LaCli.prototype.loadPlugins = function (configFile) {
       }
     })
   }
+  // load input filters
   var inputFilter = []
   if (configFile && configFile.inputFilter) {
     var outputFilterSections = Object.keys(configFile.inputFilter)
@@ -107,6 +112,7 @@ LaCli.prototype.loadPlugins = function (configFile) {
     })
   }
   this.initFilter('inputFilter', inputFilter)
+  // load output plugins
   if (configFile && configFile.output) {
     var outputSections = Object.keys(configFile.output)
     outputSections.forEach(function (key) {
@@ -115,10 +121,11 @@ LaCli.prototype.loadPlugins = function (configFile) {
       }
     })
   }
+  // load output filters
   var outputFilter = []
   if (configFile && configFile.outputFilter) {
-    var inputFilterSections = Object.keys(configFile.outputFilter)
-    inputFilterSections.forEach(function (key) {
+    var outputFilterSections = Object.keys(configFile.outputFilter)
+    outputFilterSections.forEach(function (key) {
       if (configFile.outputFilter[key].module) {
         outputFilter.push(configFile.outputFilter[key])
       }

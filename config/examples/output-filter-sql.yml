@@ -1,0 +1,20 @@
+
+outputFilter:
+  - module: sql
+    config:
+      source: !!js/regexp /access.log|httpd/
+      interval: 1
+      queries:
+        - # calculate average page size for different HTTP methods
+          SELECT 'apache_stats' AS _type, 
+                  AVG(size) AS size_avg, 
+                  COUNT(method) AS method_count, 
+                  method as http_method
+          FROM ? 
+          WHERE method is not null
+          GROUP BY method
+
+output:
+  elasticsearch:
+    url: http://localhost:9200
+    index: mylogs

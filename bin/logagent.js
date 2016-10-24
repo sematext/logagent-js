@@ -24,7 +24,9 @@ var LogAnalyzer = require('../lib/parser/parser.js')
 var mkpath = require('mkpath')
 process.setMaxListeners(0)
 var co = require('co')
-
+var moduleAlias = {
+  sql: '../lib/plugins/output-filter/sql.js'
+}
 function LaCli (options) {
   this.eventEmitter = require('../lib/core/logEventEmitter.js')
   this.eventEmitter.on('error', function (err) {
@@ -45,8 +47,6 @@ function LaCli (options) {
 }
 LaCli.prototype.initFilter = function (type, filterFunctions) {
   consoleLogger.log('init plugins')
-  var eventEmitter = require('../lib/core/logEventEmitter')
-
   this[type] = []
   for (var i = 0; i < filterFunctions.length; i++) {
     try {
@@ -56,7 +56,7 @@ LaCli.prototype.initFilter = function (type, filterFunctions) {
         ff = filterFunctions[i].module
         filterName = String(filterFunctions[i].name)
       } else {
-        ff = require(filterFunctions[i].module)
+        ff = require(moduleAlias[filterFunctions[i].module] || filterFunctions[i].module)
       }
       var filter = {
         func: ff,

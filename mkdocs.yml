@@ -8,3 +8,7 @@ pages:
 - Configuration file: config-file.md
 - Log Parser and pattern definitions: parser.md
 - Plugins: plugins.md
+- Filter: 
+  - About filters: filters.md
+  - SQL output filter: filter-output-sql.md
+

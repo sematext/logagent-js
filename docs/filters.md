@@ -132,7 +132,7 @@ outputFilter:
 # List of available filters
 
 - Grep input filter - module alias "grep"
-- SQL output filter - module alias "sql"
+- [SQL output filter](./filter-output-sql) - module alias "sql"
 
 
 

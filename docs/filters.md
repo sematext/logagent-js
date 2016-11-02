@@ -131,8 +131,8 @@ outputFilter:
 
 # List of available filters
 
-- Grep input filter - module alias "grep"
-- [SQL output filter](./filter-output-sql) - module alias "sql"
+- [Grep input filter](./input-filter-grep) - module alias "grep"
+- [SQL output filter](./output-filter-sql) - module alias "sql"
 
 
 

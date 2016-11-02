@@ -1,5 +1,5 @@
-# logagent-filter-output-sql
-Filter and aggregate parsed logs with SQL and [@sematext/logagent](https://sematext.com/logagent)
+# SQL output filter
+Filter and aggregate parsed logs with SQL 
 
 This applies SQL queries on parsed log events. The result of the query is emitted as new event, while the original events are omitted. 
 

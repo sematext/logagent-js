@@ -10,5 +10,6 @@ pages:
 - Plugins: plugins.md
 - Filter: 
   - About filters: filters.md
-  - SQL output filter: filter-output-sql.md
+  - Grep input filter: input-filter-grep.md
+  - SQL output filter: output-filter-sql.md
 

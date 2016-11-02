@@ -28,8 +28,11 @@ describe('Logagent parse web server Log', function () {
     la.parseLine('190.160.248.117 - - [03/Apr/2016:06:25:38 +0000] "GET /about/ HTTP/1.1" 200 14243 "https://sematext.com/consulting/elasticsearch/" "Mozilla/5.0 (iPhone; CPU iPhone OS 8_1_1 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) Mobile/12B436 Twitter for iPhone"',
       'nginx', function (err, data) {
         if (err) {
-          done(err)
+          return done(err)
         } else {
+          if (data.ts) {
+            return done(new Error('parserd obj includes temp. ts field'))
+          }
           if (data.message === 'GET /about/ HTTP/1.1' && data.client_ip === '190.160.248.117' && data.status_code === 200 && data['@timestamp']) {
             done()
           } else {

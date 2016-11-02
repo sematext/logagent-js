@@ -1,0 +1,35 @@
+input:
+  tcp: 
+    module: input-tcp
+    port: 45900
+    bindAddress: 0.0.0.0
+    sourceName: nginx
+    returnResult: false
+    debug: true
+
+inputFilter:
+  - module: grep
+    config:
+      matchSource: !!js/regexp /nginx/
+      include: !!js/regexp /.*/i
+      exclude: !!js/regexp /OPTIONS/i
+
+outputFilter:
+  - module: sql
+    config:
+      matchSource: !!js/regexp /nginx/
+      interval: 1 # every second
+      queries:
+        - # calculate average page size for different HTTP methods
+          SELECT 'apache_stats' AS _type, 
+                  AVG(size) AS size_avg, 
+                  COUNT(method) AS method_count, 
+                  method as http_method
+          FROM ? 
+          GROUP BY method
+        
+
+output:
+  elasticsearch:
+    url: http://localhost:9200
+    index: logs

@@ -3,7 +3,7 @@ var sqlFilter = require('../lib/plugins/output-filter/sql.js')
 var eventEmitter = eventEmitter = new (require('events')).EventEmitter()
 // simualte Logagent config object
 var config = {
-  source: /.*/,
+  matchSource: /.*/,
   interval: 1,
   queries: []
 }

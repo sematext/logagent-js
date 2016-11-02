@@ -46,7 +46,7 @@
     "co": "^4.6.0",
     "commander": "^2.9.0",
     "eventemitter3": "^1.2.0",
-    "fast-safe-stringify": "^1.0.10",
+    "fast-safe-stringify": "^1.1.1",
     "flat": "^2.0.0",
     "flatstr": "^1.0.3",
     "glob": "^7.0.3",

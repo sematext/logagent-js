@@ -1,11 +1,10 @@
-# SQL output filter
-Filter and aggregate parsed logs with SQL.
+# logagent-filter-output-sql
+Filter and aggregate parsed logs with SQL and [@sematext/logagent](https://sematext.com/logagent)
 
-This filter function applies SQL queries on parsed log events. The result of the query is emitted as new event, while the original events are omitted. 
+This applies SQL queries on parsed log events. The result of the query is emitted as new event, while the original events are omitted. 
 
 Using SQL it is very easy to aggregate values, e.g. group HTTP requests by status codes. The SQL WHERE statement is useful to filter events, before they get shipped to Elasticsearch or [Logsene](https://sematext.com/logsene). 
 
-The supported SQL syntax for SELECT statements are described in the [alasql documentation](https://github.com/agershun/alasql/wiki/Select).  
 
 # Configuration 
 
@@ -14,12 +13,12 @@ Add following section 'outputFilter' to @sematext/logagent configuration file. P
 ```
 input: 
   files:
-    - './access.log'
+    - '/var/log/*/access.log'
 
 outputFilter:
   - module: sql
     config:
-      matchSource: !!js/regexp /access.log|httpd/
+      source: !!js/regexp /access.log|httpd/
       interval: 1 # every second
       queries:
         - # calculate average page size for different HTTP methods

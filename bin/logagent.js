@@ -25,7 +25,9 @@ var mkpath = require('mkpath')
 process.setMaxListeners(0)
 var co = require('co')
 var moduleAlias = {
-  sql: '../lib/plugins/output-filter/sql.js'
+  sql: '../lib/plugins/output-filter/sql.js',
+  grep: '../lib/plugins/input-filter/grep.js',
+  'input-tcp': '../lib/plugins/input/tcp.js'
 }
 function LaCli (options) {
   this.eventEmitter = require('../lib/core/logEventEmitter.js')
@@ -76,12 +78,12 @@ LaCli.prototype.initPugins = function (plugins) {
   plugins.forEach(function (pluginName) {
     consoleLogger.log(pluginName)
     try {
-      var Plugin = require(pluginName)
+      var Plugin = require(moduleAlias[pluginName] || pluginName)
       var p = new Plugin(this.argv, eventEmitter)
       this.plugins.push(p)
       p.start()
     } catch (err) {
-      consoleLogger.error('Error loading plugin: ' + pluginName + ' ' + err.stack)
+      consoleLogger.error('Error loading plugin: ' + (moduleAlias[pluginName] || pluginName) + ' ' + err.stack)
     }
   }.bind(this))
 }
@@ -222,7 +224,7 @@ LaCli.prototype.initState = function () {
         context.sourceName || self.argv.sourceName,
         function parserCb (err, data) {
           if (err && !data) {
-            // consoleLogger.error('error during parsing: ' + err)
+            consoleLogger.error('error during parsing: ' + err.stack)
           }
           if (data) {
             var filteredData = data

@@ -27,7 +27,8 @@ var co = require('co')
 var moduleAlias = {
   sql: '../lib/plugins/output-filter/sql.js',
   grep: '../lib/plugins/input-filter/grep.js',
-  'input-tcp': '../lib/plugins/input/tcp.js'
+  'input-tcp': '../lib/plugins/input/tcp.js',
+  elasticsearch: '../lib/plugins/output/elasticsearch.js'
 }
 function LaCli (options) {
   this.eventEmitter = require('../lib/core/logEventEmitter.js')
@@ -75,11 +76,12 @@ LaCli.prototype.initPugins = function (plugins) {
   consoleLogger.log('init plugins')
   var eventEmitter = require('../lib/core/logEventEmitter')
   this.plugins = []
-  plugins.forEach(function (pluginName) {
+  plugins.forEach(function (plugin) {
+    var pluginName = plugin.module || plugin
     consoleLogger.log(pluginName)
     try {
       var Plugin = require(moduleAlias[pluginName] || pluginName)
-      var p = new Plugin(this.argv, eventEmitter)
+      var p = new Plugin(plugin.config || this.argv, eventEmitter)
       this.plugins.push(p)
       p.start()
     } catch (err) {
@@ -99,7 +101,7 @@ LaCli.prototype.loadPlugins = function (configFile) {
     inputSections.forEach(function (key) {
       if (configFile.input[key].module) {
         console.log('add ' + configFile.input[key].module + ' to plugin list')
-        plugins.push(configFile.input[key].module)
+        plugins.push(moduleAlias[configFile.input[key].module] || configFile.input[key].module)
       }
     })
   }
@@ -114,12 +116,17 @@ LaCli.prototype.loadPlugins = function (configFile) {
     })
   }
   this.initFilter('inputFilter', inputFilter)
+
   // load output plugins
   if (configFile && configFile.output) {
     var outputSections = Object.keys(configFile.output)
     outputSections.forEach(function (key) {
       if (configFile.output[key].module) {
-        plugins.push(configFile.output[key])
+        plugins.push({
+          module: moduleAlias[configFile.output[key].module] || configFile.output[key].module,
+          config: configFile.output[key],
+          globalConfig: configFile
+        })
       }
     })
   }
@@ -188,7 +195,7 @@ LaCli.prototype.initState = function () {
     }
     self.cli()
   })
-  self.eventEmitter.on('input.stdin.end', function endOnStdinEof (line, context) {
+  self.eventEmitter.once('input.stdin.end', function endOnStdinEof (line, context) {
     self.terminateRequest = true
     self.terminateReason = 'stdin closed'
   })
@@ -196,8 +203,10 @@ LaCli.prototype.initState = function () {
   self.tid = setInterval(function () {
     if (self.terminateRequest && Date.now() - self.lastParsedTS > 1500) {
       self.terminate(self.terminateReason)
+      clearInterval(self.tid)
     }
   }, 1000)
+  self.tid.unref()
 
   self.eventEmitter.on('data.raw', function parseRaw (line, context) {
     self.lastParsedTS = Date.now()
@@ -317,7 +326,7 @@ LaCli.prototype.terminate = function (reason) {
   if (this.argv.suppress) {
     this.laStats.printStats()
   }
-  var terminateCounter = this.plugins.length - 1
+  var terminateCounter = this.plugins.length
   function callBackWithATimeout (callback, timeout) {
     var run, timer
     run = function () {
@@ -336,25 +345,26 @@ LaCli.prototype.terminate = function (reason) {
         p.stop(callBackWithATimeout(function () {
           terminateCounter--
           if (terminateCounter === 0) {
-            process.exit()
+            setTimeout(process.exit, 5000)
           }
-        }, 5000))
+        }, 10 * 1000 * 60))
       } catch (err) {
         consoleLogger.error('Error stopping plugin ' + err)
       }
     } else {
       terminateCounter--
       if (terminateCounter === 0) {
-        process.exit()
+        setTimeout(process.exit, 5000)
       }
     }
   })
-  setTimeout(process.exit, 10000)
+  if (!/stdin/.test(reason))
+    setTimeout(process.exit, 10000)
 }
 
 LaCli.prototype.cli = function () {
   if (this.argv.printStats || this.argv.verbose) {
-    setInterval(this.laStats.printStats.bind(this.laStats), ((Number(this.argv.printStats)) || 60) * 1000)
+    setInterval(this.laStats.printStats.bind(this.laStats), ((Number(this.argv.printStats)) || 60) * 1000).unref()
     this.laStats.printStats()
   }
 }

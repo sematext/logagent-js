@@ -1,0 +1,27 @@
+# Global options
+options:
+  includeOriginalLine: false
+  printStats: 10
+  maxInputRate: 1mb # per second
+
+input:
+  stdin: true
+  files:
+      - '/var/log/**/*.log'
+output:  
+  es-secure-local:
+    module: elasticsearch 
+    url: http://localhost:9200
+    indices: 
+      my_secure_logs_index: 
+        - system\.log
+        - access\.log
+        - auth\.log
+        - wifi.log
+  logsene-saas:
+    module: elasticsearch
+    url: https://logsene-receiver.sematext.com
+    indices: 
+      269d7b2f-0e7d-4e92-ae7f-xxxxxxxxxx: 
+        - wifi.log
+        - bluetooth.log

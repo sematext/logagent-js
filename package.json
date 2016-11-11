@@ -1,6 +1,6 @@
 {
   "name": "@sematext/logagent",
-  "version": "2.0.28",
+  "version": "2.0.29",
   "description": "Smart log parser written in Node",
   "main": "lib/parser/parser.js",
   "bin": {
@@ -51,7 +51,7 @@
     "flatstr": "^1.0.3",
     "glob": "^7.0.3",
     "js-yaml": "^3.3.1",
-    "logsene-js": "^1.1.26",
+    "logsene-js": "^1.1.36",
     "maxmind": "^0.6.0",
     "maxmind-geolite-mirror": "^1.0.5",
     "merge": "^1.2.0",

@@ -12,6 +12,10 @@ output:
   es-secure-local:
     module: elasticsearch 
     url: http://localhost:9200
+    httpOptions:
+      key: ./client.key
+      cert: ./server.crt
+      rejectUnauthorized: false
     indices: 
       my_secure_logs_index: 
         - system\.log

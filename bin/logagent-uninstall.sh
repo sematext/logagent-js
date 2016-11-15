@@ -14,8 +14,8 @@ function remove_config_and_npm_package()
 echo "Removing configuration file ${CONFIG_FILE}"
 runCommand "rm $CONFIG_FILE"
 runCommand "rm /tmp/logagentTailPointers.json"
-echo "Removing global npm package logagent-js"
-runCommand "npm rm logagent-js -g"
+echo "Removing global npm package @sematext/logagent"
+runCommand "npm rm @sematext/logagent"
 }
 function uninstall_logagent_service() 
 {

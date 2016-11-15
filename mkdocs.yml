@@ -7,7 +7,10 @@ pages:
 - Usage: cli-parameters.md
 - Configuration file: config-file.md
 - Log Parser and pattern definitions: parser.md
-- Plugins: plugins.md
+- Plugins: 
+  - Overview: plugins.md
+  - Output plugins: 
+    - Elasticsearch: output-elasticsearch.md
 - Filter: 
   - About filters: filters.md
   - Grep input filter: input-filter-grep.md

@@ -36,7 +36,7 @@ Location of service scripts:
 Start/stop service: 
 - upstart: ```service logagent stop/start```
 - systemd: ```systemctl stop/start logagent```
-- lauchnchd: ```launchctl start/stop com.sematext.logagent```
+- launchd: ```launchctl start/stop com.sematext.logagent```
 
 
 ## Logagent in a Docker Container as Syslog Listener

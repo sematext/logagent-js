@@ -39,7 +39,7 @@ sudo apt-get install -y nodejs
 sudo npm i -g @sematext/logagent 
 ```
 
-Install service for logagent using [systemd, upstart, lauchd](http://sematext.github.io/logagent-js/installation/#install-service-linux-mac-os-x)
+Install service for logagent using [systemd, upstart, launchd](http://sematext.github.io/logagent-js/installation/#install-service-linux-mac-os-x)
 
 ```
 sudo logagent-setup LOGSENE_TOKEN

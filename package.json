@@ -5,7 +5,7 @@
   "main": "lib/parser/parser.js",
   "bin": {
     "logagent": "bin/logagent.js",
-    "logagent-windows": "bin/logagent-win.js",
+    "logagent-windows": "bin/logagent-windows.js",
     "logagent-setup": "bin/logagent-setup.sh",
     "logagent-uninstall": "bin/logagent-uninstall.sh"
   },

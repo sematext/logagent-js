@@ -100,7 +100,7 @@ LaCli.prototype.loadPlugins = function (configFile) {
     var inputSections = Object.keys(configFile.input)
     inputSections.forEach(function (key) {
       if (configFile.input[key].module) {
-        console.log('add ' + configFile.input[key].module + ' to plugin list')
+        consoleLogger.log('add ' + configFile.input[key].module + ' to plugin list')
         plugins.push(moduleAlias[configFile.input[key].module] || configFile.input[key].module)
       }
     })

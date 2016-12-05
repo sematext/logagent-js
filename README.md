@@ -1,122 +1,86 @@
 [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/sematext/logagent-js) - [read more](http://blog.sematext.com/2016/02/18/how-to-ship-heroku-logs-to-logsene-managed-elk-stack/)
 
-# Logagent
+# What is Logagent
 
-Smart and lightweight Log Parser and Log Shipper written in Node. It can ship logs to Elasticsearch and thus also to [Logsene](http://www.sematext.com/logsene/). 
-See [Documentation](http://sematext.github.io/logagent-js/).
-Homepage: [https://sematext.com/logagent](https://sematext.com/logagent)
+Logagent is a modern, open-source, light-weight log shipper. It is like Filebeat and Logstash in one, without the JVM memory footprint.  It comes with out of the box and extensible log parsing, on-disk buffering, secure transport, and bulk indexing to Elasticsearch, Logsene, and other destinations. Its low memory footprint and low CPU overhead makes it suitable for deploying on edge nodes and devices, while its ability to parse and structure logs makes it a great Logstash alternative. 
 
-# Status of this package
+# Installation
 
-This is the repository for [logagent v2.x](https://github.com/sematext/logagent-js). 
-- See [logagent 2.x features and status](https://github.com/sematext/logagent-js/milestone/1)
-- **[logagent-js 1.x](https://www.npmjs.com/package/logagent-js) is deprecated and might be removed in the future. Source code for [logagent-js 1.x](https://github.com/sematext/logagent-js/tree/1.x)**
+**1) Install Node.js**
 
-## Release notes 
-- New [config file format](http://sematext.github.io/logagent-js/config-file) (YAML)
-   - support for multiple pattern definition files (including hot reload)
-   - [log routing to multiple elasticsearch indices](http://sematext.github.io/logagent-js/config-file/#section-output) by event source name 
-- Support for [plugins](http://sematext.github.io/logagent-js/plugins/) as 3rd party npm modules, e.g.:
-  - [logagent-tcp-input](https://www.npmjs.com/package/@sematext/logagent-tcp-input) - accepting logs via tcp port from remote machines
-  - [logagent-nodejs-monitor](https://www.npmjs.com/package/@sematext/logagent-nodejs-monitor) - to monitor logagent process itself and CPU, memory, disk IO usage of the the server machine
-- Changed [command line arguments](http://sematext.github.io/logagent-js/cli-parameters/)
-- New package name "@sematext/logagent" for version 2.x. Logagent version 1.x is till available with the package name [logagent-js](https://www.npmjs.com/package/logagent-js) on npm. 
+Official Node.js [downloads and instructions](https://nodejs.org/en/download/). E.g. for Debian/Ubuntu:
 
-# Quickstart 
-
-## Install Node.js 
-
-Official Node.js [downloads and instructions](https://nodejs.org/en/download/).
-E.g. for Debian/Ubuntu:
-```
-curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
+```	
+curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 sudo apt-get install -y nodejs
+Install Logagent with npm
+sudo npm i -g @sematext/logagent
 ```
 
-# Install logagent with npm
+** 2) run logagent command line tool** 
 
 ```
-sudo npm i -g @sematext/logagent 
+logagent --help
 ```
-
-Install service for logagent using [systemd, upstart, launchd](http://sematext.github.io/logagent-js/installation/#install-service-linux-mac-os-x)
-
-```
-sudo logagent-setup LOGSENE_TOKEN
-```
-
-Edit the config file in /etc/sematext/logagent.conf - by default all logs from /var/log/**/*.log are shipped to Logsene.
+**3) Example: Index your log files in Elasticsearch**
 
 ```
-sudo service logagent restart # upstart
+logagent -e http://localhost:9200 -i logs -g ‘/var/log/**/*.log’
 ```
 
-# Features
+**4) Optional: Install service & config**
+ 
+Install service for Logagent using systemd, upstart, launchd
+To quickly create a config file for indexing into Elasticsearch without having to edit it run something like this:
 
-This project contains a library and patterns for log parsing and cli tools and installers to use logagent as log shipper with the following features: 
+```
+sudo logagent-setup http://localhost:9200/INDEX_NAME ‘/var/log/**/*.log’
+Logsene users - use https://logsene-receiver.sematext.com/LOGSENE_APP_TOKEN.
+```
 
-## Parser
-- log format detection and intelligent pattern matching 
-- pattern library included 
-- easy to extend with custom patterns and JS transform functions
-- recognition of Date and Number fields
-- replace sensitive data with SHA-1 hash codes
-- GeoIP lookup with automatic GeoIP db updates (maxmind geopip-lite files)
+**Configuration**
 
-## Command Line Tool
+To configure different inputs, different event processing, or different outputs (e.g. your own Elasticsearch) edit /etc/sematext/logagent.conf, e.g.:
 
-- log format converter (e.g. text to JSON, line delimited JSON or YAML)
-- log shipper for [Logsene](http://www.sematext.com/logsene/)
+```
+output:
+  elasticsearch:
+    url: http://elasticsearch-server:9200
+    index: logs
+```
 
-  - including cli, launchd (Mac OS X), upstart and systemd (Linux) service installer
-  - disk buffer for failed inserts during network outage
+Then restart the service with sudo service logagent restart. 
+Troubleshooting & Logs
+Logagent’s own logs:
 
-## Inputs
-- Standard input (stdin) that can read the output stream from any Linux cli tool
-  - patterns are applied to each incoming text line; includes support for multi-line patters, e.g. for Java Stack Traces and JSON input.
-- Syslog Server (UDP) listener - logagent can also act as a syslog server and receive Syslog messages via UDP. The parser is applied to the message field. 
-- [Heroku Log Drain](https://github.com/sematext/logagent-js#logagent-as-heroku-log-drain) makes it easy to ship Heroku logs to Elasticsearch or [Logsene](http://www.sematext.com/logsene/)
-- Cloud Foundry Log Drain
+- Upstart: ```/var/log/upstart/logagent.log```
+- Systemd: ```journalctl -u logagent```
+- Launchd: ```/Library/Logs/logagent.log```
 
-## Processing
-- logagent applies patterns defined in patterns.yml to all logs and creates structured logs from plain-text log lines
-- GeoIP lookups for IP address fields, including automatic download and update of the GeoIP lite database from Maxmind
 
-## Reliable log shipping with disk buffer
+Location of service scripts: 
 
-Logagent doesn't lose data.  It stores parsed logs to a disk buffer if the network connection to the Elasticsearch API fails.  Logagent retries shipping logs later, when the network or Elasticsearch is available again.  
+- Upstart: ```/etc/init/logagent.conf ```
+- Systemd: ```/etc/systemd/system/logagent.service``` 
+- Launchd: ```/Library/LaunchDaemons/com.sematext.logagent.plist```
 
-## Outputs
-- bulk inserts to [Logsene](http://sematext.com/logsene) / Elasticsearch API
-- JSON, line delimited JSON and YML to standard output  
 
-## Deployment options
-- Deployable as a system service: systemd, upstart (Linux), or launchd (Mac OS X)
-- Docker Container to receive logs via syslog
-- Deployment to Heroku as Heroku Log drain
-- Deployment to Cloud Foundry as Cloud Foundry Log drain (thus usable with Pivotal, Bluemix, etc.)
-
-## API 
-- Node.js module to integrate parsers into Node.js programs
-- logagent is a part of [SPM for Docker](https://github.com/sematext/sematext-agent-docker) to parse Container Logs
+Start/stop service:
+ 
+- Upstart: ```service logagent stop/start``` 
+- Systemd: ```systemctl stop/start logagent``` 
+- Launchd: ```launchctl start/stop com.sematext.logagent```
 
 
 # Documentation
 
-The documentation is available [here](http://sematext.github.io/logagent-js/). 
+## Community, More Info & Support
+- [Full documentation is available here](http://sematext.github.io/logagent-js/)
+- [Logagent main page](https://sematext.com/logagent)
+- [Logagent on Github](https://github.com/sematext/logagent-js)
+- Twitter: [@sematext](https://twitter.com/sematext)
+- Blog: [sematext.com/blog](https://sematext.com/blog)
+- Forum: [https://groups.google.com/forum/#!forum/logagent](https://groups.google.com/forum/#!forum/logagent)
 
 
 
-# Related packages
-
-- [Sematext Agent for Docker](https://github.com/sematext/sematext-agent-docker) - collects metrics, events and logs from Docker API and CoreOS. Logagentis a component of sematext-agent-docker. More Information: [Innovative Docker Log Management](http://blog.sematext.com/2015/08/12/docker-log-management/)
-- [Logsene-CLI](https://github.com/sematext/logsene-cli) - Enables searching Logsene log entries from the command-line. 
-- [SPM Agent for Node.js](https://github.com/sematext/spm-agent-nodejs) - collects performance metrics for Node and io.js applications
-- [Custom Metrics](https://github.com/sematext/spm-metrics-js) - Custom Metrics for SPM 
-- [Winston-Logsene](https://github.com/sematext/winston-logsene) - Logging for Node.js - Winston transport layer for Logsene
-
-# Support 
-
-- Twitter: [@sematext](http://twitter.com/sematext)
-- Blog: [sematext.com/blog](http://sematext.com/blog)
-- Homepage: [sematext.com](http://sematext.com)

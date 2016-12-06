@@ -19,7 +19,7 @@ Create a configuration file for Logagent in
 ```
 %ProgramData%\Sematext\logagent.conf
 ```  
-(e.g. c:\programfiles\sematext\logagent.conf)
+(default: c:\ProgramData\sematext\logagent.conf)
 
 In case you want tostore the configuration file in a different directory, enter the new path in the registry:
 

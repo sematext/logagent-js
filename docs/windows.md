@@ -24,7 +24,7 @@ Create a configuration file for Logagent in
 In case you want to store the configuration file in a different directory, enter the new location in the registry:
 
 ```
-HKEY_LOCAL_MACHINE\System\CurrentControlSet\\Control\Session Manager\Environment\LOGAGENT_CONFIG
+HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment\LOGAGENT_CONFIG
 ```
 
 Example config file to collect Windows events to Elasticsearch: 

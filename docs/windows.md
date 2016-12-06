@@ -21,10 +21,10 @@ Create a configuration file for Logagent in
 ```  
 (default: c:\ProgramData\sematext\logagent.conf)
 
-In case you want tostore the configuration file in a different directory, enter the new path in the registry:
+In case you want to store the configuration file in a different directory, enter the new location in the registry:
 
 ```
-HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Session Manager\\Environment\LOGAGENT_CONFIG
+HKEY_LOCAL_MACHINE\System\CurrentControlSet\\Control\Session Manager\Environment\LOGAGENT_CONFIG
 ```
 
 Example config file to collect Windows events to Elasticsearch: 
@@ -45,10 +45,7 @@ output:
   local-es:
     module: elasticsearch
     url: http://localhost:9200
-    index: test1
-    indices:  
-      win_events:
-        - .*windows.*
+    index: windows_events
 ```
 
 Run service installer: 

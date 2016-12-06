@@ -38,7 +38,7 @@ input:
   windowsEvent:
     module: logagent-input-windows-events 
     # query events every 10 seconds
-    intervall: 10
+    interval: 10
     maxEvents: 1000
 
 output:  

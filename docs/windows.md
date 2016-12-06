@@ -17,7 +17,7 @@ logagent-windows --help
 
 Create a configuration file for Logagent in 
 ```
-%ProgramData%/Sematext/logagent.conf
+%ProgramData%\Sematext\logagent.conf
 ```  
 (e.g. c:\programfiles\sematext\logagent.conf)
 

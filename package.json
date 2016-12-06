@@ -41,6 +41,9 @@
   "homepage": "https://www.sematext.com",
   "author": "Stefan Thies <stefan.thies@sematext.com> (https://github.com/megastef) ",
   "license": "Apache-2.0",
+  "optionalDependencies": {
+    "node-windows": "^0.1.12"
+  }, 
   "dependencies": {
     "alasql": "^0.3.3",
     "chalk": "^1.1.3",

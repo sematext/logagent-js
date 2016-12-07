@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+'use strict'
 try {
   if (process.argv[2] === '-install') {
     var laCmd = process.mainModule.filename
@@ -24,8 +25,7 @@ try {
       console.log('Logagent service started')
     })
     svc.install()
-  }
-  if (process.argv[2] === '-uninstall') {
+  } else if (process.argv[2] === '-uninstall') {
     let Service = require('node-windows').Service
     let svc = new Service({
       name: 'Logagent',
@@ -37,8 +37,11 @@ try {
     })
     svc.uninstall()
   } else {
-    process.argv.push('--config')
-    process.argv.push(process.env.LOGAGENT_CONFIG || process.env.ProgramData + '\\Sematext\\logagent.conf')
+    if (process.argv.join(',').indexOf('--config') === -1) {
+      // use default config
+      process.argv.push('--config')
+      process.argv.push(process.env.LOGAGENT_CONFIG || process.env.ProgramData + '\\Sematext\\logagent.conf')
+    }
     new (require('./logagent.js'))()
   }
 } catch (err) {

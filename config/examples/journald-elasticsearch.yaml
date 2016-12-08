@@ -7,48 +7,49 @@ input:
     module: command
     command: journalctl -o json -f
     sourceName: journald
-    restart: 1
-
+    restart: -1
 
 output:
   elk-local:
-    module: elasticsearch 
+    module: elasticsearch
     url: http://localhost:9200
     index: journald_logs
 
-json:
-  removeFields:
-    - __CURSOR
-    - __MONOTONIC_TIMESTAMP
-    - _TRANSPORT
-    - JOURNAL_NAME
-    - JOURNAL_PATH
-    - CURRENT_USE
-    - CURRENT_USE_PRETTY
-    - MAX_USE
-    - MAX_USE_PRETTY
-    - DISK_KEEP_FREE
-    - DISK_KEEP_FREE_PRETTY
-    - DISK_AVAILABLE_PRETTY
-    - DISK_AVAILABLE
-    - LIMIT
-    - LIMIT_PRETTY
-    - AVAILABLE
-    - AVAILABLE_PRETTY
-    - _CAP_EFFECTIVE
-    - _SYSTEMD_SLICE
-  unitFilter: !!js/regexp /sematext.*/i
-  transform: !!js/function >
-    function (sourceName, parsedObject, config) {
-       // filter for unit names
-       if (! config.uniFilter.test(parsedObject['_SYSTEMD_UNIT'])) {
-        parsedObject.logagentDropMessage = true
-        return
+parser:
+  json: 
+    enabled: true
+    removeFields:
+      - __CURSOR
+      - __MONOTONIC_TIMESTAMP
+      - _TRANSPORT
+      - JOURNAL_NAME
+      - JOURNAL_PATH
+      - CURRENT_USE
+      - CURRENT_USE_PRETTY
+      - MAX_USE
+      - MAX_USE_PRETTY
+      - DISK_KEEP_FREE
+      - DISK_KEEP_FREE_PRETTY
+      - DISK_AVAILABLE_PRETTY
+      - DISK_AVAILABLE
+      - LIMIT
+      - LIMIT_PRETTY
+      - AVAILABLE
+      - AVAILABLE_PRETTY
+      - _CAP_EFFECTIVE
+      - _SYSTEMD_SLICE
+    unitFilter: !!js/regexp /.*/i
+    transform: !!js/function >
+      function (sourceName, parsed, config) {
+        if (parsed['_SYSTEMD_UNIT']) {
+          if (!config.unitFilter.test(parsed['_SYSTEMD_UNIT'])) {
+            parsed.logagentDropMessage = true
+            return
+           }
+           parsed.logSource = parsed['_SYSTEMD_UNIT'].replace('.service','')
+        }
+        parsed['@timestamp'] = new Date(Number(parsed['_SOURCE_REALTIME_TIMESTAMP']))
+        for (var i=0; i<config.removeFields.length; i++) {
+          delete parsed[config.removeFields[i]]
+        }
       }
-      parsedObject.logSource = parsedObject['_SYSTEMD_UNIT'].replace('.service','')
-      parsedObject['@timestamp'] = new Date(Number(parsedObject['_SOURCE_REALTIME_TIMESTAMP']))
-      for (var i=0; i<config.removeFields.length; i++) {
-        // console.log('delete ' + config.removeFields[i])
-        delete parsedObject[config.removeFields[i]]
-      }
-     }

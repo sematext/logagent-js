@@ -202,6 +202,12 @@ LaCli.prototype.initState = function () {
     if (self.argv.patterns && (self.argv.patterns instanceof Array)) {
       lp.patterns = self.argv.patterns.concat(lp.patterns)
     }
+    var jsonConfigured = (self.argv.configFile != undefined &&
+        self.argv.configFile.parser != undefined && 
+        self.argv.configFile.parser.json != undefined)
+    if (jsonConfigured) {
+      lp.cfg.json = self.argv.configFile.parser.json
+    }
     if (self.argv.includeOriginalLine !== undefined) {
       lp.cfg.originalLine = self.argv.includeOriginalLine
     }

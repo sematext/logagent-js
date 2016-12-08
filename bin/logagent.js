@@ -25,6 +25,7 @@ var mkpath = require('mkpath')
 process.setMaxListeners(0)
 var co = require('co')
 var moduleAlias = {
+  command: '../lib/plugins/input/command.js',
   sql: '../lib/plugins/output-filter/sql.js',
   grep: '../lib/plugins/input-filter/grep.js',
   'input-tcp': '../lib/plugins/input/tcp.js',
@@ -81,6 +82,10 @@ LaCli.prototype.initPugins = function (plugins) {
     consoleLogger.log(pluginName)
     try {
       var Plugin = require(moduleAlias[pluginName] || pluginName)
+      // be compatible with plugins accessing config.configFile property
+      if (plugin.config) {
+        plugin.config.configFile = plugin.globalConfig
+      }
       var p = new Plugin(plugin.config || this.argv, eventEmitter)
       this.plugins.push(p)
       p.start()
@@ -99,6 +104,13 @@ LaCli.prototype.loadPlugins = function (configFile) {
   if (configFile && configFile.input) {
     var inputSections = Object.keys(configFile.input)
     inputSections.forEach(function (key) {
+      if (configFile.input[key].module) {
+        plugins.push({
+          module: moduleAlias[configFile.input[key].module] || configFile.input[key].module,
+          config: configFile.input[key],
+          globalConfig: configFile
+        })
+      }
       if (configFile.input[key].module) {
         consoleLogger.log('add ' + configFile.input[key].module + ' to plugin list')
         plugins.push(moduleAlias[configFile.input[key].module] || configFile.input[key].module)

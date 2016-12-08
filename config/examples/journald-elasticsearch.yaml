@@ -1,0 +1,20 @@
+# Global options
+options:
+  includeOriginalLine: false
+
+input:
+  unix-tail-file: 
+    module: command
+    command: tail -f /var/log/nginx/access.log
+    sourceName: nginx
+    restart: 1
+  journactl: 
+    module: command
+    command: journalctl -o json -f
+    sourceName: nginx
+    restart: 1
+
+output:
+  # print parsed logs in YAML format to stdout if supress is set false    
+  stdout: yaml # use 'pretty' for pretty json and 'ldjson' for line delimited json (default)
+  

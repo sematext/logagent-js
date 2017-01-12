@@ -10,7 +10,7 @@ input:
   bro-start: 
     module: command
     # store BRO logs in /tmp/bro in JSON format
-    command: mkdir /tmp/bro; cd /tmp/bro; bro -i en0 -e 'redef LogAscii::use_json=T;'
+    command: mkdir /tmp/bro; cd /tmp/bro; bro -i eth0 -e 'redef LogAscii::use_json=T;'
     sourceName: bro
     restart: 1
   # read the BRO logs from the file system ...

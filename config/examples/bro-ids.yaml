@@ -1,7 +1,7 @@
 # Example to run BRO IDS, adjust BRO timestamps and store BRO logs in Logsene
 # install BRO ids with "apt-get install bro" 
-# run logaent with super user permissions for packet capture
-# logagent --config bro-ids.yml
+# run logagent with super user permissions for packet capture
+# sudo logagent --config bro-ids.yml
 # Global options
 options:
   includeOriginalLine: false
@@ -13,7 +13,7 @@ input:
     command: mkdir /tmp/bro; cd /tmp/bro; bro -i en0 -e 'redef LogAscii::use_json=T;'
     sourceName: bro
     restart: 1
-  # we read the BRO logs from the file system ...
+  # read the BRO logs from the file system ...
   files:
       - '/tmp/bro/*.log'
 parser:

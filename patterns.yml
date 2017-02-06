@@ -72,11 +72,11 @@ patterns:
       fields: [ts,method,url,duration,duration_unit,status_code,info,ip,port]
       dateFormat: HH:mm:ss:S
  - # Elasticsearch 
-  blockStart: !!js/regexp /\d{4}-\d{2}-\d{2}\s[\d+|\:]+.\d+|log4j\:\S+\s/
+  blockStart: !!js/regexp /\d{4}-\d{2}-\d{2}[\s|T][\d+|\:]+.\d+|log4j\:\S+\s/
   sourceName: !!js/regexp /elasticsearch/
   match:
     - type: elasticsearch
-      regex: !!js/regexp ^\[(\d{4}-\d{2}-\d{2}\s[\d+|\:]+.\d+)\]\[(.+?)\]\[(.+?)\s*\]\s*\[(.+?)\]\s([\s|\S]+)
+      regex: !!js/regexp ^\[(\d{4}-\d{2}-\d{2}[\s|T][\d+|\:]+.\d+)\]\[(.+?)\]\[(.+?)\s*\]\s*\[(.+?)\]\s([\s|\S]+)
       fields: [ts,severity,source,node_name,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
     - type: elasticsearch

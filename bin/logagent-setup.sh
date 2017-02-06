@@ -67,7 +67,7 @@ options:
   printStats: 60
   # don't write parsed logs to stdout
   suppress: true
-  # Enalbe/disable GeoIP lookups
+  # Enable/disable GeoIP lookups
   # Startup of logagent might be slower, when downloading the GeoIP database
   geoipEnabled: false
   # Directory to store Logagent status and temporary files

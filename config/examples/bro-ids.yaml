@@ -1,0 +1,43 @@
+# Example to run BRO IDS, adjust BRO timestamps and store BRO logs in Logsene
+# install BRO ids with "apt-get install bro" 
+# run logagent with super user permissions for packet capture
+# sudo logagent --config bro-ids.yml
+# Global options
+options:
+  includeOriginalLine: false
+
+input:
+  bro-start: 
+    module: command
+    # store BRO logs in /tmp/bro in JSON format
+    command: mkdir /tmp/bro; cd /tmp/bro; bro -i eth0 -e 'redef LogAscii::use_json=T;'
+    sourceName: bro
+    restart: 1
+  # read the BRO logs from the file system ...
+  files:
+      - '/tmp/bro/*.log'
+parser:
+  json: 
+    enabled: true
+    transform: !!js/function >
+      function (sourceName, parsed, config) {
+        var src = sourceName.split('/')
+        // generate Elasticsearch _type out of the log file sourceName
+        // e.g. "dns" from /tmp/bro/dns.log
+        if (src && src[src.length-1]) {
+          parsed._type = src[src.length-1].replace(/\.log/g,'')
+        }
+        // store log file path in each doc
+        parsed.logSource = sourceName
+        // adjust BRO timestamps to JS timestamps
+        if (parsed.ts) {
+         parsed['@timestamp'] = new Date(parsed.ts * 1000)
+        }
+      }
+
+output: 
+  stdout: yaml 
+  es-secure-local:
+    module: elasticsearch 
+    url: http://localhost:9200
+    index: bro_ids_logs

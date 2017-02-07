@@ -1,5 +1,5 @@
 process.env.GEOIP_ENABLED = 'true'
-
+var util = require('util')
 describe('Logagent parse JSON', function () {
   it('should return corect message with timestamp', function (done) {
     this.timeout(150000)
@@ -27,14 +27,13 @@ describe('Logagent parse web server Log', function () {
     this.timeout(150000)
 
     var Logagent = require('../lib/parser/parser.js')
-    var la = new Logagent(null, null, function ready(laReady) {
+    var la = new Logagent(null, null, function ready (laReady) {
       // console.log('ready', arguments)
       laReady.parseLine('91.67.80.14 - - [03/Apr/2016:06:25:38 +0000] "GET /about/ HTTP/1.1" 200 14243 "https://sematext.com/consulting/elasticsearch/" "Mozilla/5.0 (iPhone; CPU iPhone OS 8_1_1 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) Mobile/12B436 Twitter for iPhone"',
       'nginx', function (err, data) {
         if (err) {
           return done(err)
         } else {
-          // console.log(data)
           if (data.ts) {
             return done(new Error('parserd obj includes temp. ts field'))
           }

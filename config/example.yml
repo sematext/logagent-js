@@ -47,6 +47,7 @@ parser:
 output:
   # index logs in Elasticsearch or Logsene
   elasticsearch: 
+    module: elasticsearch
     url: https://localhost:9200
     # default index to use, for all logs that don't match later in indices section
     index: 0a835c75-9847-4f74-xxxx

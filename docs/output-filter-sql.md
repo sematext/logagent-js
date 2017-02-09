@@ -34,6 +34,7 @@ outputFilter:
           WHERE path like "/wp-login%" 
 output:
   elasticsearch:
+    module: elasticsearch
     url: http://localhost:9200
     index: mylogs
 ```

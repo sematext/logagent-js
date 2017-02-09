@@ -8,7 +8,6 @@ if (cluster.isMaster) {
 } else {
   http.createServer(function (req, res) {
     res.writeHead(httpStatusToReturn, {'Content-Type': 'text/plain'})
-    var b = ''
     var lines = 0
     req.on('data', function (data) {
       // console.log(data.toString().substring(0, 10))

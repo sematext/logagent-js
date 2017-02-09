@@ -1,5 +1,5 @@
 process.env.GEOIP_ENABLED = 'true'
-var util = require('util')
+// var util = require('util')
 var Logagent = require('../lib/parser/parser.js')
 describe('Logagent parse JSON', function () {
   it('should return correct message with timestamp', function (done) {

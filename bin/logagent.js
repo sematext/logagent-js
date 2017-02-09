@@ -58,7 +58,7 @@ LaCli.prototype.initFilter = function (type, filterFunctions) {
       var ff = null
       if (typeof filterFunctions[i].module === 'function') {
         ff = filterFunctions[i].module
-        filterName = String(filterFunctions[i].name)
+        filterName = String(filterFunctions[i].name || 'plugin #' + i)
       } else {
         ff = require(moduleAlias[filterFunctions[i].module] || filterFunctions[i].module)
       }
@@ -73,7 +73,7 @@ LaCli.prototype.initFilter = function (type, filterFunctions) {
     }
   }
 }
-LaCli.prototype.initPugins = function (plugins) {
+LaCli.prototype.initPlugins = function (plugins) {
   consoleLogger.log('init plugins')
   var eventEmitter = require('../lib/core/logEventEmitter')
   this.plugins = []
@@ -120,8 +120,8 @@ LaCli.prototype.loadPlugins = function (configFile) {
   // load input filters
   var inputFilter = []
   if (configFile && configFile.inputFilter) {
-    var outputFilterSections = Object.keys(configFile.inputFilter)
-    outputFilterSections.forEach(function (key) {
+    var inputFilterSections = Object.keys(configFile.inputFilter)
+    inputFilterSections.forEach(function (key) {
       if (configFile.inputFilter[key].module) {
         inputFilter.push(configFile.inputFilter[key])
       }
@@ -189,7 +189,7 @@ LaCli.prototype.initState = function () {
   var self = this
   var eventEmitter = self.eventEmitter
   var plugins = self.loadPlugins(this.argv.configFile)
-  self.initPugins(plugins)
+  self.initPlugins(plugins)
 
   self.logseneDiskBufferDir = self.argv['diskBufferDir'] || process.env.LOGSENE_TMP_DIR || require('os').tmpdir()
   mkpath(self.logseneDiskBufferDir, function (err) {
@@ -202,9 +202,9 @@ LaCli.prototype.initState = function () {
     if (self.argv.patterns && (self.argv.patterns instanceof Array)) {
       lp.patterns = self.argv.patterns.concat(lp.patterns)
     }
-    var jsonConfigured = (self.argv.configFile != undefined &&
-        self.argv.configFile.parser != undefined && 
-        self.argv.configFile.parser.json != undefined)
+    var jsonConfigured = (self.argv.configFile !== undefined &&
+        self.argv.configFile.parser !== undefined &&
+        self.argv.configFile.parser.json !== undefined)
     if (jsonConfigured) {
       lp.cfg.json = self.argv.configFile.parser.json
     }

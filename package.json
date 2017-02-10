@@ -1,6 +1,6 @@
 {
   "name": "@sematext/logagent",
-  "version": "2.0.54",
+  "version": "2.0.55",
   "description": "Smart log parser written in Node",
   "main": "lib/parser/parser.js",
   "bin": {
@@ -14,8 +14,8 @@
   },
   "scripts": {
     "test": "mocha",
-    "standard": "standard lib/**/*.js bin/*.js",
-    "eslint": "eslint lib/**/*.js bin/*.js",
+    "standard": "standard lib/**/**/*.js bin/*.js",
+    "eslint": "eslint lib/**/**/*.js bin/*.js",
     "start": "node bin/logagent.js -s --heroku $PORT",
     "pubdocs": "mkdocs gh-deploy --clean",
     "docs": "mkdocs serve",
@@ -46,7 +46,7 @@
   "optionalDependencies": {
     "node-windows": "^0.1.12"
   },
-  "//":  "!!! bithound claims maxmind-geolite-mirror is not used, it is! Don't remove ...",
+  "//": "!!! bithound claims maxmind-geolite-mirror is not used, it is! Don't remove ...",
   "dependencies": {
     "alasql": "^0.3.6",
     "chalk": "^1.1.3",

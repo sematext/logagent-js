@@ -20,7 +20,9 @@
     "pubdocs": "mkdocs gh-deploy --clean",
     "docs": "mkdocs serve",
     "mkdocs": "pip install mkdocs",
-    "precommit": "npm run standard && npm run eslint"
+    "precommit": "npm run standard && npm run eslint",
+    "hook-install": "precommit install",
+    "hook-remove": "precommit remove"
   },
   "precommit" : {
     "tasks" : ["npm run precommit"]

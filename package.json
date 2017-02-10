@@ -14,6 +14,8 @@
   },
   "scripts": {
     "test": "mocha",
+    "standard": "standard lib/**/*.js bin/*.js",
+    "eslint": "eslint lib/**/*.js bin/*.js",
     "start": "node bin/logagent.js -s --heroku $PORT",
     "pubdocs": "mkdocs gh-deploy --clean",
     "docs": "mkdocs serve",
@@ -74,6 +76,8 @@
     "try-call": "0.0.2"
   },
   "devDependencies": {
-    "mocha": "^3.2.0"
+    "mocha": "^3.2.0",
+    "standard": "8.6.0",
+    "eslint": "^3.15.0"
   }
 }

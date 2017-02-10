@@ -19,7 +19,11 @@
     "start": "node bin/logagent.js -s --heroku $PORT",
     "pubdocs": "mkdocs gh-deploy --clean",
     "docs": "mkdocs serve",
-    "mkdocs": "pip install mkdocs"
+    "mkdocs": "pip install mkdocs",
+    "precommit": "npm run standard && npm run eslint"
+  },
+  "precommit" : {
+    "tasks" : ["npm run precommit"]
   },
   "repository": {
     "type": "git",
@@ -77,6 +81,7 @@
   "devDependencies": {
     "mocha": "^3.2.0",
     "standard": "8.6.0",
-    "eslint": "^3.15.0"
+    "eslint": "^3.15.0",
+    "precommit": "^1.2.2"
   }
 }

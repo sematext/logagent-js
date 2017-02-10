@@ -1,3 +1,4 @@
+[![bitHound Overall Score](https://www.bithound.io/github/sematext/logagent-js/badges/score.svg)](https://www.bithound.io/github/sematext/logagent-js)
 [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/sematext/logagent-js) - [read more](http://blog.sematext.com/2016/02/18/how-to-ship-heroku-logs-to-logsene-managed-elk-stack/)
 
 # What is Logagent

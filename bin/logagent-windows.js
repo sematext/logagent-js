@@ -42,7 +42,10 @@ try {
       process.argv.push('--config')
       process.argv.push(process.env.LOGAGENT_CONFIG || process.env.ProgramData + '\\Sematext\\logagent.conf')
     }
-    new (require('./logagent.js'))()
+    var la = new (require('./logagent.js'))()
+    if (!la) {
+      throw new Error('could not load logagent.js')
+    }
   }
 } catch (err) {
   console.log(err.stack)

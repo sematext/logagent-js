@@ -1,4 +1,4 @@
-#!/bin/sh
+#! /bin/sh
 ':' // ; export MAX_MEM="--max-old-space-size=500"; exec "$(command -v node || command -v nodejs)" --harmony "${NODE_OPTIONS:-$MAX_MEM}" "$0" "$@"
 'use strict'
 /*
@@ -203,8 +203,8 @@ LaCli.prototype.initState = function () {
       lp.patterns = self.argv.patterns.concat(lp.patterns)
     }
     var jsonConfigured = (self.argv.configFile !== undefined &&
-        self.argv.configFile.parser !== undefined &&
-        self.argv.configFile.parser.json !== undefined)
+      self.argv.configFile.parser !== undefined &&
+      self.argv.configFile.parser.json !== undefined)
     if (jsonConfigured) {
       lp.cfg.json = self.argv.configFile.parser.json
     }
@@ -376,8 +376,9 @@ LaCli.prototype.terminate = function (reason) {
       }
     }
   })
-  if (!/stdin/.test(reason))
+  if (!/stdin/.test(reason)) {
     setTimeout(process.exit, 10000)
+  }
 }
 
 LaCli.prototype.cli = function () {
@@ -389,6 +390,9 @@ LaCli.prototype.cli = function () {
 
 if (require.main === module) {
   var logagent = new LaCli()
+  if (logagent) {
+    consoleLogger.log('Logagent initialized')
+  }
 } else {
   module.exports = LaCli
 }

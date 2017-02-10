@@ -1,3 +1,4 @@
+/* global describe, it */
 var sqlFilter = require('../lib/plugins/output-filter/sql.js')
 // simulate logagent eventEmitter
 var eventEmitter = eventEmitter = new (require('events')).EventEmitter()
@@ -47,7 +48,9 @@ describe('Emits error for invalid SQL Statements', function () {
     var data = {size: size, path: '/'}
     eventEmitter.once('error', function (error) {
       // we expect the error
-      done()
+      if (error) {
+        done()
+      }
     })
     try {
       for (var i = 0; i < iterations; i++) {

@@ -50,7 +50,7 @@ function LaCli (options) {
   this.initState()
 }
 LaCli.prototype.initFilter = function (type, filterFunctions) {
-  consoleLogger.log('init plugins')
+  consoleLogger.log('init filter: ' + type)
   this[type] = []
   for (var i = 0; i < filterFunctions.length; i++) {
     try {
@@ -104,6 +104,7 @@ LaCli.prototype.loadPlugins = function (configFile) {
   if (configFile && configFile.input) {
     var inputSections = Object.keys(configFile.input)
     inputSections.forEach(function (key) {
+      consoleLogger.log('add ' + (configFile.input[key].module || key) + ' to plugin list')
       if (configFile.input[key].module) {
         plugins.push({
           module: moduleAlias[configFile.input[key].module] || configFile.input[key].module,
@@ -111,10 +112,10 @@ LaCli.prototype.loadPlugins = function (configFile) {
           globalConfig: configFile
         })
       }
-      if (configFile.input[key].module) {
+      /*if (configFile.input[key].module) {
         consoleLogger.log('add ' + configFile.input[key].module + ' to plugin list')
         plugins.push(moduleAlias[configFile.input[key].module] || configFile.input[key].module)
-      }
+      }*/
     })
   }
   // load input filters

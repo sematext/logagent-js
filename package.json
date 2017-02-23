@@ -1,6 +1,6 @@
 {
   "name": "@sematext/logagent",
-  "version": "2.0.55",
+  "version": "2.0.56",
   "description": "Smart log parser written in Node",
   "main": "lib/parser/parser.js",
   "bin": {
@@ -24,8 +24,10 @@
     "hook-install": "precommit install",
     "hook-remove": "precommit remove"
   },
-  "precommit" : {
-    "tasks" : ["npm run precommit"]
+  "precommit": {
+    "tasks": [
+      "npm run precommit"
+    ]
   },
   "repository": {
     "type": "git",

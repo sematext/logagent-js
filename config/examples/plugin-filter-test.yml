@@ -1,7 +1,7 @@
 input:
   tcp: 
     module: input-tcp
-    port: 45900
+    port: 45901
     bindAddress: 0.0.0.0
     sourceName: nginx
     returnResult: false

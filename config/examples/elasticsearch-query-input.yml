@@ -1,0 +1,38 @@
+input:
+  queryLogs: 
+    module: elasticsearchQuery
+    sourceName: esQuery
+    interval: 60
+    log: 'debug'
+    url: 'https://logsene-receiver.sematext.com'
+    query: 
+      size: 100
+      index: logstash-YYYY-MM-DD
+      body:
+        query:
+          bool:
+            must: 
+              - query_string:
+                  query: '*'
+            filter:
+              - range:
+                  '@timestamp':
+                    gte: now-1m/m
+                    lte: now/m
+          
+
+outputFilter:
+  - module: sql
+    config:
+      matchSource: !!js/regexp /esQuery/
+      sourceName: transformedLog
+      interval: 60
+      queries:
+        # use SQL to transform data, e.g. change field name
+        - SELECT message as MSG, severity as LOG_LEVEL FROM ? 
+
+output:
+  # print parsed logs in YAML format to stdout if supress is set false    
+  # use 'pretty' for pretty json and 'ldjson' for line delimited json (default)
+  stdout: yaml 
+    

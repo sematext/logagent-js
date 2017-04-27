@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 PLATFORM=$(uname)
 SERVICE_NAME=logagent
+INITD_SERVICE_FILE="/etc/init.d/logagent"
 LAUNCHCTL_SERVICE_FILE="/Library/LaunchDaemons/com.sematext.logagent.plist"
 SYSTEMD_SERVICE_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
 e=$'\e'
@@ -45,6 +46,76 @@ runCommand "systemctl start $SERVICE_NAME" 3
 sleep 1
 runCommand "systemctl status $SERVICE_NAME" 4
 runCommand "journalctl -n 10 -u $SERVICE_NAME" 5
+}
+
+function generate_initd() 
+{
+cat > /etc/init.d/logagent <<EOL
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          logagent
+# Required-Start:    \$local_fs \$network \$named \$time \$syslog
+# Required-Stop:     \$local_fs \$network \$named \$time \$syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Description:       logagent
+### END INIT INFO
+NAME=logagent
+PIDFILE=/var/run/\$NAME.pid
+DAEMON=$1
+DAEMON_OPTS="--config $SPM_AGENT_CONFIG_FILE"
+export PATH="\${PATH:+\$PATH:}/usr/sbin:/sbin"
+[ -f /etc/default/\$NAME ] && . /etc/default/\$NAME
+is_running() {
+    [ -f "\$PIDFILE" ] && ps \`cat \$PIDFILE\` > /dev/null 2>&1
+}
+start() {
+  if is_running; then
+    echo "Already started"
+  else
+    echo "Starting daemon: "\$NAME
+    start-stop-daemon --start -q --no-close -m --oknodo -b -p \$PIDFILE -x \$DAEMON -- \$DAEMON_OPTS >> /var/log/\$NAME.log 2>&1
+  fi
+}
+stop() {
+  if is_running; then
+    echo "Stopping daemon: \$NAME..."
+    start-stop-daemon --stop --quiet --oknodo -p \$PIDFILE --retry 3
+  else
+    echo "\$NAME is not running"
+  fi
+}
+case "\$1" in
+  start)
+        start
+  ;;
+  stop)
+        stop
+  ;;
+  restart)
+        echo  "Restarting daemon: "\$NAME
+        stop
+        start
+  ;;
+  status)
+    if is_running; then
+        echo "Running"
+    else
+        echo "Stopped"
+        exit 1
+    fi
+  ;;
+  *)
+  echo "Usage: "\$1" {start|stop|restart|status}"
+  exit 1
+esac
+exit 0
+EOL
+runCommand "chmod +x $INITD_SERVICE_FILE" 1
+runCommand "update-rc.d logagent defaults" 2
+runCommand "service logagent start" 3
+sleep 2
+runCommand "tail -n 10 /var/log/logagent.log" 4
 }
 
 function runCommand ()
@@ -146,16 +217,21 @@ echo "Create config file: $SPM_AGENT_CONFIG_FILE"
 		return
 	fi
 
-	if [[ `/sbin/init --version` =~ upstart ]]>/dev/null; then 
+	if [[ `/sbin/init --version` =~ upstart ]]>/dev/null  2>&1; then 
 		echo "Generate upstart script ${UPSTART_SERVICE_FILE}"
 		generate_upstart $1 $2 	$3
 		return
 	fi
-	if [[ `systemctl` =~ -\.mount ]]; then 
+	if [[ `systemctl` =~ -\.mount ]]>/dev/null  2>&1; then 
 		echo "Generate systemd script "
 		generate_systemd $1 $2 $3
 		return 
 	fi
+  if [[ `. /etc/os-release && echo $VERSION =~ wheezy` ]]; then
+    echo "Generate init.d script"
+    generate_initd $1 $2 $3
+    return
+  fi
 }
 command=$(which logagent)
 echo $command

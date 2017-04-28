@@ -2,7 +2,7 @@
 outputFilter:
   - module: sql
     config:
-      source: !!js/regexp /access.log|httpd/
+      matchSource: !!js/regexp /access.log|httpd/
       interval: 1
       queries:
         - # calculate average page size for different HTTP methods

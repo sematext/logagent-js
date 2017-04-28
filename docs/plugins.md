@@ -24,7 +24,7 @@ The architecture of logagent is modular and each input or output module is imple
 # Global options
 input:
   tcp: 
-    module: @sematext/logagent-tcp-input
+    module: input-tcp
     port: 45900
     bindAddress: 0.0.0.0
     sourceName: tcpTest

@@ -10,8 +10,13 @@ pages:
 - Log Parser and pattern definitions: parser.md
 - Plugins: 
   - Overview: plugins.md
+  - Input plugins: 
+    - TCP input: input-plugin-tcp.md
+    - Command input: input-plugin-command.md
+    - Elasticsearch query: input-plugin-elasticsearch-query.md
   - Output plugins: 
     - Elasticsearch: output-elasticsearch.md
+    - Slack webhook: output-plugin-slack.md
 - Filter: 
   - About filters: filters.md
   - Grep input filter: input-filter-grep.md

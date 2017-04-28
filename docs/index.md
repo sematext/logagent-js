@@ -32,6 +32,8 @@ This project contains a library and patterns for log parsing and cli tools and i
 - Syslog Server (UDP) listener - logagent-js can also act as a syslog server and receive Syslog messages via UDP. The parser is applied to the message field. 
 - [Heroku Log Drain](https://github.com/sematext/logagent-js#logagent-as-heroku-log-drain) makes it easy to ship Heroku logs to Elasticsearch or [Logsene](http://www.sematext.com/logsene/)
 - Cloud Foundry Log Drain
+- Results of periodically executed Elasticsearch queries
+- Output of periodically executed commands. 
 
 ## Processing
 - logagent-js applies patterns defined in patterns.yml to all logs and creates structured logs from plain-text log lines
@@ -45,6 +47,7 @@ Logagent doesn't lose data.  It stores parsed logs to a disk buffer if the netwo
 - bulk inserts to Elasticsearch and [Logsene](http://sematext.com/logsene) / Elasticsearch API
 - JSON, line delimited JSON and YAML to standard output 
 - UDP forwarding to rtail server for realtime log view 
+- Slack webhook fors notifications
 
 ## Deployment options
 - Deployable as a system service: systemd, upstart (Linux), or launchd (Mac OS X)

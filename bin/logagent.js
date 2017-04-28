@@ -25,12 +25,19 @@ var mkpath = require('mkpath')
 process.setMaxListeners(0)
 var co = require('co')
 var moduleAlias = {
+  // inputs
   command: '../lib/plugins/input/command.js',
-  sql: '../lib/plugins/output-filter/sql.js',
-  grep: '../lib/plugins/input-filter/grep.js',
   'input-tcp': '../lib/plugins/input/tcp.js',
-  elasticsearch: '../lib/plugins/output/elasticsearch.js'
+  'elasticsearch-query': '../lib/plugins/input/elasticsearchQuery.js',
+  // input filters
+  grep: '../lib/plugins/input-filter/grep.js',
+  // output filters
+  sql: '../lib/plugins/output-filter/sql.js',
+  // output plugins
+  elasticsearch: '../lib/plugins/output/elasticsearch.js',
+  'slack-webhook': '../lib/plugins/output/slack-webhook.js'
 }
+
 function LaCli (options) {
   this.eventEmitter = require('../lib/core/logEventEmitter.js')
   this.eventEmitter.on('error', function (err) {

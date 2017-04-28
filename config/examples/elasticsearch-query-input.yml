@@ -1,19 +1,20 @@
 input:
   queryLogs: 
-    module: elasticsearchQuery
-    sourceName: esQuery
+    module: elasticsearch-query
+    sourceName: errorQuery
+    # repeat query every N seconds
     interval: 60
-    log: 'debug'
-    url: 'https://logsene-receiver.sematext.com'
+    log: 'error'
+    url: https://logsene-receiver.sematext.com
     query: 
-      size: 100
-      index: logstash-YYYY-MM-DD
+      size: 50
+      index: cc5e9c1b-xxxx-xxxx-xxxx-2a0b2c01b912
       body:
         query:
           bool:
             must: 
               - query_string:
-                  query: '*'
+                  query: 'status:>399'
             filter:
               - range:
                   '@timestamp':
@@ -24,15 +25,45 @@ input:
 outputFilter:
   - module: sql
     config:
-      matchSource: !!js/regexp /esQuery/
+      matchSource: !!js/regexp /errorQuery/
       sourceName: transformedLog
-      interval: 60
+      interval: 1
       queries:
         # use SQL to transform data, e.g. change field name
-        - SELECT message as MSG, severity as LOG_LEVEL FROM ? 
+        - SELECT distinct count(*) as error_count, status, 'Apache Logs' as logSource 
+          FROM ? group by status 
+
 
 output:
-  # print parsed logs in YAML format to stdout if supress is set false    
-  # use 'pretty' for pretty json and 'ldjson' for line delimited json (default)
   stdout: yaml 
+  slack:
+    debug: false
+    module: slack-webhook
+    url: https://hooks.slack.com/services/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
+    matchSource: !!js/regexp /.*/
+    # filter function to decide about notification via slack 
+    filter: !!js/function > 
+      function (context, data, config) {
+        if (data.status > 399 && data.error_count > config.minErrors) {
+          return true
+        } else {
+          return false
+        }
+      }
+    # custom property for filter function below
+    minErrors: 3
+    # yaml, ld-json, json or template
+    format: template
+    # Text template for slack message
+    # all parsed fields can be used
+    template: ':st: <@stefan|stefan> {logSource}: {error_count} http errors "{status}"'
+    payload:
+      username: sematext
+      channel: '#test'
+      text: Message from Logagent
+      icon_emoji: ':st:'
+      attachments: 
+        - title: Alert
+          color: danger
+
     

@@ -47,7 +47,7 @@ Logagent doesn't lose data.  It stores parsed logs to a disk buffer if the netwo
 - bulk inserts to Elasticsearch and [Logsene](http://sematext.com/logsene) / Elasticsearch API
 - JSON, line delimited JSON and YAML to standard output 
 - UDP forwarding to rtail server for realtime log view 
-- Slack webhook fors notifications
+- Slack webhook for notifications
 
 ## Deployment options
 - Deployable as a system service: systemd, upstart (Linux), or launchd (Mac OS X)

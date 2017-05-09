@@ -16,6 +16,14 @@
 # the original line might include sensitive data!
 originalLine: false
 
+# default seperator for multiline logs, 
+# which don't have a blockStart property
+# The default /^\S{2,}/ would match typical stack traces
+# All lines that start with a whitespace  or contain only one char 
+# would be attached to previous lines
+multiline:
+  defaultSeparator:  ^\S{2,}
+
 # Please note when geoIP: true
 # There will be a slight delay during first start of logagent while maxmind
 # database is downloaded. Logagent downloads the MaxMind database every 24hrs or 

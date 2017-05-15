@@ -50,7 +50,7 @@ output:
           return false
         }
       }
-    # custom property for filter function below
+    # custom property for filter function above
     minErrors: 3
     # yaml, ld-json, json or template
     format: template

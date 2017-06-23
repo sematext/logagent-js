@@ -1,0 +1,11 @@
+# Global options
+options:
+  # Enable/disable GeoIP lookups
+  # Startup of logagent might be slower, when downloading the GeoIP database
+  geoipEnabled: true
+
+outputFilter:
+  - module: access-watch
+
+output:
+  stdout: pretty

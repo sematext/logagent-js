@@ -9,6 +9,29 @@ COLORblue="$e[0;36m"
 COLORred="$e[0;31m"
 COLORreset="$e[0m"
 #nodeExecutable=`$(which node)||$(which nodejs)`
+PATTERN="'/var/log/**/*.log'"
+TOKEN=$1
+while getopts ":i:u:g:" opt; do
+  case $opt in
+    u)
+      export LOGSENE_RECEIVER_URL=$OPTARG
+      #shift $((OPTIND-1))
+      ;;
+    i)
+      export TOKEN=$OPTARG
+      ;;
+    g)
+      export PATTERN="$OPTARG"
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      ;;
+  esac
+done
+
+export LOGSENE_RECEIVER_URL=${LOGSENE_RECEIVER_URL:-https://logsene-receiver.sematext.com}
+echo Set Logsene receiver url: $LOGSENE_RECEIVER_URL
+
 
 function generate_upstart()
 {
@@ -130,6 +153,10 @@ function generate_la_cfg()
 if [ -f $SPM_AGENT_CONFIG_FILE ]; then  
   mv  $SPM_AGENT_CONFIG_FILE "${SPM_AGENT_CONFIG_FILE}.bak"
 fi
+if [ -f $3 ]; then  
+  mv  $SPM_AGENT_CONFIG_FILE "${SPM_AGENT_CONFIG_FILE}.bak"
+fi
+
 echo -e \
 "
 # Global options
@@ -148,14 +175,14 @@ options:
 input:
   # a list of glob patterns to watch files to tail
   files:
-    - $2
+    - $PATTERN
 
 output:
   # index logs in Elasticsearch or Logsene
   elasticsearch: 
-    # url: https://logsene-receiver.sematext.com
+    url: $LOGSENE_RECEIVER_URL
     # default index (Logsene token) to use:
-    index: $1
+    index: $TOKEN
 " > $SPM_AGENT_CONFIG_FILE
 }
 
@@ -202,14 +229,13 @@ function install_script ()
 {
 	export SPM_AGENT_CONFIG_FILE="/etc/sematext/logagent.conf"
 	mkdir -p /etc/sematext
+  generate_la_cfg $2 $3
+  # echo "-s --logsene-tmp-dir /tmp -t $2 -g $3" > $SPM_AGENT_CONFIG_FILE
+  runCommand "chown root $SPM_AGENT_CONFIG_FILE"
+  runCommand "chmod 0600 $SPM_AGENT_CONFIG_FILE"
 
-generate_la_cfg $2 $3
-# echo "-s --logsene-tmp-dir /tmp -t $2 -g $3" > $SPM_AGENT_CONFIG_FILE
-runCommand "chown root $SPM_AGENT_CONFIG_FILE"
-runCommand "chmod 0600 $SPM_AGENT_CONFIG_FILE"
-
-echo "Create config file: $SPM_AGENT_CONFIG_FILE"
-# cat $SPM_AGENT_CONFIG_FILE
+  echo "Create config file: $SPM_AGENT_CONFIG_FILE"
+  cat $SPM_AGENT_CONFIG_FILE
 
 	if [[ $PLATFORM = "Darwin" ]]; then
 		echo "Generate launchd script ${LAUNCHCTL_SERVICE_FILE}"
@@ -235,19 +261,15 @@ echo "Create config file: $SPM_AGENT_CONFIG_FILE"
 }
 command=$(which logagent)
 echo $command
-if [ -n "$1" ] ; then
-  token=$1
-  if [ -n "$2" ] ; then
-    pattern="'$2'"
-  else
-    pattern="'/var/log/**/*.log'"
-  fi
-  install_script $command $token "${pattern}";
+if [ -n "$TOKEN" ] ; then
+  install_script $command $TOKEN "${PATTERN}";
 else 
 	echo "${COLORred}Missing paramaters. Usage:"
-	echo `basename $0` "LOGSENE_TOKEN filepattern (/var/log/**/*.log)"
-	echo "Please obtain your application token from https://apps.sematext.com/$COLORreset"
-	read -p "${COLORblue}Logsene Token: $COLORreset" token
-	token=${token:-none}
-    install_script $command $token '/var/log/**/*.log';
+	echo `basename $0` "-i LOGSENE_TOKEN -g '/var/log/**/*.log' -u https://logsene-receiver.sematext.com"
+	echo "Please obtain your application token for US region from https://apps.sematext.com/"
+  echo "Please obtain your application token for EU region from https://apps.eu.sematext.com/"
+  echo "For EU region use -u https://logsene-receiver.eu.sematext.com/$COLORreset"
+	read -p "${COLORblue}Logsene Token: $COLORreset" TOKEN
+	TOKEN=${TOKEN:-none}
+  install_script $command $TOKEN $PATTERN;
 fi 

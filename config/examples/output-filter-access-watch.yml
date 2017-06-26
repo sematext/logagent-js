@@ -10,4 +10,4 @@ outputFilter:
       apiKey: c8dc2cbd26df71dbe92cb4048bd28f84
 
 output:
-  stdout: pretty
+  stdout: yaml

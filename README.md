@@ -37,8 +37,9 @@ Install service for Logagent using systemd, upstart, launchd
 To quickly create a config file for indexing into Elasticsearch without having to edit it run something like this:
 
 ```
-sudo logagent-setup http://localhost:9200/INDEX_NAME ‘/var/log/**/*.log’
-Logsene users - use https://logsene-receiver.sematext.com/LOGSENE_APP_TOKEN.
+sudo logagent-setup -u http://localhost:9200 -i INDEX_NAME -g '/var/log/**/*.log'
+Logseneusers - use https://logsene-receiver.eu.sematext.com and your Logsene App Token as index name.
+
 ```
 
 **Configuration**

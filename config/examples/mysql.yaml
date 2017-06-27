@@ -8,7 +8,7 @@ input:
       database: 'test'
     sql: 'SELECT * FROM potluck'
     sourceName: MYSQL
-    interval: 0.0000001
+    interval: 1
 
 output:
     stdout: yaml

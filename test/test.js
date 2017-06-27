@@ -61,7 +61,7 @@ describe('Logagent parse web server Log', function () {
           if (data.ts) {
             return done(new Error('parserd obj includes temp. ts field'))
           }
-          if (data.message === 'GET /about/ HTTP/1.1' && data.client_ip === '91.67.80.14' && data.geoip && data.status_code === 200 && data['@timestamp']) {
+          if (data.message === 'GET /about/' && data.client_ip === '91.67.80.14' && data.geoip && data.status_code === 200 && data['@timestamp']) {
             done()
           } else {
             done(new Error('message is wrong: ' + JSON.stringify(data)))

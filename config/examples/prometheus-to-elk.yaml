@@ -1,0 +1,67 @@
+input:
+  docker-prometheus: 
+    module: command
+    command: curl http://127.0.0.1:9323/metrics
+    sourceName: prometheus_metrics
+    debug: false
+    restart: 10
+
+parser:
+  patternFiles: []
+  patterns:
+    - # prometheus
+      sourceName: !!js/regexp /prometheus_metrics/
+      match:
+        - type: prometheus_metrics
+          regex: !!js/regexp /\sHELP|\sTYPE\s/i
+          inputDrop: !!js/regexp /#\sHELP|#\sTYPE\s/i
+        - type: prometheus_metrics
+          regex: !!js/regexp /(\S+)({.+?})\s([\d|\.]+)/i
+          fields: 
+            - name
+            - labels
+            - value
+          transform: !!js/function > 
+            function (p) {
+              try {
+                if (p.name) {
+                  p.name_space=p.name.split('_')[0]
+                }
+                if (p.labels) {
+                  // hack, make JS code out of key/value format to parse properties
+                  p.labels = eval ('x=' + p.labels.replace(/=/g,':'))
+                  var l = Object.keys(p.labels)
+                  // convert prometheus numbers in quotes to JS numbers
+                  for (var i=0; i<l.length; i++) {
+                    var n = Number()
+                    if (!isNaN(p.labels[l[i]])) {
+                      p.labels[l[i]] = Number(p.labels[l[i]])
+                    }
+                  } 
+                }
+              } catch (err) {
+                console.log(err)
+              } 
+              p[p.name]=p.value
+              return p
+            }
+        - type: prometheus_metrics
+          regex: !!js/regexp /(\S+)\s([\d|\.]+)/i
+          fields: 
+            - name
+            - value
+          transform: !!js/function > 
+            function (p) {
+                if (p.name) {
+                  p.name_space = p.name.split('_')[0]
+                }
+                p[p.name]=p.value
+            }
+
+  
+output:
+  stdout: yaml
+  logsene:
+    module: elasticsearch
+    url: https://localhost:9200
+    index: prom_stats

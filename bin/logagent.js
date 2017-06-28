@@ -29,6 +29,7 @@ var moduleAlias = {
   command: '../lib/plugins/input/command.js',
   'mysql-query': '../lib/plugins/input/mysql.js',
   'input-tcp': '../lib/plugins/input/tcp.js',
+  'input-kafka': '../lib/plugins/input/kafka.js',
   'elasticsearch-query': '../lib/plugins/input/elasticsearchQuery.js',
   // input filters
   grep: '../lib/plugins/input-filter/grep.js',

@@ -87,4 +87,7 @@ Start/stop service:
 - Forum: [https://groups.google.com/forum/#!forum/logagent](https://groups.google.com/forum/#!forum/logagent)
 
 
-
+# Develop
+- Update to the last node version
+- from root folder node type  node ./bin/logagent -h
+- for test from root folder type  node test

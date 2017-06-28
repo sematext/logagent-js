@@ -6,9 +6,10 @@ input:
       user: 'root'
       password: ''
       database: 'test'
-    sql: 'SELECT * FROM potluck'
+    sql: SELECT * FROM potluck where signup_date < '$queryTime'
     sourceName: MYSQL
     interval: 1
+    debug: true
 
 output:
     stdout: yaml

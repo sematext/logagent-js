@@ -15,7 +15,6 @@
 # set originalLine to false when auothash fields
 # the original line might include sensitive data!
 originalLine: false
-
 # default seperator for multiline logs, 
 # which don't have a blockStart property
 # The default /^\S{2,}/ would match typical stack traces
@@ -33,6 +32,7 @@ geoIP: true
 # The database is stored in a temporary directory
 # The path could be modified via env. variable MAXMIND_DB_DIR
 maxmindDbDir: /tmp/
+
 debug: false
 
 # post process all JSON input
@@ -258,8 +258,19 @@ patterns:
   sourceName: !!js/regexp /httpd|access_log|apache2|nginx/
   match: 
     - type: access_log_combined
-      regex: !!js/regexp /^([0-9a-f.:]+)\s(-|\S+)\s(-|\S+)\s\[(.*)\]\s\"(\w+)\s(.*)\" ([0-9|\-]+) ([0-9|\-]+) \"([^\"]+)\" \"([^\"]+)\"/i
-      fields: [client_ip,remote_id,user,'ts',method,path,status_code,size,referer,user_agent]
+      regex: !!js/regexp /^([0-9a-f.:]+)\s(-|\S+)\s(-|\S+)\s\[(.*)\]\s\"(\w+)\s(\S+)\s{0,1}(.*)\" ([0-9|\-]+) ([0-9|\-]+) \"([^\"]+)\" \"([^\"]+)\"/i
+      fields: 
+        - client_ip:string
+        - remote_id:string
+        - user:string
+        - ts
+        - method:string
+        - path:string
+        - protocol:string
+        - status_code:number
+        - size:number
+        - referer:string
+        - user_agent:string
       geoIP: client_ip
       dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
       transform: !!js/function >

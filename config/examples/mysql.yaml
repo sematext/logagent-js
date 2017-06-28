@@ -1,0 +1,14 @@
+input:
+  mysql-json:
+    module: mysql-query
+    server: 
+      host: 'localhost'
+      user: 'root'
+      password: ''
+      database: 'test'
+    sql: 'SELECT * FROM potluck'
+    sourceName: MYSQL
+    interval: 1
+
+output:
+    stdout: yaml

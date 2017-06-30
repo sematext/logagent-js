@@ -7,7 +7,7 @@ input:
     brokerAddress: localhost
     offset_directory: /tmp/kafka-offsets
     brokerPort: 9092
-    topic: test4
+    topic: test
     debug: true
 
 output:

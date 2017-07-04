@@ -1,9 +1,9 @@
 input:
-  postgres:
-    module: postgres-query
+  postgresql:
+    module: postgresql-query
     server: 
       user: 'postgres'
-      database: 'testdatenbank'
+      database: 'test'
       password: '$Demo123'
       host: 'localhost'
       port: '5432'

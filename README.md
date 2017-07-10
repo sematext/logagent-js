@@ -42,8 +42,8 @@ To quickly create a config file for indexing into Elasticsearch without having t
 
 ```
 sudo logagent-setup -u http://localhost:9200 -i INDEX_NAME -g '/var/log/**/*.log'
-Logseneusers - use https://logsene-receiver.eu.sematext.com and your Logsene App Token as index name.
-
+# Logsene US: use -u https://logsene-receiver.sematext.com and your Logsene App Token as index name.
+# Logsene EU: use -u https://logsene-receiver.eu.sematext.com and your Logsene App Token as index name.
 ```
 
 **Configuration**

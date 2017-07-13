@@ -1,0 +1,24 @@
+input:
+  mssql:
+    module: mssql-query
+    connectioninfo: 
+      server: localhost
+      port: 1433
+      userName: Testuser
+      password: Testpassword
+      database: testdatabase
+      options: 
+        database: testdatabase
+        #encrypt: true
+        #rowCollectionOnDone: true
+        rowCollectionOnRequestCompletion: true
+    queryTimezone: America/Los_Angeles 
+    queryTimeFormat: YYYY-MM-DD HH:mm:ss
+    queries: 
+      - sourceName: query1
+        sql:  SELECT * FROM employees
+    interval: 1
+    debug: true
+
+output:
+    stdout: yaml

@@ -52,7 +52,7 @@
   "author": "Stefan Thies <stefan.thies@sematext.com> (https://github.com/megastef) ",
   "license": "Apache-2.0",
   "optionalDependencies": {
-    "node-windows": "^0.1.12"
+    "kafka-native": "^1.0.0"
   },
   "//": "!!! bithound claims maxmind-geolite-mirror is not used, it is! Don't remove ...",
   "dependencies": {
@@ -67,7 +67,6 @@
     "flatstr": "^1.0.4",
     "glob": "^7.1.1",
     "js-yaml": "^3.8.1",
-    "kafka-native": "^1.0.0",
     "logsene-js": "^1.1.48",
     "maxmind": "^2.1.0",
     "maxmind-geolite-mirror": "^1.0.7",

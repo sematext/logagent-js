@@ -51,9 +51,6 @@
   "homepage": "https://www.sematext.com",
   "author": "Stefan Thies <stefan.thies@sematext.com> (https://github.com/megastef) ",
   "license": "Apache-2.0",
-  "optionalDependencies": {
-    "kafka-native": "^1.0.0"
-  },
   "//": "!!! bithound claims maxmind-geolite-mirror is not used, it is! Don't remove ...",
   "dependencies": {
     "alasql": "^0.3.6",
@@ -86,6 +83,9 @@
     "tail-forever": "^0.3.15",
     "throng": "^4.0.0",
     "try-call": "0.0.2"
+  },
+   "optionalDependencies": {
+    "kafka-native": "^1.0.0"
   },
   "devDependencies": {
     "mocha": "^3.2.0",

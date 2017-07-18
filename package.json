@@ -1,6 +1,6 @@
 {
   "name": "@sematext/logagent",
-  "version": "2.0.70",
+  "version": "2.0.72",
   "description": "Smart log parser written in Node",
   "main": "lib/parser/parser.js",
   "bin": {
@@ -51,9 +51,6 @@
   "homepage": "https://www.sematext.com",
   "author": "Stefan Thies <stefan.thies@sematext.com> (https://github.com/megastef) ",
   "license": "Apache-2.0",
-  "optionalDependencies": {
-    "node-windows": "^0.1.12"
-  },
   "//": "!!! bithound claims maxmind-geolite-mirror is not used, it is! Don't remove ...",
   "dependencies": {
     "alasql": "^0.3.6",
@@ -67,13 +64,15 @@
     "flatstr": "^1.0.4",
     "glob": "^7.1.1",
     "js-yaml": "^3.8.1",
-    "logsene-js": "^1.1.45",
+    "logsene-js": "^1.1.48",
     "maxmind": "^2.1.0",
     "maxmind-geolite-mirror": "^1.0.7",
     "merge": "^1.2.0",
     "mkpath": "^1.0.0",
     "moment": "^2.17.1",
+    "moment-timezone": "^0.5.13",
     "mysql": "^2.13.0",
+    "pg": "^6.4.0",
     "prettyjson": "^1.2.1",
     "rtail": "^0.2.1",
     "split2": "^2.1.1",
@@ -82,8 +81,12 @@
     "string-template": "^1.0.0",
     "syslogd": "^1.1.2",
     "tail-forever": "^0.3.15",
+    "tedious": "^2.0.0",
     "throng": "^4.0.0",
     "try-call": "0.0.2"
+  },
+   "optionalDependencies": {
+    "kafka-native": "^1.0.0"
   },
   "devDependencies": {
     "mocha": "^3.2.0",

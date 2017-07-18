@@ -5,6 +5,9 @@ options:
 input:
   heroku: 
    port: 9999
+   worker: 4
+   blacklist:
+      714c995e-xxxx-xxxx-xxxx-f07a553048fd: true
 
 # we use here inline patterns, loaded after patterns.yml 
 parser:

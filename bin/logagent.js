@@ -40,7 +40,8 @@ var moduleAlias = {
   sql: '../lib/plugins/output-filter/sql.js',
   // output plugins
   elasticsearch: '../lib/plugins/output/elasticsearch.js',
-  'slack-webhook': '../lib/plugins/output/slack-webhook.js'
+  'slack-webhook': '../lib/plugins/output/slack-webhook.js',
+  'output-kafka' : '../lib/plugins/output/kafka.js'
 }
 
 function LaCli (options) {

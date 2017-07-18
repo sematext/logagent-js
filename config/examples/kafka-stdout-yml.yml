@@ -4,11 +4,12 @@ options:
 input:
   kafka: 
     module: input-kafka
-    brokerAddress: localhost
-    offset_directory: /tmp/kafka-offsets
-    brokerPort: 9092
+    kafkaHost: localhost:9092
+    groupId: ExampleTestGroup
     topic: test
-    debug: true
+    ssl: false
+    sessionTimeout: 15000
+    
 
 output:
   # print parsed logs in YAML format to stdout if supress is set false    

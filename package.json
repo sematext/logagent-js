@@ -85,8 +85,9 @@
     "throng": "^4.0.0",
     "try-call": "0.0.2"
   },
-   "optionalDependencies": {
-    "kafka-native": "^1.0.0"
+  "optionalDependencies": {
+    "kafka-node": "^1.6.2",
+    "kafka-streams": "^2.1.0"
   },
   "devDependencies": {
     "mocha": "^3.2.0",

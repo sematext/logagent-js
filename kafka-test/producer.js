@@ -1,25 +1,37 @@
-var kafka_native = require('kafka-native');
-
-var broker = 'localhost:9092';
+var kafka = require('kafka-node');
+var Producer = kafka.Producer;
+var KeyedMessage = kafka.KeyedMessage;
+var Client = kafka.Client;
+var clientId = 'kafka-node-client-' + 44;
+var client = new Client('localhost',clientId,undefined, undefined, false);
 var topic = 'test';
+var p = 0;
+var a = 0;
+var producer = new Producer(client, { requireAcks: 1 });
 
-function produceMessage() {
-    var producer = new kafka_native.Producer({
-        broker: broker
+producer.on('ready', function () {
+  
+  
+  for(var i = 0 ; i < 10 ; i++) {
+    var message = 'a message : ' + i ;
+    console.log('send message ' + message)
+    producer.send([
+      { topic: topic, messages: message}
+    ], function (err, result) {
+      if(err){
+        console.log('errore' + err)
+      }
+      
+      console.log(err || result);
+      process.exit();
     });
+  }
+});
 
-    producer.partition_count(topic)
-    .then(function(npartitions) {
-        var partition = 0;
-        setInterval(function() {
-            for(var i = 0; i < 100; ++i){
-                message = 'messageProduced-' + i 
-                console.log('producer send message ' + message + ' to partition' + partition); 
-                producer.send(topic, partition, [message]);
-                partition = (partition + 1) % npartitions;
-            }
-        }, 1000);
-    });
-}
+producer.on('error', function (err) {
+  console.log("Errore ci passa");
+});
 
-produceMessage();
+producer.close(function (err) {
+  console.log('error', err);
+});

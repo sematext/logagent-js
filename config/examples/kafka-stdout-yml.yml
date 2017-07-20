@@ -7,7 +7,7 @@ input:
     kafkaHost: localhost:9092
     groupId: ExampleTestGroup
     topic: test
-    ssl: false
+    sslEnable: true
     sessionTimeout: 15000
     
 

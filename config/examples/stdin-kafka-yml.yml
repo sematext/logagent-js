@@ -15,4 +15,9 @@ output:
    # 1 = Leader ack required
    # -1 All in sync replicas ack required
    requireAcks: 1
+   sslEnable: true
+   sslOptions: 
+      - rejectUnauthorized: true
+     
+
   

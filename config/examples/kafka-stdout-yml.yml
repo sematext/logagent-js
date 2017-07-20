@@ -4,11 +4,15 @@ options:
 input:
   kafka: 
     module: input-kafka
-    kafkaHost: localhost:9092
+    kafkaHost: localhost
     groupId: ExampleTestGroup
     topic: test
-    sslEnable: true
+    autoCommit: true
     sessionTimeout: 15000
+    sslEnable: false
+    #For init sslOptions please refer to to https://nodejs.org/api/tls.html
+    sslOptions: 
+      - rejectUnauthorized: false
     
 
 output:

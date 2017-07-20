@@ -1,3 +1,5 @@
+'use strict'
+
 var kafka = require('kafka-node')
 var uuid = require('uuid')
 var Producer = kafka.Producer

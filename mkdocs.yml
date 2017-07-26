@@ -14,6 +14,9 @@ pages:
     - TCP input: input-plugin-tcp.md
     - Command input: input-plugin-command.md
     - Elasticsearch query: input-plugin-elasticsearch-query.md
+    - MYSQL input: input-plugin-mysql.md
+    - MSSQL input: input-plugin-mssql.md
+    - Postgresql input: input-plugin-postgresql.md
   - Output plugins: 
     - Elasticsearch: output-elasticsearch.md
     - Slack webhook: output-plugin-slack.md

@@ -7,7 +7,11 @@ options:
 outputFilter:
   - module: access-watch
     config:
-      apiKey: c8dc2cbd26df71dbe92cb4048bd28f84
+      # Get a free Reveal API Key from Access Watch:
+      # https://access.watch/reveal
+      # Basic configuration instructions for Logagent:
+      # https://access.watch/reveal/logagent
+      # apiKey: YOUR_REVEAL_API_KEY_HERE
 
 output:
   stdout: yaml

@@ -9,9 +9,24 @@ outputFilter:
     config:
       # Get a free Reveal API Key from Access Watch:
       # https://access.watch/reveal
+      apiKey: YOUR_REVEAL_API_KEY_HERE
+
       # Basic configuration instructions for Logagent:
       # https://access.watch/reveal/logagent
-      # apiKey: YOUR_REVEAL_API_KEY_HERE
+
+      # Match Types configuration
+      matchTypes:
+        - access_common
+        - access_log_combined
+
+      # Source configuration
+      addressSource: client_ip
+      userAgentSource: user_agent
+
+      # Destination configuration
+      identityDestination: identity
+      reputationDestination: reputation
+      robotDestination: robot
 
 output:
   stdout: yaml

@@ -38,6 +38,7 @@ var moduleAlias = {
   grep: '../lib/plugins/input-filter/grep.js',
   // output filters
   sql: '../lib/plugins/output-filter/sql.js',
+  'access-watch': '../lib/plugins/output-filter/access-watch.js',
   // output plugins
   elasticsearch: '../lib/plugins/output/elasticsearch.js',
   'slack-webhook': '../lib/plugins/output/slack-webhook.js',

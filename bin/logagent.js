@@ -1,5 +1,5 @@
 #! /bin/sh
-':' // ; export MAX_MEM="--max-old-space-size=150"; exec "$(command -v node || command -v nodejs)" --harmony "${NODE_OPTIONS:-$MAX_MEM}" "$0" "$@"
+':' // ; export MAX_MEM="--max-old-space-size=200"; exec "$(command -v node || command -v nodejs)" --harmony "${NODE_OPTIONS:-$MAX_MEM}" "$0" "$@"
 'use strict'
 /*
  * See the NOTICE.txt file distributed with this work for additional information
@@ -42,7 +42,7 @@ var moduleAlias = {
   // output plugins
   elasticsearch: '../lib/plugins/output/elasticsearch.js',
   'slack-webhook': '../lib/plugins/output/slack-webhook.js',
-  'output-kafka' : '../lib/plugins/output/kafka.js'
+  'output-kafka': '../lib/plugins/output/kafka.js'
 }
 
 function LaCli (options) {

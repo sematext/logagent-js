@@ -83,7 +83,7 @@ Start/stop service:
 # Documentation
 
 ## Community, More Info & Support
-- [Full documentation is available here](http://sematext.com/docs/Logs/logagent/)
+- [Full documentation is available here](http://sematext.com/docs/Logagent/)
 - [Logagent main page](https://sematext.com/logagent)
 - [Logagent on Github](https://github.com/sematext/logagent-js)
 - Twitter: [@sematext](https://twitter.com/sematext)

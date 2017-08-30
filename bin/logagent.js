@@ -18,6 +18,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+process.on('unhandledRejection', error => {
+  console.error('unhandledRejection', error.stack)
+})
 var consoleLogger = require('../lib/util/logger.js')
 var StatsPrinter = require('../lib/core/printStats.js')
 var LogAnalyzer = require('../lib/parser/parser.js')

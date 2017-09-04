@@ -24,7 +24,7 @@ Install Logagent with npm
 sudo npm i -g @sematext/logagent
 ```
 
-** 2) run logagent command line tool** 
+**2) run logagent command line tool** 
 
 ```
 logagent --help
@@ -83,7 +83,7 @@ Start/stop service:
 # Documentation
 
 ## Community, More Info & Support
-- [Full documentation is available here](http://sematext.com/docs/Logagent/)
+- [Full documentation](http://sematext.com/docs/logagent/)
 - [Logagent main page](https://sematext.com/logagent)
 - [Logagent on Github](https://github.com/sematext/logagent-js)
 - Twitter: [@sematext](https://twitter.com/sematext)

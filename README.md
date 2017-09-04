@@ -1,7 +1,7 @@
 [![bitHound Overall Score](https://www.bithound.io/github/sematext/logagent-js/badges/score.svg)](https://www.bithound.io/github/sematext/logagent-js)
 [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/sematext/logagent-js) - [read more](http://blog.sematext.com/2016/02/18/how-to-ship-heroku-logs-to-logsene-managed-elk-stack/)
 
-[![MY Build Status](https://travis-ci.org/fbalicchia/logagent-js.svg?branch=kafka-input-support)](https://travis-ci.org/fbalicchia/logagent-js.git)
+[![Build Status](https://api.travis-ci.org/sematext/logagent-js.svg?branch=master)]
 
 # What is Logagent
 

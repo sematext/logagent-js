@@ -15,8 +15,6 @@ Logagent is a modern, open-source, light-weight log shipper. It is like Filebeat
 
 Official Node.js [downloads and instructions](https://nodejs.org/en/download/). E.g. for Debian/Ubuntu:
 
-My travis https://travis-ci.org/fbalicchia/logagent-js
-
 ```	
 curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 sudo apt-get install -y nodejs

@@ -79,9 +79,7 @@ Start/stop service:
 - Launchd: ```launchctl start/stop com.sematext.logagent```
 
 
-# Documentation
-
-## Community, More Info & Support
+# Documentation & Support
 - [Full documentation](http://sematext.com/docs/logagent/)
 - [Logagent main page](https://sematext.com/logagent)
 - [Logagent on Github](https://github.com/sematext/logagent-js)
@@ -90,7 +88,7 @@ Start/stop service:
 - Blog: [sematext.com/blog](https://sematext.com/blog)
 
 
-# Develop
+# Development
 - Update to the last node version
 - From root folder node type: node ./bin/logagent -h
 - To test from root folder type: node test

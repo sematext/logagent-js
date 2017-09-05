@@ -127,6 +127,7 @@ var safeStringify = require('fast-safe-stringify')
 function OutputStdout (config, eventEmitter) {
   this.config = config
   this.eventEmitter = eventEmitter
+  this.eventHandler = this.eventHandler.bind(this);
 }
 
 OutputStdout.prototype.eventHandler = function (data, context) {
@@ -143,7 +144,7 @@ OutputStdout.prototype.eventHandler = function (data, context) {
 }
 
 OutputStdout.prototype.start = function () {
-  this.eventEmitter.on('data.parsed', this.eventHandler.bind(this))
+  this.eventEmitter.on('data.parsed', this.eventHandler)
 }
 
 OutputStdout.prototype.stop = function (cb) {

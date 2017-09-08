@@ -7,7 +7,7 @@ options:
   # Enable/disable GeoIP lookups
   # Startup of logagent might be slower, when downloading the GeoIP database
   geoipEnabled: false
-  # Directory to store Logagent status nad temporary files
+  # Directory to store Logagent status and temporary files
   diskBufferDir: ./tmp
 
 input:
@@ -17,10 +17,10 @@ input:
   # listen to udp syslog protocol  
   syslog: 
     port: 1514
-  # listen to http to receive data from Heroku  log drains  
+  # Receive data from Heroku log drains via http
   #heroku: 
   #  port: 9999
-  # listen to http to receive data from Cloud Foundry drains  
+  # Receive data from Cloud Foundry log drains via http  
   #cloudFoundry:
   #  port: 8888
 
@@ -32,8 +32,7 @@ parser:
     # later files overwrite settings from previous files
     #- patterns1.yml
     #- patterns2.yml
-  # inline pattern definitions, to put on top of patterns list
-  # loaded from files or default librarary  
+  # Inline pattern definitions are merged with default pattern list and can overwrite existing definitions
   patterns:
     - # timestamped messages from /var/log/*.log on Mac OS X
       sourceName: !!js/regexp /\system\.log/ # catch all system.log files  
@@ -56,7 +55,7 @@ output:
     # but it can be modified by JS transforms functions in the patterns.yml file
     indices: 
       4f70a0c7-9458-43e2-bbc5-xxxx: 
-      # list of RegEx mathich logSource / filename  
+      # list of RegEx matching logSource (e.g. file name, container image, container name, ...)  
       # all logs from this source will be indexed to above index
         - .*wifi.*
         - .*bluetooth.*
@@ -64,14 +63,14 @@ output:
         - system\.log
         - access\.log
         - auth\.log
-  # print parsed logs in YAML format to stdout if supress is set false    
+  # print parsed logs in YAML format to stdout    
   stdout: yaml # use 'pretty' for pretty json and 'ldjson' for line delimited json (default)
-  # forward logs to rtail realtime log viewer
+  # forward logs to rtail real-time log viewer
   #rtail:
     # rtail host to send logs to
     # host: localhost
     # rtails port to send logs to 
     # udpPort: 3434
-    # start rtail Server with given http port and bind to hostname
+    # start rtail-server with given http port and bind to hostname
     #webPort: 8080
     #webHost: localhost

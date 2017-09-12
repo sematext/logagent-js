@@ -63,6 +63,7 @@
     "flat": "^2.0.1",
     "flatstr": "^1.0.4",
     "glob": "^7.1.1",
+    "i": "^0.3.5",
     "js-yaml": "^3.8.1",
     "logsene-js": "^1.1.48",
     "lru-cache": "^4.1.1",
@@ -70,10 +71,12 @@
     "maxmind-geolite-mirror": "^1.0.7",
     "md5": "^2.2.1",
     "merge": "^1.2.0",
+    "minimatch": "^3.0.4",
     "mkpath": "^1.0.0",
     "moment": "^2.17.1",
     "moment-timezone": "^0.5.13",
     "mysql": "^2.13.0",
+    "npm": "^5.4.1",
     "pg": "^6.4.0",
     "prettyjson": "^1.2.1",
     "rtail": "^0.2.1",
@@ -86,10 +89,6 @@
     "tedious": "^2.0.0",
     "throng": "^4.0.0",
     "try-call": "0.0.2"
-  },
-  "optionalDependencies": {
-    "kafka-node": "^1.6.2",
-    "kafka-streams": "^2.1.0"
   },
   "devDependencies": {
     "mocha": "^3.2.0",

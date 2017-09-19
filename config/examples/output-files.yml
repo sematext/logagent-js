@@ -1,5 +1,5 @@
 input: 
-	stdin: true 
+  stdin: true 
 
 # example parser, extracting country name to route file output to country files named {country}.json
 parser:

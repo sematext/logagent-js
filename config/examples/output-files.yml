@@ -16,16 +16,16 @@ parser:
 
 output:
   files:
-  		module: output-files
-      fileName: '/tmp/{country}.json'
-      # available format values: 'ldjson' (default), 'yaml', 'pretty' (pretty JSON)
-      format: ldjson
-      # matches context.sourceName == data.logSource
-      sourceName: .*
-      # matches data._type field 
-      typeName: countryInfo
-      # properties for https://www.npmjs.com/search?q=rotating-file-stream
-      size: 10M
-      maxFiles: 2
-      interval: 1d
-      compress: true
+    module: output-files
+    fileName: '/tmp/{country}.json'
+    # available format values: 'ldjson' (default), 'yaml', 'pretty' (pretty JSON)
+    format: ldjson
+    # matches context.sourceName == data.logSource
+    sourceName: .*
+    # matches data._type field 
+    typeName: countryInfo
+    # properties for https://www.npmjs.com/search?q=rotating-file-stream
+    size: 10M
+    maxFiles: 2
+    interval: 1d
+    compress: true

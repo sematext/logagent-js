@@ -6,8 +6,6 @@ input:
 output:
   aws-es: 
     module: output-aws-elasticsearch
-    # tracing ES api calls with debug:true
-    # debug: true
     url: https://my-url.es.amazonaws.com
     index: mylogs
     type: myLogType

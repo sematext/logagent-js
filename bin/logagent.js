@@ -46,7 +46,8 @@ var moduleAlias = {
   elasticsearch: '../lib/plugins/output/elasticsearch.js',
   'slack-webhook': '../lib/plugins/output/slack-webhook.js',
   'output-kafka': '../lib/plugins/output/kafka.js',
-  'output-files': '../lib/plugins/output/files.js'
+  'output-files': '../lib/plugins/output/files.js',
+  'output-aws-elasticsearch': '../lib/plugins/output/aws-elasticsearch.js'
 }
 
 function LaCli (options) {

@@ -1,0 +1,11 @@
+input: 
+  files: 
+    - /var/log/myapp.log
+
+output:
+  module: output-aws-elasticsearch
+  url: https://my-url.es.amazonaws.com
+  index: mylogs
+  type: myLogType
+  auth: 'user:password'
+  awsConfigFile: ./aws-config.json

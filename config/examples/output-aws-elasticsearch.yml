@@ -1,11 +1,22 @@
 input: 
+  stdin: true
   files: 
     - /var/log/myapp.log
 
 output:
-  module: output-aws-elasticsearch
-  url: https://my-url.es.amazonaws.com
-  index: mylogs
-  type: myLogType
-  auth: 'user:password'
-  awsConfigFile: ./aws-config.json
+  aws-es: 
+    module: output-aws-elasticsearch
+    # tracing ES api calls with debug:true
+    # debug: true
+    url: https://my-url.es.amazonaws.com
+    index: mylogs
+    type: myLogType
+    auth: 'user:password'
+    awsConfigFile: ./aws-config.json
+    # ES client logging options
+    log:
+      - type: 'stdio'
+        levels: [] # empty array to supress ES node client logs
+          #- 'error' 
+          #- 'warning'
+          #- 'info'

@@ -37,6 +37,7 @@
     "url": "https://github.com/sematext/logagent-js/issues"
   },
   "keywords": [
+    "Logagent",
     "monitoring",
     "alerting",
     "log management",
@@ -46,7 +47,8 @@
     "logging",
     "log shipper",
     "elasticsearch",
-    "indexing"
+    "indexing",
+    "etl"
   ],
   "homepage": "https://www.sematext.com",
   "author": "Stefan Thies <stefan.thies@sematext.com> (https://github.com/megastef) ",

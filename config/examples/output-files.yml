@@ -18,8 +18,9 @@ output:
   files:
     module: output-files
     fileName: '/tmp/{country}.json'
-    # available format values: 'ldjson' (default), 'yaml', 'pretty' (pretty JSON)
-    format: ldjson
+    # available format values: 'ldjson' (default), 'yaml', 'pretty' (pretty JSON), 'template'
+    format: template
+    template: '{country} {anotherField} {andAnotherField}'
     # matches context.sourceName == data.logSource
     sourceName: .*
     # matches data._type field 

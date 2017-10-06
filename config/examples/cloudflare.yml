@@ -1,0 +1,32 @@
+# Global options
+options:
+  includeOriginalLine: false
+
+input:
+  cloudflare: 
+    module: command
+    debug: true
+    # modify cloudflare URL and headers for your account
+    command: 'curl -s -H"X-Auth-Email: monkey@zoo.com" -H"X-Auth-Key: banana12345" "https://api.cloudflare.com/client/v4/zones/4f8g90r42275bce56f242596aic6fc5b/logs/received?start=$QUERY_TIME&end=$NOW&count=-1"' 
+    sourceName: CloudFlare
+    # fetch logs every 10 seconds
+    restart: 10
+
+outputFilter:
+  - name: duration
+    module: !!js/function >
+      function (context, config, eventEmitter, data, callback)  {
+        if (data.EdgeEndTimestamp && data.EdgeStartTimestamp) {
+          data.Duration = data.EdgeEndTimestamp - data.EdgeStartTimestamp
+        }
+        cb(null, data)
+      }
+
+output:
+  stdout: yaml
+  sematext:
+    module: elasticsearch
+    url: http://logsene-receiver.sematext.com:9200
+    index: YOUR_LOGSENE_TOKEN_HERE
+
+

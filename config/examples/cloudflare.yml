@@ -19,7 +19,7 @@ outputFilter:
         if (data.EdgeEndTimestamp && data.EdgeStartTimestamp) {
           data.Duration = data.EdgeEndTimestamp - data.EdgeStartTimestamp
         }
-        cb(null, data)
+        callback(null, data)
       }
 
 output:

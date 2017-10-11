@@ -101,5 +101,9 @@
     "standard": "8.6.0",
     "eslint": "^3.15.0",
     "precommit": "^1.2.2"
+  },
+  "pkg": {
+    "scripts": "lib/**/*.js",
+    "assets": "patterns.yml"
   }
 }

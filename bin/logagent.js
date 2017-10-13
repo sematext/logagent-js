@@ -35,7 +35,7 @@ var moduleAlias = {
   'postgresql-query': '../lib/plugins/input/postgresql.js',
   'input-tcp': '../lib/plugins/input/tcp.js',
   'input-kafka': '../lib/plugins/input/kafka.js',
-  'input-influx-http': '../lib/plugins/input/influxHttp.js',
+  'input-influxdb-http': '../lib/plugins/input/influxHttp.js',
   'elasticsearch-query': '../lib/plugins/input/elasticsearchQuery.js',
 
   // input filters

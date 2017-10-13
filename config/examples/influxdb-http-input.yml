@@ -1,6 +1,6 @@
 input:
   influx: 
-    module: input-influx-http
+    module: input-influxdb-http
     port: 8086
     workers: 1
 

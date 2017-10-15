@@ -37,6 +37,7 @@ var moduleAlias = {
   'input-kafka': '../lib/plugins/input/kafka.js',
   'input-influxdb-http': '../lib/plugins/input/influxHttp.js',
   'elasticsearch-query': '../lib/plugins/input/elasticsearchQuery.js',
+  'input-elasticsearch-http': '../lib/plugins/input/elasticsearchHttp.js',
 
   // input filters
   grep: '../lib/plugins/input-filter/grep.js',

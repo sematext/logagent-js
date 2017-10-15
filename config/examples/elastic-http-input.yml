@@ -1,0 +1,15 @@
+# Global options
+options:
+  includeOriginalLine: true
+
+input:
+   elasticsearch-http:
+    module: input-elasticsearch-http
+    port: 9900
+    worker: 2
+      
+output: 
+  stdout: yaml
+  elasticsearch:
+   module: elasticsearch
+   url: http://localhost:9200

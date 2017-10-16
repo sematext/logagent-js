@@ -34,7 +34,7 @@ var moduleAlias = {
   'mssql-query': '../lib/plugins/input/mssql.js',
   'postgresql-query': '../lib/plugins/input/postgresql.js',
   'input-tcp': '../lib/plugins/input/tcp.js',
-  'input-kafka': '../lib/plugins/input/kafka.js',
+  'input-kafka': 'logagent-input-kafka',
   'input-influxdb-http': '../lib/plugins/input/influxHttp.js',
   'elasticsearch-query': '../lib/plugins/input/elasticsearchQuery.js',
   'input-elasticsearch-http': '../lib/plugins/input/elasticsearchHttp.js',
@@ -47,7 +47,7 @@ var moduleAlias = {
   // output plugins
   elasticsearch: '../lib/plugins/output/elasticsearch.js',
   'slack-webhook': '../lib/plugins/output/slack-webhook.js',
-  'output-kafka': '../lib/plugins/output/kafka.js',
+  'output-kafka': 'logagent-output-kafka',
   'output-files': '../lib/plugins/output/files.js',
   'output-aws-elasticsearch': '../lib/plugins/output/aws-elasticsearch.js'
 }

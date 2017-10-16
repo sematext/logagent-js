@@ -1,0 +1,13 @@
+input:
+  influx: 
+    module: input-influxdb-http
+    port: 8086
+    workers: 1
+
+output: 
+  stdout: yaml 
+  # logsene:
+  #   module: elasticsearch 
+  #   url: https://logsene-receiver.sematext.com:9200
+  #   index: YOUR_LOGSENE_TOKEN_HERE
+

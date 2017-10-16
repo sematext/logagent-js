@@ -16,8 +16,8 @@ services:
         soft: 65536
         hard: 65536
     mem_limit: 1g
-    volumes:
-      - /tmp/elasticsearch/data:/tmp/elasticsearch
+    #volumes:
+    #  - /tmp/elasticsearch/data:/tmp/elasticsearch
     ports:
       - "9200:9200"
       - "9300:9300"

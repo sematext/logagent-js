@@ -3,6 +3,7 @@ input:
   gelf: 
     module: input-gelf
     port: 12100
+    bindAddress: 0.0.0.0
 output:
   # print parsed logs in YAML format to stdout   
   stdout: yaml 

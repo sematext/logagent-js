@@ -18,6 +18,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+/*jshint esversion: 6 */
 process.on('unhandledRejection', error => {
   console.error('unhandledRejection', error.stack)
 })
@@ -38,6 +39,7 @@ var moduleAlias = {
   'input-influxdb-http': '../lib/plugins/input/influxHttp.js',
   'elasticsearch-query': '../lib/plugins/input/elasticsearchQuery.js',
   'input-elasticsearch-http': '../lib/plugins/input/elasticsearchHttp.js',
+  'input-gelf': '../lib/plugins/input/gelf.js',
 
   // input filters
   grep: '../lib/plugins/input-filter/grep.js',

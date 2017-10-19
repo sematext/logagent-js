@@ -18,7 +18,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-/*jshint esversion: 6 */
 process.on('unhandledRejection', error => {
   console.error('unhandledRejection', error.stack)
 })

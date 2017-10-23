@@ -39,6 +39,7 @@ var moduleAlias = {
   'elasticsearch-query': '../lib/plugins/input/elasticsearchQuery.js',
   'input-elasticsearch-http': '../lib/plugins/input/elasticsearchHttp.js',
   'input-gelf': '../lib/plugins/input/gelf.js',
+  'input-cloudfoundry': '../lib/plugins/input/cloudfoundry.js',
 
   // input filters
   grep: '../lib/plugins/input-filter/grep.js',
@@ -63,6 +64,8 @@ function LaCli (options) {
   this.la = null
   this.throng = null
   this.argv = options || require('../lib/core/cliArgs.js')
+  consoleLogger.log('value fchttp '+ JSON.stringify(options))
+
   this.globPattern = this.argv.glob || process.env.GLOB_PATTERN
   this.logseneToken = this.argv.index || process.env.LOGSENE_TOKEN
   this.loggers = {}
@@ -108,6 +111,7 @@ LaCli.prototype.initPlugins = function (plugins) {
       if (plugin.config) {
         plugin.config.configFile = plugin.globalConfig
       }
+      
       var p = new Plugin(plugin.config || this.argv, eventEmitter)
       this.plugins.push(p)
       p.start()

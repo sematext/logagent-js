@@ -40,6 +40,7 @@ var moduleAlias = {
   'input-elasticsearch-http': '../lib/plugins/input/elasticsearchHttp.js',
   'input-gelf': '../lib/plugins/input/gelf.js',
   'input-cloudfoundry': '../lib/plugins/input/cloudfoundry.js',
+  'input-heroku': '../lib/plugins/input/heroku.js',
 
   // input filters
   grep: '../lib/plugins/input-filter/grep.js',
@@ -64,7 +65,6 @@ function LaCli (options) {
   this.la = null
   this.throng = null
   this.argv = options || require('../lib/core/cliArgs.js')
-  consoleLogger.log('value fchttp '+ JSON.stringify(options))
 
   this.globPattern = this.argv.glob || process.env.GLOB_PATTERN
   this.logseneToken = this.argv.index || process.env.LOGSENE_TOKEN

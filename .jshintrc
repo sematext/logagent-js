@@ -81,6 +81,8 @@
     "worker"        : false,    // Web Workers
     "wsh"           : false,    // Windows Scripting Host
     "yui"           : false,    // Yahoo User Interface
+    "esversion"     : 6,        // Disable JSHint from unnecessary warnings when code use ES6 syntax 
+  
 
     // Custom Globals
     "globals"       : {}        // additional predefined global variables

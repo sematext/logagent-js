@@ -3,8 +3,9 @@ options:
   includeOriginalLine: true
 
 input:
-  cloudFoundry: 
-   port: 9999
+  cloudFoundry:
+    module: input-cloudfoundry
+    port: 9999
 
 # we use here inline patterns, loaded after patterns.yml 
 parser:

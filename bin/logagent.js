@@ -133,10 +133,10 @@ LaCli.prototype.loadPlugins = function (configFile) {
           globalConfig: configFile
         })
       }
-      /* if (configFile.input[key].module) {
-        consoleLogger.log('add ' + configFile.input[key].module + ' to plugin list')
-        plugins.push(moduleAlias[configFile.input[key].module] || configFile.input[key].module)
-      } */
+    /* if (configFile.input[key].module) {
+      consoleLogger.log('add ' + configFile.input[key].module + ' to plugin list')
+      plugins.push(moduleAlias[configFile.input[key].module] || configFile.input[key].module)
+    } */
     })
   }
   // load input filters
@@ -179,7 +179,7 @@ LaCli.prototype.loadPlugins = function (configFile) {
     // only stdin/stdout are used and process can terminate
     // when stdin gets closed
     this.argv.stdinExitEnabled = true
-  }  
+  }
   if (this.argv.udp) {
     plugins.push({
       module: '../lib/plugins/input/syslog',

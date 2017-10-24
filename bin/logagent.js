@@ -118,8 +118,8 @@ LaCli.prototype.initPlugins = function (plugins) {
 
 LaCli.prototype.loadPlugins = function (configFile) {
   var plugins = [
-    '../lib/plugins/input/stdin',
-    '../lib/plugins/output/stdout'
+    {module: '../lib/plugins/input/stdin', config: {}, globalConfig: configFile},
+    {module: '../lib/plugins/output/stdout', config: {}, globalConfig: configFile}
   ]
   // load 3rd paty modules
   if (configFile && configFile.input) {
@@ -179,14 +179,23 @@ LaCli.prototype.loadPlugins = function (configFile) {
     // only stdin/stdout are used and process can terminate
     // when stdin gets closed
     this.argv.stdinExitEnabled = true
-  }
-
+  }  
   if (this.argv.udp) {
-    plugins.push('../lib/plugins/input/syslog')
+    plugins.push({
+      module: '../lib/plugins/input/syslog',
+      config: {
+        port: this.argv.udp,
+        bindAddress: '0.0.0.0',
+        globalConfig: configFile || {}
+      }
+    })
     this.argv.stdinExitEnabled = false
   }
   if (this.argv.heroku) {
-    plugins.push('../lib/plugins/input/heroku')
+    plugins.push({
+      module: '../lib/plugins/input/heroku',
+      config: {port: this.argv.heroku}
+    })
     this.argv.stdinExitEnabled = false
   }
   if (this.argv.cfhttp) {

@@ -190,8 +190,7 @@ LaCli.prototype.loadPlugins = function (configFile) {
       module: '../lib/plugins/input/syslog',
       config: {
         port: this.argv.udp,
-        bindAddress: '0.0.0.0',
-        globalConfig: configFile || {}
+        bindAddress: '0.0.0.0'
       }
     })
     this.argv.stdinExitEnabled = false
@@ -199,16 +198,30 @@ LaCli.prototype.loadPlugins = function (configFile) {
   if (this.argv.heroku) {
     plugins.push({
       module: '../lib/plugins/input/heroku',
-      config: {port: this.argv.heroku}
+      config: {
+        port: this.argv.heroku
+      }
     })
     this.argv.stdinExitEnabled = false
   }
   if (this.argv.cfhttp) {
-    plugins.push('../lib/plugins/input/cloudfoundry')
+    plugins.push({
+      module: '../lib/plugins/input/cloudfoundry',
+      config: {
+        port: this.argv.heroku
+      }
+    })
     this.argv.stdinExitEnabled = false
   }
   if (this.argv.index || this.argv.elasticsearchUrl || this.argv.indices) {
-    plugins.push('../lib/plugins/output/elasticsearch')
+    plugins.push({
+      module: '../lib/plugins/output/elasticsearch',
+      config: {
+        indices: this.argv.indices,
+        url: this.argv.elasticsearchUrl,
+        index: this.argv.index
+      }
+    })
   }
   if (this.argv.rtailPort) {
     plugins.push('../lib/plugins/output/rtail')

@@ -230,11 +230,6 @@ LaCli.prototype.loadPlugins = function (configFile) {
     plugins.push('../lib/plugins/input/files')
     this.argv.stdinExitEnabled = false
   }
-
-  if (!configFile) {
-    return plugins
-  }
-
   return plugins
 }
 

@@ -3,7 +3,8 @@ options:
   includeOriginalLine: true
 
 input:
-  heroku: 
+  heroku:
+   module: input-heroku
    port: 9999
    worker: 4
    blacklist:

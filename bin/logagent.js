@@ -208,7 +208,7 @@ LaCli.prototype.loadPlugins = function (configFile) {
     plugins.push({
       module: '../lib/plugins/input/cloudfoundry',
       config: {
-        port: this.argv.heroku
+        port: this.argv.cloudfoundry
       }
     })
     this.argv.stdinExitEnabled = false

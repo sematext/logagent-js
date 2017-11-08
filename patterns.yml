@@ -80,7 +80,7 @@ patterns:
       fields: [ts,method,url,duration,duration_unit,status_code,info,ip,port]
       dateFormat: HH:mm:ss:S
  - # Elasticsearch 
-  blockStart: !!js/regexp /\d{4}-\d{2}-\d{2}[\s|T][\d+|\:]+.\d+|log4j\:\S+\s/
+  blockStart: !!js/regexp /^\d{4}-\d{2}-\d{2}[\s|T][\d+|\:]+.\d+|log4j\:\S+\s/
   sourceName: !!js/regexp /elasticsearch/
   match:
     - type: elasticsearch_slow_log
@@ -116,7 +116,7 @@ patterns:
       fields: [severity,ts,application,class,webapp,path,params,hits,status,qtime]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
     - type: apache_solr_v5_1
-      regex: !!js/regexp (\d+)\s\[(\S+)]\s(\S+)\s(\S+)\s\[(\S+)\s(\S+)\s(\S+)\s(\S+)\].+?\[(.+?)\]\swebapp=(.+?)\spath=(.+?)\sparams={(.+?)}\sstatus=(\d+)\sQTime=(\d+)
+      regex: !!js/regexp ^(\d+)\s\[(\S+)]\s(\S+)\s(\S+)\s\[(\S+)\s(\S+)\s(\S+)\s(\S+)\].+?\[(.+?)\]\swebapp=(.+?)\spath=(.+?)\sparams={(.+?)}\sstatus=(\d+)\sQTime=(\d+)
       fields: [relative_ts,thread_id,severity,class,collection,shard,core,replica,core_name,webapp,path,params,status,qtime]
       transform: !!js/function >
         function (p) {

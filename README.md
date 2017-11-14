@@ -20,7 +20,7 @@ The docker container can be configured through the following environment variabl
 
 Run a container:
 The following example enables UDP syslog receiver and ships all log files from /var/log to Sematext Cloud (US).
-Simply mount the log file directort into Logagent container and provide a glob pattern to match the log files to watch.
+Simply mount the log file directory into Logagent container and provide a glob pattern to match the log files to watch.
 
 ```
 docker run -d --name logagent \

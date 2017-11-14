@@ -25,8 +25,8 @@ Simply mount the log file directory into Logagent container and provide a glob p
 ```
 docker run -d --name logagent \
 -v /var/log:/mylogs
--p 1514:514
--e LOG_URL=https://logsene-receiver.sematext.com
+-p 1514:514/udp \
+-e LOG_URL=https://logsene-receiver.sematext.com \
 -e LOG_INDEX=YOUR_LOGSENE_TOKEN_HERE \
 -e LOG_GLOB="/mylogs/**/.log" \
 -e LA_ARGUMENTS="-u 514" \

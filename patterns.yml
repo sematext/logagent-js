@@ -368,7 +368,19 @@ patterns:
     - type: tutum_cleanup
       regex: !!js/regexp /^(\d+\/\d+\/\d+\s\d+:\d+:\d+)\s(.*)/
       fields: [ts,message]
-      dateFormat: YYYY/MM/DD hh:mm:ss 
+      dateFormat: YYYY/MM/DD hh:mm:ss
+
+ - # RabbitMQ
+  sourceName: !!js/regexp /rabbitmq/
+  blockStart: !!js/regexp /^=(\S+)\sREPORT====/
+  match:
+   - type: rabbitmq
+     regex: !!js/regexp /^=(\S+)\sREPORT====(.+?)\s===([\s|\S]+)/
+     fields: 
+      - severity:string
+      - ts
+      - message
+     dateFormat: DD-MMM-YYYY::hh:mm:ss
 
  - # Heroku Syslog Messages
   sourceName: !!js/regexp /syslog_framed|heroku/ 

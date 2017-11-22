@@ -14,7 +14,7 @@
 
 # set originalLine to false when auothash fields
 # the original line might include sensitive data!
-originalLine: false
+originalLine: true
 # default seperator for multiline logs, 
 # which don't have a blockStart property
 # The default /^\S{2,}/ would match typical stack traces
@@ -381,6 +381,37 @@ patterns:
       - ts
       - message
      dateFormat: DD-MMM-YYYY::hh:mm:ss
+
+ - # CouchDB
+  sourceName: !!js/regexp /couchdb/
+  match:
+   - type: couchdb
+     regex: !!js/regexp /^\[(\S+)\]\s(\S+)\s(\S+)\s(\S+)\s(\S{8})\s([\s|\S]+)/
+     fields: 
+      - severity:string
+      - ts
+      - node:string
+      - module:string
+      - code:string
+      - message:string
+     dateFormat: YYYY-MM-DDTHH:mm:ssZ
+   - type: couchdb_http
+     regex: !!js/regexp /^\[(\S+)\]\s(\S+)\s(\S+)\s(\S+)\s(\S{10})\s(\S+):(\d+)\s(\S+)\s(\S+)\s(GET|PUT|POST|DELETE|HEAD)\s(\S+)\s(\d+)\s(\S|\s+)/
+     fields: 
+      - severity:string
+      - ts
+      - node:string
+      - module:string
+      - code:string
+      - server_ip:string
+      - server_port:number
+      - client_ip:string
+      - user:string
+      - method:string
+      - url:string
+      - status_code:number
+      - response:string
+     dateFormat: YYYY-MM-DDTHH:mm:ssZ
 
  - # Heroku Syslog Messages
   sourceName: !!js/regexp /syslog_framed|heroku/ 

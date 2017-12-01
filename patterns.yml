@@ -273,7 +273,7 @@ patterns:
   sourceName: !!js/regexp /httpd|access_log|apache2|nginx/
   match: 
     - type: access_log_combined
-      regex: !!js/regexp /^([0-9a-f.:]+)\s(-|\S+)\s(-|\S+)\s\[(.*)\]\s\"(\w+)\s(\S+)\s{0,1}(.*)\" ([0-9|\-]+) ([0-9|\-]+) \"([^\"]+)\" \"([^\"]+)\"/i
+      regex: !!js/regexp ^([0-9a-f.:]+)\s(-|\S+)\s(-|\S+)\s\[(.*)\]\s\"(\w+)\s(\S+)\s{0,1}(.*)\" ([0-9|\-]+) ([0-9|\-]+) \"([^\"]+)\" \"([^\"]+)\"
       fields: 
         - client_ip:string
         - remote_id:string
@@ -301,7 +301,20 @@ patterns:
     # nginx proxy jwilder/nginx-proxy
     - regex: !!js/regexp /^(\S+)\s+\|\s(\S+)\s+([0-9a-f.:]+)\s+(-|.+?)\s+(-|.+?)\s\[(.*)\]\s"(.+?)\s(.+?)\s(.+?)"\s(\d+)\s(\d+)\s"(.+?)"\s"(.+?)"/i
       type: access_common
-      fields:       [proxy_service,virtual_host,client_ip,remote_id,user,ts,method,path,http_version,status_code,size,url,user_agent]
+      fields: 
+        - proxy_service
+        - virtual_host
+        - client_ip
+        - remote_id,
+        - user
+        - ts
+        - method
+        - path
+        - http_version
+        - status_code:number
+        - size:number
+        - url
+        - user_agent
       dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
       geoIP: client_ip
       transform: !!js/function >
@@ -315,7 +328,7 @@ patterns:
           }
         } 
     # Common Log Format
-    - regex: !!js/regexp /(^[0-9a-f.:]+)\s+(-|.+?)\s+(-|.+?)\s+\[([0-9]{2}\/[a-z]{3}\/[0-9]{4}\:[0-9]{2}:[0-9]{2}:[0-9]{2}[^\]]*)\] \"(\S+?)\s(\S*?)\s{0,1}(\S+?)\" ([0-9|\-]+) ([0-9|\-]+)/i
+    - regex: !!js/regexp (^[0-9a-f.:]+)\s+(-|.+?)\s+(-|.+?)\s+\[([0-9]{2}\/[a-z]{3}\/[0-9]{4}\:[0-9]{2}:[0-9]{2}:[0-9]{2}[^\]]*)\] \"(\S+?)\s(\S*?)\s{0,1}(\S+?)\" ([0-9|\-]+) ([0-9|\-]+)
       type: access_common
       fields: [client_ip,remote_id,user,ts,method,path,http_version,status_code,size]
       geoIP: client_ip
@@ -331,7 +344,7 @@ patterns:
           }
         } 
 
-    - regex: !!js/regexp /^(\S+)\s+(-|.+?)\s+(-|.+?)\s+\[(.*)\]\s\"(\S+)\s(\S+)\s(\S+)\s(\d+)\s([\d+|\"-\"])/i
+    - regex: !!js/regexp ^(\S+)\s+(-|.+?)\s+(-|.+?)\s+\[(.*)\]\s\"(\S+)\s(\S+)\s(\S+)\s(\d+)\s([\d+|\"-\"])
       type: access_common
       fields:       [client_ip,remote_id,user,ts,method,path,http_version,status_code,size]
       geoIP: client_ip

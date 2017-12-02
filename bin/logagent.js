@@ -35,8 +35,8 @@ var moduleAlias = {
   'postgresql-query': '../lib/plugins/input/postgresql.js',
   'input-tcp': '../lib/plugins/input/tcp.js',
   'input-kafka': 'logagent-input-kafka',
-  'grok': 'logagent-input-filter-grok',
   'input-influxdb-http': '../lib/plugins/input/influxHttp.js',
+  'input-zeromq': '../lib/plugins/input/index.js',
   'elasticsearch-query': '../lib/plugins/input/elasticsearchQuery.js',
   'input-elasticsearch-http': '../lib/plugins/input/elasticsearchHttp.js',
   'input-gelf': '../lib/plugins/input/gelf.js',
@@ -53,6 +53,7 @@ var moduleAlias = {
   'slack-webhook': '../lib/plugins/output/slack-webhook.js',
   'output-kafka': 'logagent-output-kafka',
   'output-files': '../lib/plugins/output/files.js',
+  'output-gelf': '../lib/plugins/output/gelfout.js',
   'output-aws-elasticsearch': '../lib/plugins/output/aws-elasticsearch.js'
 }
 

@@ -36,7 +36,6 @@ var moduleAlias = {
   'input-tcp': '../lib/plugins/input/tcp.js',
   'input-kafka': 'logagent-input-kafka',
   'input-influxdb-http': '../lib/plugins/input/influxHttp.js',
-  'input-zeromq': '../lib/plugins/input/index.js',
   'elasticsearch-query': '../lib/plugins/input/elasticsearchQuery.js',
   'input-elasticsearch-http': '../lib/plugins/input/elasticsearchHttp.js',
   'input-gelf': '../lib/plugins/input/gelf.js',

@@ -33,7 +33,7 @@ geoIP: true
 # The path could be modified via env. variable MAXMIND_DB_DIR
 maxmindDbDir: /tmp/
 
-debug: false
+debug: true
 
 # post process all JSON input
 json:
@@ -327,26 +327,18 @@ patterns:
             p.size = 0
           }
         } 
-    # Common Log Format
-    - regex: !!js/regexp (^[0-9a-f.:]+)\s+(-|.+?)\s+(-|.+?)\s+\[([0-9]{2}\/[a-z]{3}\/[0-9]{4}\:[0-9]{2}:[0-9]{2}:[0-9]{2}[^\]]*)\] \"(\S+?)\s(\S*?)\s{0,1}(\S+?)\" ([0-9|\-]+) ([0-9|\-]+)
+    - regex: !!js/regexp ^(\S+)\s+(-|.+?)\s+(-|.+?)\s+\[(.*)\]\s\"(\S+)\s(\S+)\s(\S+)\s(\d+)\s([\d+|\"-\"|-])
       type: access_common
-      fields: [client_ip,remote_id,user,ts,method,path,http_version,status_code,size]
-      geoIP: client_ip
-      dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
-      transform: !!js/function >
-        function transformMessage (p) {
-          p.message = p.method + ' ' + p.path
-          if(p.status_code === '-') {
-            p.status_code = 0
-          }
-          if(p.size === '-') {
-            p.size = 0
-          }
-        } 
-
-    - regex: !!js/regexp ^(\S+)\s+(-|.+?)\s+(-|.+?)\s+\[(.*)\]\s\"(\S+)\s(\S+)\s(\S+)\s(\d+)\s([\d+|\"-\"])
-      type: access_common
-      fields:       [client_ip,remote_id,user,ts,method,path,http_version,status_code,size]
+      fields: 
+        - client_ip:string
+        - remote_id:string
+        - user:string
+        - ts
+        - method:string
+        - path:string
+        - http_version:string
+        - status_code:number
+        - size:number
       geoIP: client_ip
       dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
       transform: !!js/function >

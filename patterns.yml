@@ -33,7 +33,7 @@ geoIP: true
 # The path could be modified via env. variable MAXMIND_DB_DIR
 maxmindDbDir: /tmp/
 
-debug: true
+debug: false
 
 # post process all JSON input
 json:

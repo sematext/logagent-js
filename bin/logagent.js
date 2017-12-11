@@ -44,6 +44,7 @@ var moduleAlias = {
 
   // input filters
   grep: '../lib/plugins/input-filter/grep.js',
+  'grok': 'logagent-input-filter-grok',
   // output filters
   sql: '../lib/plugins/output-filter/sql.js',
   'access-watch': '../lib/plugins/output-filter/access-watch.js',

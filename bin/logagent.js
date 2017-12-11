@@ -123,9 +123,21 @@ LaCli.prototype.initPlugins = function (plugins) {
 }
 
 LaCli.prototype.loadPlugins = function (configFile) {
+  var stdOutConfig = {}
+  if (configFile && configFile.input && configFile.input.stdout) {
+    stdOutConfig = configFile.input.stdout
+  } else {
+    stdOutConfig = this.argv
+  }
+  var stdInConfig = {}
+  if (configFile && configFile.input && configFile.input.stdout) {
+    stdInConfig = configFile.input.stdin
+  } else {
+    stdInConfig = this.argv
+  }
   var plugins = [
-    {module: '../lib/plugins/input/stdin', config: {}, globalConfig: configFile},
-    {module: '../lib/plugins/output/stdout', config: {}, globalConfig: configFile}
+    {module: '../lib/plugins/input/stdin', config: stdInConfig, globalConfig: configFile},
+    {module: '../lib/plugins/output/stdout', config: stdOutConfig, globalConfig: configFile}
   ]
   // load 3rd paty modules
   if (configFile && configFile.input) {

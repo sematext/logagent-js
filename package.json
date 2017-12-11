@@ -1,6 +1,6 @@
 {
   "name": "@sematext/logagent",
-  "version": "2.0.90",
+  "version": "2.0.93",
   "description": "Smart log parser written in Node",
   "main": "lib/parser/parser.js",
   "bin": {
@@ -87,7 +87,7 @@
     "rotating-file-stream": "^1.3.4",
     "rtail": "^0.2.1",
     "split2": "^2.1.1",
-    "stackman": "^1.2.7",
+    "stackman": "^2.0.1",
     "stream-throttle": "^0.1.3",
     "string-template": "^1.0.0",
     "syslogd": "^1.1.2",

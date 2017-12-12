@@ -1,0 +1,17 @@
+# Global options
+options:
+  includeOriginalLine: false
+
+input:
+  stdin: true
+
+output: 
+  gelf:
+    module: output-gelf
+    host: localhost
+    # graylog port (default: 12201)
+    port: 12201
+    # compression 'gzip' or 'deflate' (default: 'deflate')
+    compressType: deflate
+    # size of chunked messages in bytes (default: 1240)
+    chunkSize: 1024

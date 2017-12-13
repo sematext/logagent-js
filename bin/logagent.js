@@ -307,10 +307,7 @@ LaCli.prototype.initState = function () {
       if (!trimmedLine) {
         return
       }
-      self.la.parseLine(
-        trimmedLine.replace(self.removeAnsiColor, ''),
-        context.sourceName || self.argv.sourceName,
-        function parserCb (err, data) {
+      function parserCb (err, data) {
           if (err && !data) {
             consoleLogger.error('error during parsing: ' + err.stack)
           }
@@ -341,7 +338,17 @@ LaCli.prototype.initState = function () {
               // consoleLogger.error(e.stack)
             })
           }
+        }
+        
+       setImmediate (function laParse() {
+          self.la.parseLine(
+            trimmedLine.replace(self.removeAnsiColor, ''),
+            context.sourceName || self.argv.sourceName,
+            parserCb)
         })
+
+      
+      
     }, function (e) {
       // consoleLogger.error(e.stack)
     })

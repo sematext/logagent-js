@@ -14,7 +14,7 @@
 
 # set originalLine to false when auothash fields
 # the original line might include sensitive data!
-originalLine: true
+originalLine: false
 # default seperator for multiline logs, 
 # which don't have a blockStart property
 # The default /^\S{2,}/ would match typical stack traces
@@ -317,16 +317,16 @@ patterns:
         - user_agent
       dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
       geoIP: client_ip
-      transform: !!js/function >
-        function transformMessage (p) {
-          p.message = p.method + ' ' + p.path
-          if(p.status_code === '-') {
-            p.status_code = 0
-          }
-          if(p.size === '-') {
-            p.size = 0
-          }
-        } 
+      #transform: !!js/function >
+      #  function transformMessage (p) {
+      #    p.message = p.method + ' ' + p.path
+      #    if(p.status_code === '-') {
+      #      p.status_code = 0
+      #    }
+      #    if(p.size === '-') {
+      #      p.size = 0
+      #    }
+      #  } 
     - regex: !!js/regexp ^(\S+)\s+(-|.+?)\s+(-|.+?)\s+\[(.*)\]\s\"(\S+)\s(\S+)\s(\S+)\s(\d+)\s([\d+|\"-\"|-])
       type: access_common
       fields: 
@@ -341,16 +341,16 @@ patterns:
         - size:number
       geoIP: client_ip
       dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
-      transform: !!js/function >
-        function transformMessage (p) {
-          p.message = p.method + ' ' + p.path
-          if(p.status_code === '-') {
-            p.status_code = 0
-          }
-          if(p.size === '-') {
-            p.size = 0
-          }
-        } 
+      #transform: !!js/function >
+      #  function transformMessage (p) {
+      #    p.message = p.method + ' ' + p.path
+      #    if(p.status_code === '-') {
+      #      p.status_code = 0
+      #    }
+      #    if(p.size === '-') {
+      #      p.size = 0
+      #    }
+      #  } 
     - type: nginx_error_log 
       regex: !!js/regexp /^(\d{4}\/\d{2}\/\d{2}\s[\d|\:]+)\s\[(.+?)]\s(\d+)#(\d+)\:\s(.*)/
       fields: [ts,level,pid,tid,message]

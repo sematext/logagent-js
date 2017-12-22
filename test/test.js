@@ -4,7 +4,7 @@ process.env.GEOIP_ENABLED = 'true'
 var Logagent = require('../lib/parser/parser.js')
 describe('Logagent parse JSON', function () {
   it('should return correct message with timestamp', function (done) {
-    this.timeout(150000)
+    this.timeout(5000)
     var la = new Logagent()
     la.parseLine(JSON.stringify({
       message: 'hello world',
@@ -38,10 +38,10 @@ describe('Logagent parse bunyan JSON', function () {
       if (err) {
         done(err)
       } else {
-        if (data.message === 'hello world' && data.counter === 1 && data['@timestamp']) {
+        if (data.message === 'hello world' && data.counter === 1) {
           done()
         } else {
-          done(new Error('message is wrong: ' + data.message))
+          done(new Error('message is wrong: ' + data['@timestamp'] + ' ' + data.message))
         }
       }
     })

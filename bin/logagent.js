@@ -41,7 +41,7 @@ var moduleAlias = {
   'input-gelf': '../lib/plugins/input/gelf.js',
   'input-cloudfoundry': '../lib/plugins/input/cloudfoundry.js',
   'input-heroku': '../lib/plugins/input/heroku.js',
-
+  'input-mqtt-broker': '../lib/plugins/input/mqtt-broker.js',
   // input filters
   grep: '../lib/plugins/input-filter/grep.js',
   'grok': 'logagent-input-filter-grok',
@@ -113,7 +113,7 @@ LaCli.prototype.initPlugins = function (plugins) {
       if (plugin.config) {
         plugin.config.configFile = plugin.globalConfig
       }
-      
+
       var p = new Plugin(plugin.config || this.argv, eventEmitter)
       this.plugins.push(p)
       p.start()
@@ -309,47 +309,44 @@ LaCli.prototype.initState = function () {
         return
       }
       function parserCb (err, data) {
-          if (err && !data) {
-            consoleLogger.error('error during parsing: ' + err.stack)
-          }
-          if (data) {
-            var filteredData = data
-            co(function * () {
-              for (var i = 0; i < self.outputFilter.length; i++) {
-                filteredData = yield function (callback) {
-                  self.outputFilter[i].func(context, self.outputFilter[i].config, eventEmitter, filteredData, callback)
-                }
-              }
-            }).then(function () {
-              if (!filteredData) {
-                return
-              }
-              if (context.enrichEvent) {
-                Object.keys(context.enrichEvent).forEach(function (key) {
-                  data[key] = context.enrichEvent[key]
-                })
-              }
-              if (context.filter) {
-                filteredData = context.filter(data, context)
-              }
-              if (filteredData) {
-                self.eventEmitter.parsedEvent(filteredData, context)
-              }
-            }, function (e) {
-              // consoleLogger.error(e.stack)
-            })
-          }
+        if (err && !data) {
+          consoleLogger.error('error during parsing: ' + err.stack)
         }
-        
-       setImmediate (function laParse() {
-          self.la.parseLine(
+        if (data) {
+          var filteredData = data
+          co(function * () {
+            for (var i = 0; i < self.outputFilter.length; i++) {
+              filteredData = yield function (callback) {
+                self.outputFilter[i].func(context, self.outputFilter[i].config, eventEmitter, filteredData, callback)
+              }
+            }
+          }).then(function () {
+            if (!filteredData) {
+              return
+            }
+            if (context.enrichEvent) {
+              Object.keys(context.enrichEvent).forEach(function (key) {
+                data[key] = context.enrichEvent[key]
+              })
+            }
+            if (context.filter) {
+              filteredData = context.filter(data, context)
+            }
+            if (filteredData) {
+              self.eventEmitter.parsedEvent(filteredData, context)
+            }
+          }, function (e) {
+              // consoleLogger.error(e.stack)
+          })
+        }
+      }
+
+      setImmediate(function laParse () {
+        self.la.parseLine(
             trimmedLine.replace(self.removeAnsiColor, ''),
             context.sourceName || self.argv.sourceName,
             parserCb)
-        })
-
-      
-      
+      })
     }, function (e) {
       // consoleLogger.error(e.stack)
     })

@@ -1,0 +1,5 @@
+input:
+  mqtt-broker:
+    module: input-mqtt-broker
+    port: 1883
+    debug: true

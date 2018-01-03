@@ -5,4 +5,4 @@ input:
     topics: 
       - log-messages
       - sensor-data
-    debug: true
+

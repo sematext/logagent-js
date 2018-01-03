@@ -29,7 +29,7 @@ process.setMaxListeners(0)
 var co = require('co')
 var moduleAlias = {
   // inputs
-  command: '../lib/plugins/input/command.js',
+  'command': '../lib/plugins/input/command.js',
   'mysql-query': '../lib/plugins/input/mysql.js',
   'mssql-query': '../lib/plugins/input/mssql.js',
   'postgresql-query': '../lib/plugins/input/postgresql.js',
@@ -44,18 +44,19 @@ var moduleAlias = {
   'input-mqtt-broker': '../lib/plugins/input/mqtt-broker.js',
   'input-mqtt-client': '../lib/plugins/input/mqtt-client.js',
   // input filters
-  grep: '../lib/plugins/input-filter/grep.js',
+  'grep': '../lib/plugins/input-filter/grep.js',
   'grok': 'logagent-input-filter-grok',
   // output filters
-  sql: '../lib/plugins/output-filter/sql.js',
+  'sql': '../lib/plugins/output-filter/sql.js',
   'access-watch': '../lib/plugins/output-filter/access-watch.js',
   // output plugins
-  elasticsearch: '../lib/plugins/output/elasticsearch.js',
+  'elasticsearch': '../lib/plugins/output/elasticsearch.js',
   'slack-webhook': '../lib/plugins/output/slack-webhook.js',
   'output-kafka': 'logagent-output-kafka',
   'output-files': '../lib/plugins/output/files.js',
   'output-gelf': '../lib/plugins/output/gelfout.js',
-  'output-aws-elasticsearch': '../lib/plugins/output/aws-elasticsearch.js'
+  'output-aws-elasticsearch': '../lib/plugins/output/aws-elasticsearch.js',
+  'output-mqtt': '../lib/plugins/output/mqtt.js'
 }
 
 function LaCli (options) {
@@ -117,7 +118,7 @@ LaCli.prototype.initPlugins = function (plugins) {
 
       var p = new Plugin(plugin.config || this.argv, eventEmitter)
       this.plugins.push(p)
-      p.start()
+      p.start.bind(p)()
     } catch (err) {
       consoleLogger.error('Error loading plugin: ' + (moduleAlias[pluginName] || pluginName) + ' ' + err.stack)
     }

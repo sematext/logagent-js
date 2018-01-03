@@ -1,0 +1,8 @@
+input:
+  mqtt-client:
+    module: input-mqtt-client
+    url: mqtt://test.mosquitto.org
+    topics: 
+      - log-messages
+      - sensor-data
+    debug: true

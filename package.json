@@ -79,7 +79,6 @@
     "mkpath": "^1.0.0",
     "moment": "^2.19.4",
     "moment-timezone": "^0.5.13",
-    "mosca": "^2.7.0",
     "mqtt": "^2.15.0",
     "mysql": "^2.13.0",
     "npm": "^5.4.1",
@@ -100,7 +99,8 @@
   },
   "optionalDependencies": {
     "date-fns": "^2.0.0-alpha.7",
-    "graygelf": "^1.1.0"
+    "graygelf": "^1.1.0",
+    "mosca": "^2.7.0"
   },
   "devDependencies": {
     "mocha": "^3.2.0",

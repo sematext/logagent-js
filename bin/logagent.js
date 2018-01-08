@@ -43,6 +43,7 @@ var moduleAlias = {
   'input-heroku': '../lib/plugins/input/heroku.js',
   'input-mqtt-broker': '../lib/plugins/input/mqtt-broker.js',
   'input-mqtt-client': '../lib/plugins/input/mqtt-client.js',
+  'imput-zeromq' : 'logagent-input-zeromq',
   // input filters
   'grep': '../lib/plugins/input-filter/grep.js',
   'grok': 'logagent-input-filter-grok',
@@ -56,7 +57,8 @@ var moduleAlias = {
   'output-files': '../lib/plugins/output/files.js',
   'output-gelf': '../lib/plugins/output/gelfout.js',
   'output-aws-elasticsearch': '../lib/plugins/output/aws-elasticsearch.js',
-  'output-mqtt': '../lib/plugins/output/mqtt.js'
+  'output-mqtt': '../lib/plugins/output/mqtt.js',
+  'output-zeromq': 'logagent-output-zeromq'
 }
 
 function LaCli (options) {

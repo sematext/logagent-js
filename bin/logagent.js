@@ -43,7 +43,7 @@ var moduleAlias = {
   'input-heroku': '../lib/plugins/input/heroku.js',
   'input-mqtt-broker': '../lib/plugins/input/mqtt-broker.js',
   'input-mqtt-client': '../lib/plugins/input/mqtt-client.js',
-  'imput-zeromq' : 'logagent-input-zeromq',
+  'input-zeromq' : 'logagent-input-zeromq',
   // input filters
   'grep': '../lib/plugins/input-filter/grep.js',
   'grok': 'logagent-input-filter-grok',

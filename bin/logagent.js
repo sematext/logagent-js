@@ -155,7 +155,7 @@ LaCli.prototype.loadPlugins = function (configFile) {
           config: configFile.input[key],
           globalConfig: configFile
         })
-      }
+      } 
     /* if (configFile.input[key].module) {
       consoleLogger.log('add ' + configFile.input[key].module + ' to plugin list')
       plugins.push(moduleAlias[configFile.input[key].module] || configFile.input[key].module)
@@ -178,6 +178,10 @@ LaCli.prototype.loadPlugins = function (configFile) {
   if (configFile && configFile.output) {
     var outputSections = Object.keys(configFile.output)
     outputSections.forEach(function (key) {
+      if (key === 'elasticsearch' && configFile.output[key].module === undefined) {
+        consoleLogger.error('Missing property "module: elasticsearch" in Elasticsearch output configuration')
+        configFile.output[key].module = 'elasticsearch'
+      }
       if (configFile.output[key].module) {
         plugins.push({
           module: moduleAlias[configFile.output[key].module] || configFile.output[key].module,

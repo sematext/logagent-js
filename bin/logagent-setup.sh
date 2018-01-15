@@ -180,6 +180,7 @@ input:
 output:
   # index logs in Elasticsearch or Logsene
   elasticsearch: 
+    module: elasticsearch
     url: $LOGSENE_RECEIVER_URL
     # default index (Logsene token) to use:
     index: $TOKEN

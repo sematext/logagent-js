@@ -1,0 +1,25 @@
+input: 
+  track-apple-devices: 
+    module: input-apple-device-finder
+    # Your Apple ID (e-mail address)
+    # Instead of adding Apple-ID to this config you could set env. variable APPLE_ID
+    appleId: your-apple-id@example.com 
+    # Instead of adding iCloud password to this config you could set env. variable APPLE_PW
+    applePassword: yourPassword
+    # Note locating phones might consume more energy on the devices  
+    # Query Apple API every N minutes. The minimum value is 1 minute.
+    interval: 10 
+    # Regular expressions to filter devices by device.name or device.deviceDisplayName
+    # blacklist - ignore devices matching following regex, case sensitive
+    ignoreDeviceName: 'iPhone.4'
+    # whitelist - track only devices matching follwoing expression
+    filterDeviceName: 'Stefans.iPhone6'
+    # verbose output to console for filter matching
+    debug: true
+
+output: 
+  stdout: yaml
+  sematext-cloud: 
+    module: elasticsearch
+    url: https://logsene-receiver.sematext.com
+    index: YOUR_LOGSENE_TOKEN

@@ -12,7 +12,7 @@ input:
     # Regular expressions to filter devices by device.name or device.deviceDisplayName
     # blacklist - ignore devices matching following regex, case sensitive
     ignoreDeviceName: 'iPhone.4'
-    # whitelist - track only devices matching follwoing expression
+    # whitelist - track only devices matching following expression
     filterDeviceName: 'Stefans.iPhone6'
     # verbose output to console for filter matching
     debug: true

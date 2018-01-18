@@ -18,8 +18,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-process.on('unhandledRejection', error => {
-  console.error('unhandledRejection', error.stack)
+process.on('unhandledRejection', (a, b) => {
+  console.error('unhandledRejection')
 })
 var consoleLogger = require('../lib/util/logger.js')
 var StatsPrinter = require('../lib/core/printStats.js')
@@ -157,7 +157,7 @@ LaCli.prototype.loadPlugins = function (configFile) {
           config: configFile.input[key],
           globalConfig: configFile
         })
-      } 
+      }
     /* if (configFile.input[key].module) {
       consoleLogger.log('add ' + configFile.input[key].module + ' to plugin list')
       plugins.push(moduleAlias[configFile.input[key].module] || configFile.input[key].module)

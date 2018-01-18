@@ -1,0 +1,7 @@
+input:
+ novaSDS011:
+ 	module: input-nova-sda011
+ 	comPort: /dev/cu.wchusbserialfa1220
+
+output: 
+  stdout: yaml

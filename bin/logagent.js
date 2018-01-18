@@ -45,6 +45,7 @@ var moduleAlias = {
   'input-mqtt-client': '../lib/plugins/input/mqtt-client.js',
   'input-zeromq': 'logagent-input-zeromq',
   'input-apple-device-finder': '../lib/plugins/input/appleDeviceTracker.js',
+  'input-nova-sda011': '../lib/plugins/input/novaSDS011.js',
   // input filters
   'grep': '../lib/plugins/input-filter/grep.js',
   'grok': 'logagent-input-filter-grok',

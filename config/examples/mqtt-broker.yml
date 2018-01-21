@@ -2,7 +2,8 @@ input:
   mqtt-broker:
     module: input-mqtt-broker
     port: 1883
+    websocketPort: 2883
     # regular expression to ignore topics
-    ignoreTopic: ^\$SYS
-    debug: false
+    # ignoreTopic: ^\$SYS
+    debug: true
 

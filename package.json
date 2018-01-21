@@ -104,7 +104,8 @@
     "graygelf": "^1.1.0",
     "nova-sds011": "0.0.2",
     "sds011-wrapper": "^1.0.0",
-    "serialport": "^6.0.4"
+    "serialport": "^6.0.4",
+    "websocket-stream": "^5.1.1"
   },
   "devDependencies": {
     "mocha": "^3.2.0",

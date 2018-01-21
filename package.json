@@ -1,6 +1,6 @@
 {
   "name": "@sematext/logagent",
-  "version": "2.0.99",
+  "version": "2.0.100",
   "description": "Smart log parser written in Node",
   "main": "lib/parser/parser.js",
   "bin": {
@@ -55,7 +55,6 @@
   "license": "Apache-2.0",
   "//": "!!! bithound claims maxmind-geolite-mirror is not used, it is! Don't remove ...",
   "dependencies": {
-    "aedes": "^0.32.1",
     "alasql": "^0.3.6",
     "aws-sdk": "^2.157.0",
     "chalk": "^1.1.3",
@@ -100,6 +99,7 @@
     "try-call": "0.0.2"
   },
   "optionalDependencies": {
+    "aedes": "^0.32.1",
     "date-fns": "^2.0.0-alpha.7",
     "graygelf": "^1.1.0",
     "nova-sds011": "0.0.2",

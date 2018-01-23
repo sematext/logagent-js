@@ -63,7 +63,6 @@
     "elasticsearch": "^13.3.1",
     "eventemitter3": "^2.0.2",
     "fast-safe-stringify": "^1.1.6",
-    "find-my-iphone": "^1.1.1",
     "flat": "^2.0.1",
     "flatstr": "^1.0.4",
     "glob": "^7.1.1",
@@ -102,9 +101,6 @@
     "aedes": "^0.32.1",
     "date-fns": "^2.0.0-alpha.7",
     "graygelf": "^1.1.0",
-    "nova-sds011": "0.0.2",
-    "sds011-wrapper": "^1.0.0",
-    "serialport": "^6.0.4",
     "websocket-stream": "^5.1.1"
   },
   "devDependencies": {

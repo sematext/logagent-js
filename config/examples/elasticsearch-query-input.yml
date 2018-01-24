@@ -1,5 +1,14 @@
+# optional credentials for Amazon Elasticsearch
+aws:
+  auth: 'username:password'
+  awsConfigFile: ./aws-config.json
+
 input:
   queryLogs: 
+    # set to true for Amazon Elasticsearch service
+    awsEnabled: false
+    # auth: 'username:password'
+    # awsConfigFile: ./aws-config.json
     module: elasticsearch-query
     sourceName: errorQuery
     # repeat query every N seconds

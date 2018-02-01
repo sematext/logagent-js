@@ -7,7 +7,7 @@ RUN \
   rm -rf /var/cache/apk/*
 
 RUN \
-  npm install -g @sematext/logagent && \
+  npm install -g --unsafe-perm @sematext/logagent && \
   mkdir -p /etc/sematext && \
   rm -rf /tmp/*
 

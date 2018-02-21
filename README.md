@@ -4,13 +4,13 @@
 
 # What is Logagent
 
-Logagent is a modern, open-source, light-weight log shipper. It is like Filebeat and Logstash in one, without the JVM memory footprint.  It comes with out of the box and extensible log parsing, on-disk buffering, secure transport, and bulk indexing to Elasticsearch, Logsene, and other destinations. Its low memory footprint and low CPU overhead makes it suitable for deploying on edge nodes and devices, while its ability to parse and structure logs makes it a great Logstash alternative.
+Logagent is a modern, open-source, light-weight log shipper. It is like Filebeat and Logstash in one, without the JVM memory footprint.  It comes with out of the box and extensible log parsing, on-disk buffering, secure transport, and bulk indexing to Elasticsearch, Logsene, and other destinations. Its low memory footprint and low CPU overhead make it suitable for deploying on edge nodes and devices, while its ability to parse and structure logs makes it a great Logstash alternative.
 
 ![](https://sematext.com/wp-content/uploads/2016/07/logagent.png)
 
 # Docker
 
-The docker container can be configured through the following environment variables:
+You can run Logagent in a container. The docker container can be configured through the following environment variables:
 
 * **LOG_URL**: The URL of your Elasticsearch Endpoint _(defaults to https://logsene-receiver.sematext.com)_
                For Sematext Europe use https://logsene-receiver.eu.sematext.com. For Elasticsearch https://elasticserch-server-name:9200.

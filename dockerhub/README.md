@@ -1,7 +1,9 @@
 
 The [Logagent](https://sematext.com/logagent) docker container can be configured through the following environment variables:
 
-* **LOG_URL**: The URL of your Elasticsearch Endpoint _(defaults to https://logsene-receiver.sematext.com)_. For Sematext Europe use https://logsene-receiver.eu.sematext.com. For Elasticsearch https://elasticserch-server-name:9200.
+* **LOG_URL**: The URL of your Elasticsearch Endpoint _(defaults to https://logsene-receiver.sematext.com)_. 
+  - For Sematext Europe use https://logsene-receiver.eu.sematext.com. 
+  - For Elasticsearch https://elasticserch-server-name:9200.
 * **LOG_INDEX**: The index where the agent should log to _(for sematext users the logs token)_
 * **LOG_GLOB**: Semicolon-separated list of file globs _(e.g. /var/log/**/*.log;/my/app/logs/*.log)_
 * **LA_ARGUMENTS**: Additional [command line arguments for Logagent](https://sematext.com/docs/logagent/cli-parameters/) _(e.g. LA_ARGUMENTS="-n httpd" to specify a log source name or LA_ARGUMENTS="-u 514" to act as syslog server)_

@@ -33,4 +33,6 @@ docker service create --mode global --name logagent \
 sematext/logagent
 ```
 
-Note: Please use [sematext/sematext-agent-docker](https://hub.docker.com/r/sematext/sematext-agent-docker/) to collect container logs, host and container metrics and Docker events. Sematext Docker Agent supports log enrichment with all relevant container metadata like Swarm service names, Kubernetes metadata etc. 
+See [Logagent Documentation](https://sematext.com/docs/logagent) for more info.
+
+Note: Please use [sematext/sematext-agent-docker](https://hub.docker.com/r/sematext/sematext-agent-docker/) to collect container logs, host and container metrics and Docker events. Sematext Docker Agent supports log enrichment with all relevant container metadata like Swarm service names, Kubernetes metadata, etc. 

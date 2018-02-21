@@ -1,0 +1,645 @@
+# 
+# PARSER DEFINITIONS FILE IN YML FORMAT
+#
+# Please use 'ts' as feild name for dates and time
+# RegexTools: https://regex101.com/#javascript
+
+# Sensitive data can be replaced with a hashcode (sha1)
+# it applies to fields matching the field names by a regular expression
+# Note: this function is not optimized (yet) and might cause 10-15% performance hit
+#autohash: !!js/regexp /user|client_ip|password|email|credit_card_number|payment_info/i
+# set the hash function (default sha256), sha256,sha512
+#hashFunction: sha512
+
+
+# set originalLine to false when auothash fields
+# the original line might include sensitive data!
+originalLine: false
+# default seperator for multiline logs, 
+# which don't have a blockStart property
+# The default /^\S{2,}/ would match typical stack traces
+# All lines that start with a whitespace  or contain only one char 
+# would be attached to previous lines
+multiline:
+  defaultSeparator:  ^\S{2,}
+
+# Please note when geoIP: true
+# There will be a slight delay during first start of logagent while maxmind
+# database is downloaded. Logagent downloads the MaxMind database every 24hrs or 
+# during startup.
+geoIP: true
+
+# The database is stored in a temporary directory
+# The path could be modified via env. variable MAXMIND_DB_DIR
+maxmindDbDir: /tmp/
+
+debug: false
+
+# post process all JSON input
+json:
+  enabled: true 
+#  autohashFields:
+#    _HOSTNAME: true
+#  removeFields:
+#    - _SOURCE_REALTIME_TIMESTAMP
+#  transform: !!js/function >
+#   function (sourceName, parsedObject, config) {
+#     for (var i=0; i<config.removeFields.length; i++) {
+#       console.log('delete ' + config.removeFields[i])
+#       delete parsedObject[config.removeFields[i]]
+#     }
+#   }
+
+
+# The global transform function is called for each parsed line.
+# A good place to do add global fields, custom date processing, or special parsers.
+#globalTransform: !!js/function >
+#  function (source, parsedObject) {
+#    // this function is called after parsing
+#    // regardless of the logging source 
+#    // for pattern specific functions use transform in pattern definitions
+#    // this.geopip lookups for ip adresses
+#    // this.moment for date parsing
+#    // Example:
+#    // this.enrichGeoIp(parsedObject, 'client_ip')
+#  }
+
+# IMPORTANT:
+# PATTERNS ARE EVALUATED SEQUENTIALLY FOR EACH LOG EVENT. PUT MORE COMPLEX AND MORE SPECIFIC PATTERNS FIRST.
+# As soon as a pattern matches a log event the rest of the patterns are skipped.
+#
+# To test your pattern: cat myTest.log | logagent -n <pattern name here> -yml -f mypatterns.yml
+# A pattern name are things like 'kubernetes hyperkube' or 'Elasticsearch' or 'Apache Solr' below.
+
+patterns:
+ - # kubernetes hyperkube
+  sourceName: !!js/regexp /hyperkube/
+  match:
+    - type: hyperkube
+      regex: !!js/regexp /^\S+\s(\S+)\s+\S+\s+\S+\s([GET|POST|PUT|DELETE|HEAD|OPTIONS]+)\s+(\/.+)\:\s\(([\d|\.]+)(\S+)\)\s(\d+\s)(.*hyperkube.+)\s(.+)\:(\d+)\]/i
+      fields: [ts,method,url,duration,duration_unit,status_code,info,ip,port]
+      dateFormat: HH:mm:ss:S
+ - # Elasticsearch 
+  blockStart: !!js/regexp /^[\d{4}-\d{2}-\d{2}[\s|T][\d+|\:]+.\d+|log4j\:\S+\s/
+  sourceName: !!js/regexp /elasticsearch/
+  match:
+    - type: elasticsearch_slow_log
+      regex: !!js/regexp /^\[(\d{4}-\d{2}-\d{2}[\s|T][\d+|\:]+.\d+)\]\[(.+?)\s*\]\[(\S{0,512})\s*\]\s*\[(.+?)\]\s\[(\S+?)\]\[(\d+)\]\s.+took_millis\[(\d+)\].+types\[(.*?)\].+stats\[(.*?)\].*search_type\[(.*?)\].+total_shards\[(.*?)\].+source\[(.*?)\],/i
+      fields: 
+        - ts
+        - severity:string
+        - class_name:string
+        - node_name:string
+        - index_name:string
+        - shard_number:number
+        - took_millis:number
+        - types:string
+        - stats:string
+        - search_type:string
+        - total_shards:number
+        - source:string
+    - type: elasticsearch
+      regex: !!js/regexp /^\[(\d{4}-\d{2}-\d{2}[\s|T][\d+|\:]+.\d+)\]\[(.+?)\s*\]\[(\S{0,512})\s*\]\s*\[(.+?)\]\s([\s|\S]+)/
+      fields: [ts,severity,class_name,node_name,message]
+      dateFormat: YYYY-MM-DD HH:mm:ss,SS
+    - type: elasticsearch
+      regex: !!js/regexp ^\[(\d{4}-\d{2}-\d{2}\s[\d+|\:]+.\d+)\]\[(.+?)\]\[(\S{0,512})\s*\]\s*\s([\s|\S]+)
+      fields: [ts,severity,class_name,message]
+      dateFormat: YYYY-MM-DD HH:mm:ss,SS
+
+ - # Apache Solr
+  blockStart: !!js/regexp ^\S+\s+-\s\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3}|^\d+\s+\S{3,5}\s+
+  sourceName: !!js/regexp /solr/i
+  match:
+    - type: apache_solr
+      regex: !!js/regexp ^(\S+)\s+-\s(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3});\s\[\s*(.+?)]\s(\S+);\s.*.*webapp=(\S+)\spath=(.+?)\sparams={(.*)}.*hits=(\d+)\sstatus=(\d+)\sQTime=(\d+)
+      fields: [severity,ts,application,class,webapp,path,params,hits,status,qtime]
+      dateFormat: YYYY-MM-DD HH:mm:ss,SS
+    - type: apache_solr_v5_1
+      regex: !!js/regexp ^(\d+)\s\[(\S+)]\s(\S+)\s(\S+)\s\[(\S+)\s(\S+)\s(\S+)\s(\S+)\].+?\[(.+?)\]\swebapp=(.+?)\spath=(.+?)\sparams={(.+?)}\sstatus=(\d+)\sQTime=(\d+)
+      fields: [relative_ts,thread_id,severity,class,collection,shard,core,replica,core_name,webapp,path,params,status,qtime]
+      transform: !!js/function >
+        function (p) {
+          if (process.env.PARSE_SOLR_QUERY_PARAMS === '1')
+          {
+            var params = p.params.split('&')
+            p.parsedParams={}
+            for(var i=0;i<params.length;i++)
+            {
+              var key_value = params[i].split('=')
+              if (key_value.length>1)
+                p.parsedParams[key_value[0]] = key_value[1]
+            }
+            if (p.parsedParams['NOW']) {
+              p.parsedParams['NOW'] = new Date(p.parsedParams['NOW']*1)
+              // if (!p['@timestamp'])
+              //   p['@timestamp'] = p.paramsParsed['NOW']
+            }
+          }
+        }
+    - type: apache_solr
+      regex: !!js/regexp ^(\S+)\s+-\s+(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3});\s+(\S+);\s+(.+Exception:\s[\s|\S]+)
+      fields: [severity,ts,class,message]
+      dateFormat: YYYY-MM-DD HH:mm:ss,SS
+    - type: apache_solr
+      regex: !!js/regexp ^(\S+)\s+-\s+(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3});\s+(\S+);\s([\s|\S]+)
+      fields: [severity,ts,class,message]
+      dateFormat: YYYY-MM-DD HH:mm:ss,SS
+    - type: apache_solr_5_generic
+      regex: !!js/regexp ^(\S+)\s+-\s+(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3});\s(.*)
+      fields: [severity,ts,message]
+      dateFormat: YYYY-MM-DD HH:mm:ss,SS
+    - type: apache_solr4
+      regex: !!js/regexp ^(\d+)\s+(\S+)\s+\((\S+)\)\s+\[(.+?)\]\s(\S+)\s(.+)
+      fields: [relative_ts,severity,thread,thread_id,class,message]
+
+ - # Apache Kafka
+  sourceName: !!js/regexp /kafka/
+  match:
+    - type: apache_kafka
+      regex: !!js/regexp ^\[(\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+)\]\s(\S+)\s(.+)
+      fields: [ts,severity,message]
+      dateFormat: YYYY-MM-DD HH:mm:ss
+
+ - # Apache HDFS Data Node
+  blockStart: !!js/regexp ^\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+\s(\S+)\s/
+  sourceName: !!js/regexp /hdfs/
+  match:
+    - type: apache_hdfs_data_node
+      regex: !!js/regexp ^(\d{4}-\d{2}-\d{2}\s+[\d|\:]+,\d+)\s+(\S+)\s(\S+):\s([\s|\S]+)
+      fields: [ts,severity,class,message]
+      dateFormat: YYYY-MM-DD HH:mm:ss,SS
+
+ - # Apache HBase Region Server
+  blockStart: !!js/regexp ^\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+\s(\S+)\s/
+  sourceName: !!js/regexp /hbase/
+  match:
+    - type: apache_hbase_region_server
+      regex: !!js/regexp ^(\d{4}-\d{2}-\d{2}\s+[\d|\:]+,\d+)\s+(\S+)\s+\[(.+)\]\s(\S+):\s([\s|\S]+)
+      fields: [ts,severity,thread,class,message]
+      dateFormat: YYYY-MM-DD HH:mm:ss,SS
+
+ - # Apache YARN
+  sourceName: !!js/regexp /yarn/
+  match:
+    - type: apache_hadoop_yarn_node_manager
+      regex: !!js/regexp ^(\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+)\s(\S+)\s(\S+):\s([\S|\s]+)
+      fields: [ts,severity,class_name,message]
+      dateFormat: YYYY-MM-DD HH:mm:ss,SS
+
+ - # Apache Zookeeper
+  sourceName: !!js/regexp /zookeeper|zk/
+  blockStart: !!js/regexp /^\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+\s+/
+  match:
+    - type: apache_zookeeper
+      regex: !!js/regexp /^(\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+)\s+(\S+)\s+-\s+(\S+)\s+\[(.+)\]\s-\s+([\S|\s]+)/
+      fields: [ts,pid,severity,thread_info,message]
+      dateFormat: YYYY-MM-DD HH:mm:ss,SS
+
+ - # Apache Cassandra
+  sourceName: !!js/regexp cassandra
+  # multi-line, start sequence
+  blockStart: !!js/regexp ^\S+\s\[.+\]\s\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+\s
+  match:
+    - type: apache_cassandra
+      regex: !!js/regexp ^(\S+)\s\[(.+)\]\s(\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+)\s(.+.java)\s+\(line\s(\d+).+\n\s+(.*)
+      fields: [severity,module,ts,java_file,code_line,message]
+      dateFormat: YYYY-MM-DD HH:mm:ss,SS
+
+ - # MongoDB
+  # name of the docker image
+  sourceName: !!js/regexp /mongo/
+  # 2015-07-28T00:35:46.329+0000 I JOURNAL  [initandlisten] journal dir=/data/db/journal
+  match: 
+    - type: mongodb
+      regex: !!js/regexp /^(\d{4}-\d{2}-\d{2}T[\d|\.|\:]+\+\d{4})\s(\w+)\s(\S+)\s+\[(\S+)\]\s(.+)/i
+      fields:  [ts,severity, component, context, message]
+      dateFormat: YYYY-MM-DDTHH:mm:ss.SSSZ
+
+ - # REDIS
+  # name of the docker image
+  # example: "1:M 22 Jul 21:58:28.146 # Server started, Redis version 3.0.2"
+  sourceName: !!js/regexp /redis/i
+  match:
+  - type: redis
+    fields: [pid,node_type,ts,message]
+    regex: !!js/regexp /^(\d+):\w+\s(\d\d\s\w+.+)\s\W\s(.*)/
+  - type: redis
+    fields: [pid,ts,message]
+    regex: !!js/regexp /^\[(\d+)\]\s(.+?)\s\*\s(.+)/i
+    dateFormat: DD MMM HH:mm:ss.SSS
+  - type: redis
+    regex: !!js/regexp /^(.*)/i
+    fields: message
+
+ - # Sonatype Nexus
+  sourceName: !!js/regexp /nexus/
+  # YYYY-MM-DD starts a new log entry
+  blockStart: !!js/regexp ^\d{4}-\d{2}-\d{2}
+  match:
+    - type: nexus
+      regex: !!js/regexp /^([\d|\-|\s|\:|\.|\,|\+]+)\s+([A-Z]+)\s+[^\[]*\[\s*([^\]]+)\]\s(\*?\w+)\s+([\w|\.]+)\W+(.+)/
+      fields: [ts,severity,thread,user,class,message]
+      dateFormat: YYYY-MM-DD HH:mm:ss,SSSZ
+
+ - # NodeBB Forum
+  sourceName: !!js/regexp /nodebb/i
+  match:
+  - type: nodebb_forum
+    fields: [ts,severity,module,message]
+    regex: !!js/regexp /^(\d{4}\-\d{2}\-\d{1,2}T\d\d:\d\d:\d\d\.\d+Z)\s-\s(\w+):\s\[(\S+)]\s(.*)/
+    dateFormat: YYYY-MM-DDTHH:mm:ss.S
+  - type: nodebb_forum
+    fields: [ts,severity,message]
+    regex: !!js/regexp /^(\d{4}\-\d{2}\-\d{1,2}T\d\d:\d\d:\d\d\.\d+Z)\s-\s(\w+):\s(.*)/
+ - # mysql
+  # 2015-07-25 14:11:35 0 [Note] mysqld (mysqld 5.6.26) starting as process 1 ...
+  sourceName: !!js/regexp /mysql/ 
+  match: 
+    - regex: !!js/regexp /^(\d{4}-\d{2}-\d{2}\s[\d|\:]+)\s(\d+)\s\[(.+?)\]\s+(.*)/
+      fields: [ts,pid,level,message]
+      dateFormat: YYYY-MM-DD HH:mm:ss
+      type: mysql
+
+ - # nsq.io  
+  sourceName: !!js/regexp nsqio\/nsq
+  match:
+    - type: nsq
+      regex: !!js/regexp (^\d{4}\/\d{2}\/\d{2}\s[\d|\:]+)\s(\S+)\s+(\d+)\s+\[(\S+)\]\s+(.+)
+      fields: [ts, level, pid, module, message]
+      dateFormat: YYYY/MM/DD HH:mm:ss
+
+ - #  Web Logs
+  sourceName: !!js/regexp /httpd|access_log|apache2|nginx/
+  match: 
+    - type: access_log_combined
+      regex: !!js/regexp ^([0-9a-f.:]+)\s(-|\S+)\s(-|\S+)\s\[(.*)\]\s\"(\w+)\s(\S+)\s{0,1}(.*)\" ([0-9|\-]+) ([0-9|\-]+) \"([^\"]+)\" \"([^\"]+)\"
+      fields: 
+        - client_ip:string
+        - remote_id:string
+        - user:string
+        - ts
+        - method:string
+        - path:string
+        - protocol:string
+        - status_code:number
+        - size:number
+        - referer:string
+        - user_agent:string
+      geoIP: client_ip
+      dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
+      transform: !!js/function >
+        function transformMessage (p) {
+          p.message = p.method + ' ' + p.path
+          if(p.status_code === '-') {
+            p.status_code = 0
+          }
+          if(p.size === '-') {
+            p.size = 0
+          }
+        } 
+    # nginx proxy jwilder/nginx-proxy
+    - regex: !!js/regexp /^(\S+)\s+\|\s(\S+)\s+([0-9a-f.:]+)\s+(-|.+?)\s+(-|.+?)\s\[(.*)\]\s"(.+?)\s(.+?)\s(.+?)"\s(\d+)\s(\d+)\s"(.+?)"\s"(.+?)"/i
+      type: access_common
+      fields: 
+        - proxy_service
+        - virtual_host
+        - client_ip
+        - remote_id,
+        - user
+        - ts
+        - method
+        - path
+        - http_version
+        - status_code:number
+        - size:number
+        - url
+        - user_agent
+      dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
+      geoIP: client_ip
+      #transform: !!js/function >
+      #  function transformMessage (p) {
+      #    p.message = p.method + ' ' + p.path
+      #    if(p.status_code === '-') {
+      #      p.status_code = 0
+      #    }
+      #    if(p.size === '-') {
+      #      p.size = 0
+      #    }
+      #  } 
+    - regex: !!js/regexp ^(\S+)\s+(-|.+?)\s+(-|.+?)\s+\[(.*)\]\s\"(\S+)\s(\S+)\s(\S+)\s(\d+)\s([\d+|\"-\"|-])
+      type: access_common
+      fields: 
+        - client_ip:string
+        - remote_id:string
+        - user:string
+        - ts
+        - method:string
+        - path:string
+        - http_version:string
+        - status_code:number
+        - size:number
+      geoIP: client_ip
+      dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
+      #transform: !!js/function >
+      #  function transformMessage (p) {
+      #    p.message = p.method + ' ' + p.path
+      #    if(p.status_code === '-') {
+      #      p.status_code = 0
+      #    }
+      #    if(p.size === '-') {
+      #      p.size = 0
+      #    }
+      #  } 
+    - type: nginx_error_log 
+      regex: !!js/regexp /^(\d{4}\/\d{2}\/\d{2}\s[\d|\:]+)\s\[(.+?)]\s(\d+)#(\d+)\:\s(.*)/
+      fields: [ts,level,pid,tid,message]
+      dateformat: YYYY/MM/DD HH:mm:ss
+
+    - type: apache_error_log
+      regex: !!js/regexp /^\[(\w{3} \w{3} \d{2} [\d|\:]+\s\d+)\] \[(.+?)\] \[client ([\d|\.]+)\] (.+)/
+      fields: [ts,level,client_ip,message]
+      dateformat: ddd MMM DD hh:mm:ss.SSS YYYY
+       
+    # Apache MPM events
+    - regex: !!js/regexp /^\[(.+?)\]\s+\[(.+?)\]\s+\[(.+?)\]\s+(.+)/
+      fields: [ts,event_type,processInfo,message]
+      type: apache_mpm
+      dateformat: ddd MMM DD hh:mm:ss.SSS YYYY
+
+ - # Tutum Logs
+  sourceName: !!js/regexp /tutum\/cleanup/
+  match:
+    - type: tutum_cleanup
+      regex: !!js/regexp /^(\d+\/\d+\/\d+\s\d+:\d+:\d+)\s(.*)/
+      fields: [ts,message]
+      dateFormat: YYYY/MM/DD hh:mm:ss
+
+ - # RabbitMQ
+  sourceName: !!js/regexp /rabbitmq/
+  blockStart: !!js/regexp /^=(\S+)\sREPORT====/
+  match:
+   - type: rabbitmq
+     regex: !!js/regexp /^=(\S+)\sREPORT====(.+?)\s===([\s|\S]+)/
+     fields: 
+      - severity:string
+      - ts
+      - message
+     dateFormat: DD-MMM-YYYY::hh:mm:ss
+
+ - # Postgres
+  sourceName: !!js/regexp /postgres/
+  match:
+   - type: postgres
+     regex: !!js/regexp /^(\S+\s\S+\s\S+)\s\[\d+\]\s(\S+):\s+([\S|\s]+)/
+     fields: 
+      # todo handle issue with postgres UTC time format
+      # moment.js date format does not handle UTC string
+      - server_time:string
+      - severity:string
+      - message
+     dateFormat: YYYY-MM-DD hh:mm:ss.ZZ
+
+
+ - # CouchDB
+  sourceName: !!js/regexp /couchdb/
+  match:
+   - type: couchdb
+     regex: !!js/regexp /^\[(\S+)\]\s(\S+)\s(\S+)\s(\S+)\s(\S{8})\s([\s|\S]+)/
+     fields: 
+      - severity:string
+      - ts
+      - node:string
+      - module:string
+      - code:string
+      - message:string
+     dateFormat: YYYY-MM-DDTHH:mm:ssZ
+   - type: couchdb_http
+     regex: !!js/regexp /^\[(\S+)\]\s(\S+)\s(\S+)\s(\S+)\s(\S{10})\s(\S+):(\d+)\s(\S+)\s(\S+)\s(GET|PUT|POST|DELETE|HEAD)\s(\S+)\s(\d+)\s(\S|\s+)/
+     fields: 
+      - severity:string
+      - ts
+      - node:string
+      - module:string
+      - code:string
+      - server_ip:string
+      - server_port:number
+      - client_ip:string
+      - user:string
+      - method:string
+      - url:string
+      - status_code:number
+      - response:string
+     dateFormat: YYYY-MM-DDTHH:mm:ssZ
+
+ - # Heroku Syslog Messages
+  sourceName: !!js/regexp /syslog_framed|heroku/ 
+  match:
+    -
+      type: heroku
+      # blockStart: !!js/regexp \^+\s<(\d+)>(\d+)\s/
+      regex: !!js/regexp ^\d*\s{0,1}<(\d+)>(\d+)\s(\S+)\s(\S+)\s(\S+)\s(\S+)\.{0,1}(\d*)\s+-\s(.*)
+      fields: [prio,version,ts,host,app,process_type,dyno,message]
+      dateFormat: YYYY-MM-DDTHH:mm:ssZ
+      transform: !!js/function >
+        function (p) {
+          const SEVERITY = [
+            'emerg',
+            'alert',
+            'crit',
+            'err',
+            'warning',
+            'notice',
+            'info',
+            'debug'
+          ]
+          const FACILITY = [
+            'kern',
+            'user',
+            'mail',
+            'daemon',
+            'auth',
+            'syslog',
+            'lpr',
+            'news',
+            'uucp',
+            'cron',
+            'authpriv',
+            'ftp',
+            'ntp',
+            'logaudit',
+            'logalert',
+            'clock',
+            'local0',
+            'local1',
+            'local2',
+            'local3',
+            'local4',
+            'local5',
+            'local6',
+            'local7'
+          ]
+          p.facility = FACILITY[p.prio>>3] || String(p.prio>>3)
+          p.severity = SEVERITY[p.prio&7] || String(p.prio&7)
+          if (p.process_type === 'router')
+          {
+            try { 
+            var keyValue = p.message.trim().split(' ')
+            keyValue.forEach (function (kv) {
+              var kvs = kv.split ('=')
+              p[kvs[0].trim()] = kvs[1].trim()
+            })
+            } catch (err) {
+              // ignore
+            }
+          }
+        }
+
+ - # CloudFoundry Syslog Messages
+  sourceName: !!js/regexp /cloudfoundry.*|syslog_raw/ 
+  match:
+    -
+      type: cloudfoundry
+      regex: !!js/regexp ^\d*\s{0,1}<(\d+)>(\d+)\s([\d|-]+T[\d|\:|.|\+]+)\s(\S+)\s(.+?)\s\[(.+)\]\s-\s-\s(.+)
+      fields: [prio,version,ts,host,applicationID,processID,message]
+      dateFormat: YYYY-MM-DDTHH:mm:ss.SSSZ
+      transform: !!js/function >
+        function (p) {
+          const SEVERITY = [
+            'emerg',
+            'alert',
+            'crit',
+            'err',
+            'warning',
+            'notice',
+            'info',
+            'debug'
+          ]
+          const FACILITY = [
+            'kern',
+            'user',
+            'mail',
+            'daemon',
+            'auth',
+            'syslog',
+            'lpr',
+            'news',
+            'uucp',
+            'cron',
+            'authpriv',
+            'ftp',
+            'ntp',
+            'logaudit',
+            'logalert',
+            'clock',
+            'local0',
+            'local1',
+            'local2',
+            'local3',
+            'local4',
+            'local5',
+            'local6',
+            'local7'
+          ]
+          p.facility = FACILITY[p.prio>>3] || String(p.prio>>3)
+          p.severity = SEVERITY[p.prio&7] || String(p.prio&7)
+          delete p.prio
+        }
+ - # Docker Swarm 
+  sourceName: !!js/regexp /swarm/ # catch all .log files  
+  match:
+    -
+      type: docker
+      regex: !!js/regexp /^time="(.*)\slevel=(\S+)\smsg="(.+?)"\saddr="(.+?)"\sdiscovery="(.+?)"/
+      fields: [ts,severity,message,address,discovery]
+    -
+      type: docker
+      regex: !!js/regexp /^time="(.*)\slevel=(\S+)\smsg="(.+?)/
+      fields: [ts,severity,message]
+   
+ - # timestamped messages from /var/log/*.log on Mac OS X
+  sourceName: !!js/regexp /\.log/ # catch all .log files  
+  match:
+    -
+      type: system_log
+      regex: !!js/regexp /^([\w|\s]+\s+\d{2}\s[\d|\:]+)\s(.+?)\s(.+?)\s<(.+)>(.*)/
+      fields: [ts,host,service,severity,message]
+      dateFormat: MMM DD HH:mm:ss
+    -
+      type: system_log
+      regex: !!js/regexp /^([\w|\s]+\s+\d{1,2}\s[\d|\:]+)\s(\S+)\s(\S+)\[(\d+)\]\s{0,4}<(.+)>\:\s{0,2}(.+)/
+      fields: [ts,host,service,pid,severity,message]
+      dateFormat: MMM DD HH:mm:ss
+    -
+      type: system_log
+      regex: !!js/regexp /^([\w|\s]+\s+\d{1,2}\s[\d|\:]+)\s(\S+)\s(\S+)\[(\d+)\]\:\s(.+)/
+      fields: [ts,host,service,pid,message]
+      dateFormat: MMM DD HH:mm:ss
+    -
+      type: system_log
+      regex: !!js/regexp /^([\w|\s]+\s+\d{1,2}\s[\d|\:|\.]+)\s+(\S+)\s+(.*)\:\s(.*)/
+      fields: [ts,host,service,message]
+      dateFormat: MMM DD HH:mm:ss
+    - 
+      type: log
+      regex: !!js/regexp /^([\w|\s]+\s\d{2}\s[\d|\:|\.]+)\s+(<.+?>)\s(.*)/
+      fields: [ts,service,message]
+      dateFormat: MMM D HH:mm:ss
+    - 
+      type: log
+      regex: !!js/regexp /^(\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2},\d+)\s\[(\S+)]\s(.+)/
+      fields: [ts,severity,message]
+      dateFormat: YYYY-MM-DD HH:mm:ss,S
+    - 
+      type: log
+      regex: !!js/regexp /^(\d{4}[\-|\d{2}]+\s[\d|\:]+\s\+\d{4})\:\s+(.+)/
+      fields: [ts,message]
+      dateFormat: YYYY-MM-DD HH:mm:ss ZZ
+
+ - # Logagent-js ISO timestamp + message
+  sourceName: !!js/regexp /logagent/   
+  match:    
+    -
+      type: logagent-js
+      regex: !!js/regexp /^(\[\d|\:|\-]+Z)\s([\S|\s]+)/
+      fields: [ts,message]
+      dateFormat: YYYY-MM-DDTHHmmss
+
+dateFormats: [
+    'DD/MMM/YYYY:HH:mm:ss ZZ', #apache
+    'MMM D HH:mm:ss',
+    'MMM DD HH:mm:ss',
+    'DD MMM HH:mm:ss.S',
+    'DD MMM HH:mm:ss',
+    'DDD MMM DD HH:mm:ss',
+    'YYYY-MM-DD',
+    'YYYY-MM-DD HH:mm',
+    'YYYY-MM-DDTHH:mm',
+    'YYYY-MM-DD HHmm',
+    'YYYYMMDD HH:mm',
+    'YYYYMMDD HHmm',
+    'YYYYMMDD',
+    'YYYY-MM-DDTHHmm',
+    'YYYYMMDDTHH:mm',
+    'YYYYMMDDTHHmm',
+    'YYYYMMDDTHH:mm',
+    'YYYY-MM-DD HH:mm:ss',
+    'YYYY-MM-DD HHmmss',
+    'YYYY-MM-DDTHH:mm:ss',
+    'YYYY-MM-DDTHHmmss',
+    'YYYYMMDDTHHmmss',
+    'YYYY-MM-DD HH:mmZ',
+    'YYYY-MM-DD HHmmZ',
+    'YYYY-MM-DD HH:mm:ssZ',
+    'YYYY-MM-DD HHmmssZ',
+    'YYYYMMDD HH:mmZ',
+    'YYYYMMDD HHmmZ',
+    'YYYY-MM-DDTHH:mmZ',
+    'YYYY-MM-DDTHHmmZ',
+    'YYYY-MM-DDTHH:mm:ssZ',
+    'YYYY-MM-DDTHHmmssZ',
+    'YYYYMMDDTHH:mmZ',
+    'YYYYMMDDTHHmmZ',
+    'YYYYMMDDTHHmmZ',
+    'YYYYMMDDTHHmmssZ',
+    'YYYYMMDDTHH:mmZ']

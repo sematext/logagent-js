@@ -6,6 +6,8 @@ output:
     module: output-influxdb
     url: http://127.0.0.1:8086
     db: sensor_data
+    # flush interval in seconds
+    flushInterval: 5
     debug: true
     # following message fields are not used  
     # as tags or fields influxDB output

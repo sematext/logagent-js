@@ -1,0 +1,18 @@
+input: 
+  stdin: true 
+
+output: 
+  sematext-spm:
+    module: output-influxdb
+    url: http://127.0.0.1:8086
+    db: sensor_data
+    debug: true
+    # following message fields are not used  
+    # as tags or fields influxDB output
+    ignoreFields: 
+      - logSource
+      - message
+    # optional filter settings matching data field with regular expressions
+    filter: 
+      field: logSource
+      match: .*

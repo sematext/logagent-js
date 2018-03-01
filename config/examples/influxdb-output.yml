@@ -8,6 +8,8 @@ output:
     db: sensor_data
     # flush interval in seconds
     flushInterval: 5
+    # max buffer size to force flush
+    maxBufferSize: 100
     debug: true
     # following message fields are not used  
     # as tags or fields influxDB output

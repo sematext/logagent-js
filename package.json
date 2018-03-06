@@ -79,7 +79,6 @@
     "fast-safe-stringify": "^1.1.6",
     "flat": "^2.0.1",
     "flatstr": "^1.0.4",
-    "flatten": "^1.0.2",
     "glob": "^7.1.1",
     "http-aws-es": "^3.1.0",
     "influx-line-protocol-parser": "^0.2.0",

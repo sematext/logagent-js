@@ -11,6 +11,10 @@ output:
     # max buffer size to force flush
     maxBufferSize: 100
     debug: true
+    tags: 
+      role: backend
+      version: "1.0.0"
+      region: eu
     # following message fields are not used  
     # as tags or fields influxDB output
     ignoreFields: 

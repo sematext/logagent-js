@@ -1,0 +1,38 @@
+# Application: Add realtime notification for data ingested to Elasticsearch
+# Listening to realtime logs  using mqtt client 
+# mqtt subscribe -h 127.0.0.1 -t realtime_logs
+input:
+  # Elasticsearch compatible indexing API
+  elasticsearch-http:
+    module: input-elasticsearch-http
+    port: 9200
+
+  # Run embedded MQTT broker incl. Websocket for browser clients
+  mqtt-broker:
+    module: input-mqtt-broker
+    port: 1883
+    websocketPort: 2883
+    # Ignore all topics and use the MQTT broker just for MQTT clients
+    # Messages are not ingested to Logagent pipeline
+    ignoreTopic: .*
+    debug: true
+
+output: 
+  # Forward all messages, ingested by elasticsearch-http to MQTT 
+  mqtt:
+    module: output-mqtt
+    url: mqtt://127.0.0.1:1883
+    topic: realtime_logs
+    debug: false
+    # optional filter settings matching data field with regular expressions
+    filter: 
+      field: logSource
+      match: .*
+
+  elasticsearch-server:
+    module: elasticsearch 
+    url: http://elasticsearch_server:9200
+    index: logs
+
+
+

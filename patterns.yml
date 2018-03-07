@@ -40,16 +40,35 @@ json:
   enabled: true 
 #  autohashFields:
 #    _HOSTNAME: true
+  debug: false
 #  removeFields:
-#    - _SOURCE_REALTIME_TIMESTAMP
+#    - stacktrace
+#    - msg
+#    - level
+#    - time
+#  mapFields: 
+#    msg: message
+#    level: severity
+#    time: '@timestamp'
 #  transform: !!js/function >
 #   function (sourceName, parsedObject, config) {
-#     for (var i=0; i<config.removeFields.length; i++) {
-#       console.log('delete ' + config.removeFields[i])
+#    // map fields
+#    Object.keys(config.mapFields).forEach(function (f) {
+#      if (parsedObject[f] !== undefined) {
+#        parsedObject[config.mapFields[f]] = parsedObject[f] 
+#        if (config.debug) {
+#         console.log('map ' + f + ' to ' + config.mapFields[f] + ': ' + parsedObject[config.mapFields[f]])
+#       }
+#      }
+#    })
+#    // remove fields
+#    for (var i=0; i<config.removeFields.length; i++) {
+#       if (config.debug) {
+#         console.log('delete ' + config.removeFields[i])
+#       }
 #       delete parsedObject[config.removeFields[i]]
-#     }
+#    } 
 #   }
-
 
 # The global transform function is called for each parsed line.
 # A good place to do add global fields, custom date processing, or special parsers.

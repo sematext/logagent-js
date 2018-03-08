@@ -1,5 +1,5 @@
 #! /bin/sh
-':' // ; export MAX_MEM="--max-old-space-size=200"; exec "$(command -v node || command -v nodejs)" --harmony "${NODE_OPTIONS:-$MAX_MEM}" "$0" "$@"
+':' // ; export MAX_MEM="--max-old-space-size=300"; exec "$(command -v node || command -v nodejs)" --harmony "${NODE_OPTIONS:-$MAX_MEM}" "$0" "$@"
 'use strict'
 /*
  * See the NOTICE.txt file distributed with this work for additional information

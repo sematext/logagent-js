@@ -28,10 +28,12 @@ output:
     filter: 
       field: logSource
       match: .*
-
+  # store data in Elasticsearch 
   elasticsearch-server:
     module: elasticsearch 
     url: http://elasticsearch_server:9200
+    # note the index name might be overwritten by the index used 
+    # in the original bulk index request 
     index: logs
 
 

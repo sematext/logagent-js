@@ -1,0 +1,36 @@
+version: '2.1'
+services:
+    # Configuration for our seed cassandra node. The node is call DC1N1
+    # .i.e Node 1 in Data center 1.
+    DC1N1:
+        # Cassandra image for Cassandra version 3.1.0. This is pulled
+        # from the docker store.
+        image: cassandra:3.10
+        # In case this is the first time starting up cassandra we need to ensure
+        # that all nodes do not start up at the same time. Cassandra has a
+        # 2 minute rule i.e. 2 minutes between each node boot up. Booting up
+        # nodes simultaneously is a mistake. This only needs to happen the firt
+        # time we bootup. Configuration below assumes if the Cassandra data
+        # directory is empty it means that we are starting up for the first
+        # time.
+        command: bash -c 'if [ -z "$$(ls -A /var/lib/cassandra/)" ] ; then sleep 0; fi && /docker-entrypoint.sh cassandra -f'
+        volumes:
+            - ./n1data:/var/lib/cassandra
+        # Docker constainer environment variable. We are using the
+        # CASSANDRA_CLUSTER_NAME to name the cluster. This needs to be the same
+        # across clusters. We are also declaring that DC1N1 is a seed node.
+        environment:
+            - CASSANDRA_CLUSTER_NAME=dev_cluster
+            - CASSANDRA_SEEDS=DC1N1
+        # Exposing ports for inter cluste communication
+        ports:
+            - 7000:7000
+            - 7001:7001
+            - 7199:7199
+            - 9042:9042
+            - 9160:9160
+        # Cassandra ulimt recommended settings
+        ulimits:
+            memlock: -1
+            nproc: 32768
+            nofile: 100000

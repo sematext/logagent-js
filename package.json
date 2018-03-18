@@ -71,6 +71,7 @@
   "dependencies": {
     "alasql": "^0.3.6",
     "aws-sdk": "^2.157.0",
+    "cassandra-driver": "^3.4.1",
     "chalk": "^1.1.3",
     "co": "^4.6.0",
     "commander": "^2.9.0",

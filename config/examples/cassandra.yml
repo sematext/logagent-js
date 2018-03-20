@@ -1,0 +1,19 @@
+input:
+  cassandra-json:
+    module: cassandra-query
+    server: 
+      host: 'localhost'
+      port: '9042'
+      user: 'cassandra'
+      password: 'cassandra'
+      keyspace: 'logagent'
+    queryTimezone: America/Los_Angeles 
+    queryTimeFormat: YYYY-MM-DD HH:mm:ss          
+    queries: 
+      - sourceName: query1
+        sql: SELECT * FROM logagent.orders_by_day WHERE event_time >= '$queryTime' ALLOW FILTERING
+    interval: 1
+    debug: false
+
+output:
+    stdout: yaml

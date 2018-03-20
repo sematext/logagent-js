@@ -45,6 +45,7 @@ var moduleAlias = {
   'input-mqtt-client': '../lib/plugins/input/mqtt-client.js',
   'input-zeromq': 'logagent-input-zeromq',
   'apple-location': 'logagent-apple-location',
+  'cassandra-query': '../lib/plugins/input/cassandra.js',
   // input filters
   'grep': '../lib/plugins/input-filter/grep.js',
   'grok': 'logagent-input-filter-grok',

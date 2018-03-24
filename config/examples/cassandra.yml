@@ -1,12 +1,16 @@
 input:
   cassandra-json:
     module: cassandra-query
-    server: 
-      host: 'localhost'
+    server:
+      #contact points should be divied by comma ',' for example 'h1', 'h2' 
+      host: localhost
       port: '9042'
-      user: 'cassandra'
-      password: 'cassandra'
       keyspace: 'logagent'
+    #https://docs.datastax.com/en/developer/nodejs-driver/3.4/features/connection-pooling/
+    pooling:
+        coreConnectionsPerHost:
+          distanceLocal: 2
+          distanceRemote: 1
     queryTimezone: America/Los_Angeles 
     queryTimeFormat: YYYY-MM-DD HH:mm:ss          
     queries: 

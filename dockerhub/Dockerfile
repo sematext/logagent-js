@@ -1,4 +1,4 @@
-FROM node:8-alpine
+FROM node:8.11-alpine
 
 ENV LOG_URL="https://logsene-receiver.sematext.com"
 

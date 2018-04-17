@@ -1,0 +1,20 @@
+
+outputFilter:
+  anonymizer:
+    module: anonymizer
+    # JS regeular expression to match log source name
+    matchSource: !!js/regexp nginx
+    # not existing fields are ignored
+    # existing field values are replaced according to config below
+    fields:
+      - client_ip
+      - server_ip
+    # encrypt fields with symmetric AES encryption  aes256 is the default algorithm
+    # aesAlgo: aes256
+    aesPassword: "I don't tell you my passw0rd!"
+    # hash fields
+    hashAlgo: sha256
+    # replace last block of IP with 0 
+    # truncateIpV4: true
+    # truncateIpV6: true
+    

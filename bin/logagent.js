@@ -52,6 +52,7 @@ var moduleAlias = {
   // output filters
   'sql': '../lib/plugins/output-filter/sql.js',
   'access-watch': '../lib/plugins/output-filter/access-watch.js',
+  'anonymizer': '../lib/plugins/output-filter/anonymizer.js',
   // output plugins
   'elasticsearch': '../lib/plugins/output/elasticsearch.js',
   'slack-webhook': '../lib/plugins/output/slack-webhook.js',

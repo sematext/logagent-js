@@ -99,7 +99,7 @@ LaCli.prototype.initFilter = function (type, filterFunctions) {
       }
       var filter = {
         func: ff,
-        config: filterFunctions[i].config || {}
+        config: filterFunctions[i].config || filterFunctions[i] || {}
       }
       this[type].push(filter)
       consoleLogger.log('load ' + type + ': ' + i + ' ' + filterName)

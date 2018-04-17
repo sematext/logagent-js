@@ -11,7 +11,7 @@ outputFilter:
       - server_ip
     # encrypt fields with symmetric AES encryption  aes256 is the default algorithm
     # aesAlgo: aes256
-    aesPassword: "I don't tell you my passw0rd!"
+    # aesPassword: "I don't tell you my passw0rd!"
     # hash fields
     hashAlgo: sha256
     # replace last block of IP with 0 

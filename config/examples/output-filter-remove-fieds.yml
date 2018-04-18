@@ -1,0 +1,8 @@
+outputFilter:
+  ip-truncate-fields:
+    module: remove-fields
+    # JS regeular expression to match log source name
+    matchSource: !!js/regexp nginx
+    fields:
+      - client_ip
+      - user

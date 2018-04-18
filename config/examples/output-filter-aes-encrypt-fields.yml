@@ -1,0 +1,12 @@
+outputFilter:
+  encrypt:
+    module: aes-encrypt-fields
+    # JS regeular expression to match log source name
+    matchSource: !!js/regexp nginx
+    fields:
+      - client_ip
+      - user
+    password: "Top secret!"
+    # algorithms supported by nodejs crypto module, e.g. aes-128-cbc, aes-128-ecb, aes-192-cbc, aes-192-ecb, aes-256-cbc, aes-256-ecb
+    algorithm: aes-256-ecb
+    

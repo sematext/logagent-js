@@ -1,0 +1,11 @@
+
+outputFilter:
+  hashfields: 
+    module: hash-fields
+    # JS regeular expression to match log source name
+    matchSource: !!js/regexp nginx
+    # algorithms supported by nodejs crypto module, e.g. sha1, sha256, sha512, md5, ...
+    algorithm: sha256
+    fields:
+      - client_ip
+      - user

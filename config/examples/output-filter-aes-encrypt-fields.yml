@@ -2,7 +2,7 @@ outputFilter:
   encrypt:
     module: aes-encrypt-fields
     # JS regeular expression to match log source name
-    matchSource: !!js/regexp nginx
+    matchSource: !!js/regexp nginx|apache|httpd
     fields:
       - client_ip
       - user

@@ -120,7 +120,7 @@
   },
   "optionalDependencies": {
     "aedes": "^0.32.1",
-    "date-fns": "^2.0.0-alpha.7",
+    "date-fns": "2.0.0-alpha.6",
     "websocket-stream": "^5.1.1"
   },
   "devDependencies": {

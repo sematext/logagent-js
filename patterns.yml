@@ -384,6 +384,40 @@ patterns:
       type: apache_mpm
       dateformat: ddd MMM DD hh:mm:ss.SSS YYYY
 
+ - # Traefik access_log
+  sourceName: !!js/regexp /traefik/
+  match:
+    - type: traefik_access_log
+      regex: !!js/regexp ^([0-9a-f.:]+)\s(-|\S+)\s(-|\S+)\s\[(.*)\]\s\"(\w+)\s(\S+)\s{0,1}(.*)\"\s([0-9|\-]+)\s([0-9|\-]+)\s\"([^\"]+)\"\s\"([^\"]+)\"\s([0-9|\-]+)\s\"(.+)\"\s\"(.+)\"\s([0-9]+)ms
+      fields: 
+        - client_ip:string
+        - remote_id:string
+        - user:string
+        - ts
+        - method:string
+        - path:string
+        - protocol:string
+        - status_code:number
+        - size:number
+        - referer:string
+        - user_agent:string
+        - req_count:string # https://github.com/containous/traefik/blob/master/middlewares/accesslog/logger_formatters.go#L45
+        - frontend_name:string
+        - backend_url:string
+        - response_time:number
+      geoIP: client_ip
+      dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
+      transform: !!js/function >
+        function transformMessage (p) {
+          p.message = p.method + ' ' + p.path
+          if(p.status_code === '-') {
+            p.status_code = 0
+          }
+          if(p.size === '-') {
+            p.size = 0
+          }
+        }
+
  - # Tutum Logs
   sourceName: !!js/regexp /tutum\/cleanup/
   match:

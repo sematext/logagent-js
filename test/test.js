@@ -4,7 +4,7 @@ process.env.GEOIP_ENABLED = 'true'
 var Logagent = require('../lib/parser/parser.js')
 describe('Logagent parse JSON', function () {
   it('should return correct message with timestamp', function (done) {
-    this.timeout(15000)
+    this.timeout(20000)
     var la = new Logagent()
     la.parseLine(JSON.stringify({
       message: 'hello world',

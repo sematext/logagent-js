@@ -1,5 +1,5 @@
 outputFilter:
-  ip-truncate-fields:
+  remove-fields:
     module: remove-fields
     # JS regeular expression to match log source name
     matchSource: !!js/regexp nginx

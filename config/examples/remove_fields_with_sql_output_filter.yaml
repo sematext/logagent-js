@@ -1,0 +1,15 @@
+input:
+  stdin: true
+
+outputFilter:
+  - module: sql
+    config:
+      matchSource: !!js/regexp /nginx/
+      interval: 1 # every second
+      queries:
+        - # remove field client_ip, referrer
+          SELECT * REMOVE COLUMNS LIKE '%ip%', referer FROM ?
+        
+
+output:
+  stdout: yaml

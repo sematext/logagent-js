@@ -202,6 +202,18 @@ LaCli.prototype.loadPlugins = function (configFile) {
   }
   // load output filters
   var outputFilter = []
+  if (this.argv.docker) {
+    plugins.push({
+      module: 'docker-logs',
+      config: {
+        dockerSocket: this.argv.docker
+      }
+    })
+    outputFilter.push({
+      module: 'docker-enrichment',
+      autodetectSeverity: true
+    })
+  }
   if (configFile && configFile.outputFilter) {
     var outputFilterSections = Object.keys(configFile.outputFilter)
     outputFilterSections.forEach(function (key) {
@@ -251,20 +263,6 @@ LaCli.prototype.loadPlugins = function (configFile) {
         indices: this.argv.indices,
         url: this.argv.elasticsearchUrl,
         index: this.argv.index
-      }
-    })
-  }
-  if (this.argv.docker) {
-    plugins.push({
-      module: '../lib/plugins/input/docker/docker.js',
-      config: {
-        dockerSocket: this.argv.docker
-      }
-    })
-    outputFilter.push({
-      module: '../lib/plugins/output-filter/docker-log-enrichment.js',
-      config: {
-        autodetectSeverity: true
       }
     })
   }

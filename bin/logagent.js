@@ -46,6 +46,7 @@ var moduleAlias = {
   'input-zeromq': 'logagent-input-zeromq',
   'apple-location': 'logagent-apple-location',
   'cassandra-query': '../lib/plugins/input/cassandra.js',
+  'docker-logs': '../lib/plugins/input/docker/docker.js',
   // input filters
   'grep': '../lib/plugins/input-filter/grep.js',
   'grok': 'logagent-input-filter-grok',
@@ -56,6 +57,7 @@ var moduleAlias = {
   'aes-encrypt-fields': '../lib/plugins/output-filter/aes-encrypt-fields.js',
   'ip-truncate-fields': '../lib/plugins/output-filter/ip-truncate-fields.js',
   'remove-fields': '../lib/plugins/output-filter/remove-fields.js',
+  'docker-enrichment': '../lib/plugins/output-filter/docker-log-enrichment.js',
   // output plugins
   'elasticsearch': '../lib/plugins/output/elasticsearch.js',
   'slack-webhook': '../lib/plugins/output/slack-webhook.js',
@@ -249,6 +251,20 @@ LaCli.prototype.loadPlugins = function (configFile) {
         indices: this.argv.indices,
         url: this.argv.elasticsearchUrl,
         index: this.argv.index
+      }
+    })
+  }
+  if (this.argv.docker) {
+    plugins.push({
+      module: '../lib/plugins/input/docker/docker.js',
+      config: {
+        dockerSocket: this.argv.docker
+      }
+    })
+    outputFilter.push({
+      module: '../lib/plugins/output-filter/docker-log-enrichment.js',
+      config: {
+        autodetectSeverity: true
       }
     })
   }

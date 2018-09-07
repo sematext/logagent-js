@@ -1,0 +1,37 @@
+# Global options
+options:
+  # print stats every 60 seconds 
+  printStats: 60
+  # don't write parsed logs to stdout
+  suppress: false
+  # Enable/disable GeoIP lookups
+  # Startup of logagent might be slower, when downloading the GeoIP database
+  geoipEnabled: false
+  # Directory to store Logagent status and temporary files
+  diskBufferDir: ./tmp
+
+input:
+  # a list of glob patterns to watch files to tail
+  #files:
+  #    - '/var/log/**/*.log'
+  # listen to udp syslog protocol  
+  dockerLogs: 
+    module: docker-logs
+    labelFilter: .*
+  # Receive data from Heroku log drains via http
+  #heroku: 
+  #  port: 9999
+  # Receive data from Cloud Foundry log drains via http  
+  #cloudFoundry:
+  #  port: 8888
+
+outputFilter: 
+  - module: docker-enrichment
+    config: 
+      autodetectSeverity: true
+
+
+#output:
+#  logsene: 
+#    url: https://logsene-receiver.sematext.com
+#    index: test

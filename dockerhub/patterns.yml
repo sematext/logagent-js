@@ -11,7 +11,7 @@
 # set the hash function (default sha256), sha256,sha512
 #hashFunction: sha512
 
-
+debug: false
 # set originalLine to false when auothash fields
 # the original line might include sensitive data!
 originalLine: false
@@ -33,23 +33,40 @@ geoIP: true
 # The path could be modified via env. variable MAXMIND_DB_DIR
 maxmindDbDir: /tmp/
 
-debug: false
-
 # post process all JSON input
 json:
   enabled: true 
 #  autohashFields:
 #    _HOSTNAME: true
+  debug: false
 #  removeFields:
-#    - _SOURCE_REALTIME_TIMESTAMP
+#    - stacktrace
+#    - msg
+#    - level
+#    - time
+#  mapFields: 
+#    msg: message
+#    level: severity
+#    time: '@timestamp'
 #  transform: !!js/function >
 #   function (sourceName, parsedObject, config) {
-#     for (var i=0; i<config.removeFields.length; i++) {
-#       console.log('delete ' + config.removeFields[i])
+#    // map fields
+#    Object.keys(config.mapFields).forEach(function (f) {
+#      if (parsedObject[f] !== undefined) {
+#        parsedObject[config.mapFields[f]] = parsedObject[f] 
+#        if (config.debug) {
+#         console.log('map ' + f + ' to ' + config.mapFields[f] + ': ' + parsedObject[config.mapFields[f]])
+#       }
+#      }
+#    })
+#    // remove fields
+#    for (var i=0; i<config.removeFields.length; i++) {
+#       if (config.debug) {
+#         console.log('delete ' + config.removeFields[i])
+#       }
 #       delete parsedObject[config.removeFields[i]]
-#     }
+#    } 
 #   }
-
 
 # The global transform function is called for each parsed line.
 # A good place to do add global fields, custom date processing, or special parsers.
@@ -199,10 +216,10 @@ patterns:
  - # Apache Cassandra
   sourceName: !!js/regexp cassandra
   # multi-line, start sequence
-  blockStart: !!js/regexp ^\S+\s\[.+\]\s\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+\s
+  blockStart: !!js/regexp ^\S{3,5}\s+\[.+\]\s+\d{4}
   match:
     - type: apache_cassandra
-      regex: !!js/regexp ^(\S+)\s\[(.+)\]\s(\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+)\s(.+.java)\s+\(line\s(\d+).+\n\s+(.*)
+      regex: !!js/regexp ^\S{0,5}(\S*)\s+\[(.+)\]\s(\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+)\s+(.+\.java)\:(\d+)\s+-\s+([\S|\s]+)
       fields: [severity,module,ts,java_file,code_line,message]
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
 
@@ -366,6 +383,40 @@ patterns:
       fields: [ts,event_type,processInfo,message]
       type: apache_mpm
       dateformat: ddd MMM DD hh:mm:ss.SSS YYYY
+
+ - # Traefik access_log
+  sourceName: !!js/regexp /traefik/
+  match:
+    - type: traefik_access_log
+      regex: !!js/regexp ^([0-9a-f.:]+)\s(-|\S+)\s(-|\S+)\s\[(.*)\]\s\"(\w+)\s(\S+)\s{0,1}(.*)\"\s([0-9|\-]+)\s([0-9|\-]+)\s\"([^\"]+)\"\s\"([^\"]+)\"\s([0-9|\-]+)\s\"(.+)\"\s\"(.+)\"\s([0-9]+)ms
+      fields: 
+        - client_ip:string
+        - remote_id:string
+        - user:string
+        - ts
+        - method:string
+        - path:string
+        - protocol:string
+        - status_code:number
+        - size:number
+        - referer:string
+        - user_agent:string
+        - req_count:string # https://github.com/containous/traefik/blob/master/middlewares/accesslog/logger_formatters.go#L45
+        - frontend_name:string
+        - backend_url:string
+        - response_time:number
+      geoIP: client_ip
+      dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
+      transform: !!js/function >
+        function transformMessage (p) {
+          p.message = p.method + ' ' + p.path
+          if(p.status_code === '-') {
+            p.status_code = 0
+          }
+          if(p.size === '-') {
+            p.size = 0
+          }
+        }
 
  - # Tutum Logs
   sourceName: !!js/regexp /tutum\/cleanup/

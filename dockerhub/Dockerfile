@@ -1,6 +1,7 @@
 FROM node:8.11-alpine
 
 ENV LOG_URL="https://logsene-receiver.sematext.com"
+ENV REGION="US"
 
 RUN \
   apk add --update bash tini && \

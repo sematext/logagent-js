@@ -206,7 +206,7 @@ LaCli.prototype.loadPlugins = function (configFile) {
     plugins.push({
       module: 'docker-logs',
       config: {
-        dockerSocket: this.argv.docker
+        socket: this.argv.docker
       }
     })
     outputFilter.push({

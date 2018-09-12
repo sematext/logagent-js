@@ -18,12 +18,7 @@ input:
   dockerLogs: 
     module: docker-logs
     labelFilter: .*
-  # Receive data from Heroku log drains via http
-  #heroku: 
-  #  port: 9999
-  # Receive data from Cloud Foundry log drains via http  
-  #cloudFoundry:
-  #  port: 8888
+    socket: /var/run/docker.sock
 
 outputFilter: 
   - module: docker-enrichment
@@ -31,7 +26,7 @@ outputFilter:
       autodetectSeverity: true
 
 
-#output:
-#  logsene: 
-#    url: https://logsene-receiver.sematext.com
-#    index: test
+output:
+  logsene: 
+    url: https://logsene-receiver.sematext.com
+    index: YOUR_LOG_TOKEN_HERE

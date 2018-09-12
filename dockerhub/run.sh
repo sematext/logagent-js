@@ -2,11 +2,16 @@
 
 # 
 if [[ -z "$LOG_INDEX" ]]; then
-    echo "You need to set the LOG_INDEX in the environment!" >&2
+  export LOG_INDEX="$LOGSENE_TOKEN"
+fi 
+
+if [[ -z "$LOG_INDEX" ]]; then
+    echo "You need to set the LOG_INDEX or LOGSENE_TOKEN in the environment!" >&2
     exit 1
 fi
 
 if [ ! -r /var/run/docker.sock ]; then
+  export LA_ARGUMENTS="${LA_ARGUMENTS} --docker /var/run/docker.sock"
   if [[ -z "$LOG_GLOB" ]]; then
     echo "You need to set the LOG_GLOB in the environment!" >&2
     exit 1
@@ -56,11 +61,12 @@ options:
 parser:
   patternFiles:
     - /opt/logagent/patterns.yml
-input:
+
 EOF
 
 if [[ -z "$LOG_GLOB}" ]]; then
 cat >>/etc/sematext/logagent.conf <<EOF
+input:
   files:
 EOF
 
@@ -71,18 +77,18 @@ while IFS=';' read -ra ADDR; do
 done <<<"$LOG_GLOB"
 fi
 
-if [ -r /var/run/docker.sock ]; then
-cat >>/etc/sematext/logagent.conf <<EOF
-  dockerLogs: 
-    module: docker-logs
-    labelFilter: .*
+# if [ -r /var/run/docker.sock ]; then
+# cat >>/etc/sematext/logagent.conf <<EOF
+#   dockerLogs: 
+#     module: docker-logs
+#     labelFilter: .*
 
-outputFilter: 
-  - module: docker-enrichment
-    config: 
-      autodetectSeverity: true
-EOF
-fi
+# outputFilter: 
+#   - module: docker-enrichment
+#     config: 
+#       autodetectSeverity: true
+# EOF
+# fi
 
 
 cat >>/etc/sematext/logagent.conf <<EOF

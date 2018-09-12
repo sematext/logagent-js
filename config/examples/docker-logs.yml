@@ -17,7 +17,7 @@ input:
   # listen to udp syslog protocol  
   dockerLogs: 
     module: docker-logs
-    labelFilter: .*
+    labelFilter: com.docker.*,io.kubernetes.*,annotation.io.*
     socket: /var/run/docker.sock
 
 outputFilter: 

@@ -11,11 +11,12 @@ if [[ -z "$LOG_INDEX" ]]; then
 fi
 
 if [ ! -r /var/run/docker.sock ]; then
-  export LA_ARGUMENTS="${LA_ARGUMENTS} --docker /var/run/docker.sock"
   if [[ -z "$LOG_GLOB" ]]; then
     echo "You need to set the LOG_GLOB in the environment!" >&2
     exit 1
   fi
+else 
+  export LA_ARGUMENTS="--docker /var/run/docker.sock ${LA_ARGUMENTS}"
 fi
 
 echo "Preparing environment..."
@@ -99,6 +100,7 @@ output:
     index: ${LOG_INDEX}
 EOF
 
+echo "/usr/local/bin/logagent -c /etc/sematext/logagent.conf ${LA_ARGUMENTS}"
 exec /usr/local/bin/logagent -c /etc/sematext/logagent.conf ${LA_ARGUMENTS}
 cat /etc/sematext/logagent.conf
 

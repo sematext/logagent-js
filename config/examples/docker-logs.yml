@@ -21,9 +21,14 @@ input:
     socket: /var/run/docker.sock
 
 outputFilter: 
-  - module: docker-enrichment
-    config: 
-      autodetectSeverity: true
+  docker-enrichment:
+    module: docker-enrichment 
+    autodetectSeverity: true
+
+#outputFilter: 
+#  - module: docker-enrichment
+#    config: 
+#      autodetectSeverity: true
 
 
 output:

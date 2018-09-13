@@ -1,0 +1,46 @@
+# Kubernetes < v1.9
+# apiVersion: extensions/v1beta1
+# Kubernetes >= v1.9
+apiVersion: extensions/v1beta2
+kind: DaemonSet
+metadata:
+  name: sematext-logagent
+spec:
+  template:
+    metadata:
+      labels:
+        app: sematext-logagent
+    spec:
+      nodeSelector: {}
+      hostNetwork: true
+      dnsPolicy: "ClusterFirst"
+      restartPolicy: "Always"
+      containers:
+      - name: sematext-logagent
+        image: sematext/logagent:latest
+        imagePullPolicy: "Always"
+        env:
+        - name: LOGSENE_TOKEN
+          value: "YOUR_LOGSENE_TOKEN"
+        volumeMounts:
+          - mountPath: /var/run/docker.sock
+            name: docker-sock
+          - mountPath: /etc/localtime
+            name: localtime
+#          - mountPath: /etc/logagent
+#            name: patterns
+        securityContext:
+          privileged: true
+      volumes:
+        - name: docker-sock
+          hostPath:
+            path: /var/run/docker.sock
+        - name: localtime
+          hostPath:
+            path: /etc/localtime
+#        - name: patterns
+#          configMap:
+#            name: sematext-agent-patterns
+#            items:
+#            - key: patterns.yml
+#              path: patterns.yml

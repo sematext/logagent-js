@@ -45,12 +45,12 @@ export LOGSENE_RECEIVER_URL="https://logsene-receiver.sematext.com"
 if [ "$REGION" == "EU" ]; then 
   generate_eu_config
   echo "Set region $REGION in /etc/sematext/receivers.config:"
-  cat /etc/sematext/receivers.config
+  # cat /etc/sematext/receivers.config
 fi;
 if [ "$REGION" == "US" ]; then 
   generate_us_config
   echo "Set region $REGION in /etc/sematext/receivers.config:"
-  cat /etc/sematext/receivers.config
+  # cat /etc/sematext/receivers.config
 fi;
 
 cat >/etc/sematext/logagent.conf <<EOF

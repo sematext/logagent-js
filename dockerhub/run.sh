@@ -91,6 +91,7 @@ fi
 # EOF
 # fi
 
+echo "Logsene receiver url (LOGSENE_RECEIVER_URL): ${LOGSENE_RECEIVER_URL}"
 
 cat >>/etc/sematext/logagent.conf <<EOF
 output:

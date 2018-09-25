@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export LOG_URL
+export LOGSENE_RECEIVER_URL
 export RECEIVERS_CONFIG="/etc/sematext/receivers.config"
 
 if [[ -z "$LOG_INDEX" ]]; then
@@ -27,26 +27,26 @@ touch /etc/sematext/logagent.conf
 chmod 600 /etc/sematext/logagent.conf
 
 generate_config() {
-  if [[ ! -z "$LOG_URL" ]]; then
+  if [[ ! -z "$LOGSENE_RECEIVER_URL" ]]; then
     echo -e "SPM_RECEIVER_URL=$SPM_RECEIVER_URL
 EVENTS_RECEIVER_URL=$EVENTS_RECEIVER_URL
-LOG_URL=$LOG_URL" >"$RECEIVERS_CONFIG"
+LOGSENE_RECEIVER_URL=$LOGSENE_RECEIVER_URL" >"$RECEIVERS_CONFIG"
     REGION="custom"
   fi
 
   if [[ $REGION == "US" ]]; then
     echo -e "SPM_RECEIVER_URL=https://spm-receiver.sematext.com/receiver/v1
 EVENTS_RECEIVER_URL=https://event-receiver.sematext.com
-LOG_URL=https://logsene-receiver.sematext.com" >"$RECEIVERS_CONFIG"
+LOGSENE_RECEIVER_URL=https://logsene-receiver.sematext.com" >"$RECEIVERS_CONFIG"
   fi
 
   if [[ $REGION == "EU" ]]; then
     echo -e "SPM_RECEIVER_URL=https://spm-receiver.eu.sematext.com/receiver/v1
 EVENTS_RECEIVER_URL=https://event-receiver.eu.sematext.com
-LOG_URL=https://logsene-receiver.eu.sematext.com" >"$RECEIVERS_CONFIG"
+LOGSENE_RECEIVER_URL=https://logsene-receiver.eu.sematext.com" >"$RECEIVERS_CONFIG"
   fi
 
-  LOG_URL=$(grep -w LOG_URL "$RECEIVERS_CONFIG" | sed 's/\(LOG_URL=\)\(.*\)/\2/')
+  LOGSENE_RECEIVER_URL=$(grep -w LOGSENE_RECEIVER_URL "$RECEIVERS_CONFIG" | sed 's/\(LOGSENE_RECEIVER_URL=\)\(.*\)/\2/')
 
   echo "Receivers config from $RECEIVERS_CONFIG:"
   cat "$RECEIVERS_CONFIG"
@@ -95,7 +95,7 @@ cat >>/etc/sematext/logagent.conf <<EOF
 output:
   logsene:
     module: elasticsearch
-    url: $LOG_URL
+    url: $LOGSENE_RECEIVER_URL
     index: ${LOG_INDEX}
 EOF
 

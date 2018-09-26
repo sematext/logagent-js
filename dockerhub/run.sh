@@ -65,8 +65,9 @@ parser:
     - /opt/logagent/patterns.yml
 EOF
 
-if [[ -z "$LOG_GLOB}" ]]; then
-  cat >>/etc/sematext/logagent.conf <<EOF
+echo "$LOG_GLOB"
+if [ "${LOG_GLOB}" ]; then 
+cat >>/etc/sematext/logagent.conf <<EOF
 input:
   files:
 EOF

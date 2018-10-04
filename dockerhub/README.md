@@ -75,7 +75,7 @@ sematext/logagent
 <tr>
   
 <tr><td>LOG_GLOB</td>
-  <td>Semicolon-separated list of file globs (e.g. /var/log/**/*.log;/my/app/logs/*.log)</td>
+  <td>Semicolon-separated list of file globs (e.g. <code>/var/log/**/*.log;/mylogs/**/*.log</code>) to collect log files from the host, assuming the log files are mounted to <code>/mylogs</code> using Docker <code> -v /var/logs:/mylogs</code> </td>
 </tr>  
 <tr><td>LA_ARGUMENTS</td>
   <td>

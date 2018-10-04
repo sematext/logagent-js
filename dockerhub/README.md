@@ -63,7 +63,7 @@ sematext/logagent
 </tr>
 <tr>
 <td><code>-v /var/run/docker.sock</code></td>
-<td>Path to the docker socket (optional, if dockerd provides TCP on 2375, see also DOCKER_PORT and DOCKER_HOST parameter)</td>
+<td>Path to the docker socket </td>
 </tr>
 <td><strong>Optional Parameters:</strong></td>
 <td></td>
@@ -82,8 +82,6 @@ sematext/logagent
     Additional <a href="https://sematext.com/docs/logagent/cli-parameters/">command line arguments for Logagent</a> (e.g. <code>LA_ARGUMENTS="-n httpd"</code> to specify a log source name or <code>LA_ARGUMENTS="-u 514"</code> to act as syslog server)
 </td>
 </tr>  
-Run a container:
-
 <td>--privileged</td>
 <td>The parameter might be helpful when Sematext Agent could not start because of limited permission to connect and write to the Docker socket /var/run/docker.sock. The privileged mode is a potential security risk, we recommend to enable the appropriate security. Please read about Docker security: https://docs.docker.com/engine/security/security/</td>
 </tr>

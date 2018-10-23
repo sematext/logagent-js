@@ -7,7 +7,7 @@ The [Logagent](https://sematext.com/logagent) docker container can be configured
   - For Elasticsearch https://elasticserch-server-name:9200.
 * **LOGSENE_TOKEN**: The index where the agent should log to _(for [Sematext Cloud](https://sematext.com/cloud) users the logs token)_
 * **LOG_GLOB**: Semicolon-separated list of file globs __(e.g. /mylogs/**/*.log;/var/log/**/*.log)__. Mount your server log files into the container using a Docker volume e.g. `-v /var/log:/mylogs`. 
-* **LOGAGENT_ARGS**: Additional [command line arguments for Logagent](https://sematext.com/docs/logagent/cli-parameters/) _(e.g. LA_ARGUMENTS="-n httpd" to specify a log source name or LA_ARGUMENTS="-u 514" to act as syslog server)_. Please refer to Logagent command line argumetns in the [Logagent Documentation](https://sematext.com/docs/logagent/cli-parameters/)
+* **LOGAGENT_ARGS**: Additional [command line arguments for Logagent](https://sematext.com/docs/logagent/cli-parameters/) _(e.g. LOGAGENT_ARGS="-n httpd" to specify a log source name or LOGAGENT_ARGS="-u 514" to act as syslog server)_. Please refer to Logagent command line argumetns in the [Logagent Documentation](https://sematext.com/docs/logagent/cli-parameters/)
 
 ## Collecting Docker logs
 
@@ -46,7 +46,7 @@ docker run -d --name logagent \
 -e LOG_GLOB="/mylogs/**/.log" \
 -e LOGSENE_RECEIVER_URL=https://logsene-receiver.sematext.com \
 -e LOGSENE_TOKEN=YOUR_LOGSENE_TOKEN_HERE \
--e LA_ARGUMENTS="-u 514" \
+-e LOGAGENT_ARGS="-u 514" \
 sematext/logagent
 ```
 ## Configuration Parameters

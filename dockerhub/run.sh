@@ -18,7 +18,7 @@ if [[ ! -r /var/run/docker.sock ]]; then
     exit 1
   fi
 else
-  export LOGAGENT_ARGUMENTS="--docker /var/run/docker.sock ${LOGAGENT_ARGUMENTS}"
+  export LOGAGENT_ARGS="--docker /var/run/docker.sock ${LOGAGENT_ARGS}"
 fi
 
 echo "Preparing environment..."
@@ -100,6 +100,6 @@ output:
     index: ${LOG_INDEX}
 EOF
 
-echo "/usr/local/bin/logagent -c /etc/sematext/logagent.conf ${LOGAGENT_ARGUMENTS}"
-exec /usr/local/bin/logagent -c /etc/sematext/logagent.conf ${LOGAGENT_ARGUMENTS}
+echo "/usr/local/bin/logagent -c /etc/sematext/logagent.conf ${LOGAGENT_ARGS}"
+exec /usr/local/bin/logagent -c /etc/sematext/logagent.conf ${LOGAGENT_ARGS}
 cat /etc/sematext/logagent.conf

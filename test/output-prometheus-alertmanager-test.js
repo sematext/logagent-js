@@ -5,19 +5,13 @@ describe('OutputPrometheusAlertmanager', function () {
     it('throws if no config given', function () {
       assert.throws(function() {
         new OutputPrometheusAlertmanager({})
-      }, {
-        name: 'TypeError',
-        message: 'Please specify Prometheus Alertmanager "url"'
-      })
+      }, /Please specify Prometheus Alertmanager "url"/)
     })
 
     it('throws if no config.url given', function () {
       assert.throws(function() {
         new OutputPrometheusAlertmanager()
-      }, {
-        name: 'TypeError',
-        message: 'Please specify Prometheus Alertmanager "url"'
-      })
+      }, /Please specify Prometheus Alertmanager "url"/)
     })
 
     it('returns instance', function () {

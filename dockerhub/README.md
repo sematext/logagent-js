@@ -7,7 +7,7 @@ The [Logagent](https://sematext.com/logagent) docker container can be configured
   - For Elasticsearch https://elasticserch-server-name:9200.
 * **LOGSENE_TOKEN**: The index where the agent should log to _(for [Sematext Cloud](https://sematext.com/cloud) users the logs token)_
 * **LOG_GLOB**: Semicolon-separated list of file globs __(e.g. /mylogs/**/*.log;/var/log/**/*.log)__. Mount your server log files into the container using a Docker volume e.g. `-v /var/log:/mylogs`. 
-* **LOGAGENT_ARGUMENTS**: Additional [command line arguments for Logagent](https://sematext.com/docs/logagent/cli-parameters/) _(e.g. LA_ARGUMENTS="-n httpd" to specify a log source name or LA_ARGUMENTS="-u 514" to act as syslog server)_. Please refer to Logagent command line argumetns in the [Logagent Documentation](https://sematext.com/docs/logagent/cli-parameters/)
+* **LOGAGENT_ARGS**: Additional [command line arguments for Logagent](https://sematext.com/docs/logagent/cli-parameters/) _(e.g. LA_ARGUMENTS="-n httpd" to specify a log source name or LA_ARGUMENTS="-u 514" to act as syslog server)_. Please refer to Logagent command line argumetns in the [Logagent Documentation](https://sematext.com/docs/logagent/cli-parameters/)
 
 ## Collecting Docker logs
 
@@ -83,9 +83,9 @@ sematext/logagent
 <tr><td>LOG_GLOB</td>
   <td>Semicolon-separated list of file globs (e.g. <code>/var/log/**/*.log;/mylogs/**/*.log</code>) to collect log files from the host, assuming the log files are mounted to <code>/mylogs</code> using Docker <code> -v /var/logs:/mylogs</code> </td>
 </tr>  
-<tr><td>LOGAGENT_ARGUMENTS</td>
+<tr><td>LOGAGENT_ARGS</td>
   <td>
-    Additional <a href="https://sematext.com/docs/logagent/cli-parameters/">command line arguments for Logagent</a> (e.g. <code>LOGAGENT_ARGUMENTS="-n httpd"</code> to specify a log source name or <code>LOGAGENT_ARGUMENTS="-u 514"</code> to act as syslog server)
+    Additional <a href="https://sematext.com/docs/logagent/cli-parameters/">command line arguments for Logagent</a> (e.g. <code>LOGAGENT_ARGS="-n httpd"</code> to specify a log source name or <code>LOGAGENT_ARGS="-u 514"</code> to act as syslog server)
 </td>
 </tr>  
 <td>--privileged</td>

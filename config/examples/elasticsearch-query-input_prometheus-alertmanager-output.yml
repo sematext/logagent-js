@@ -1,0 +1,43 @@
+# optional credentials for Amazon Elasticsearch
+# aws:
+#   auth: 'username:password'
+#   awsConfigFile: ./aws-config.json
+
+input:
+  queryLogs: 
+    # set to true for Amazon Elasticsearch service
+    awsEnabled: false
+    module: elasticsearch-query
+    sourceName: errorQuery
+    # repeat query every N seconds
+    interval: 60
+    log: 'error'
+    url: http://elasticsearch/
+    query: 
+      size: 50
+      index: logs-*app-proxy*
+      body:
+        query:
+          bool:
+            must: 
+              - query_string:
+                  query: '*foo122*'
+            filter:
+              - range:
+                  '@timestamp':
+                    gte: now-3600m/m
+                    lte: now/m
+
+output:
+  # stdout: yaml 
+  prometheus:
+    module: prometheus-alertmanager
+    url: http://localhost:9093
+    alertTemplate:
+      generatorURL: http://kibana/_plugin/kibana/app/kibana#/discover?&_a=(query:(language:lucene,query:'*{host}*'))
+      labels:
+        host: "{host}"
+        environment: "{environment}"
+      annotations:
+        environment: "{environment}"
+    debug: true

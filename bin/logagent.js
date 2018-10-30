@@ -61,6 +61,7 @@ var moduleAlias = {
   // output plugins
   'elasticsearch': '../lib/plugins/output/elasticsearch.js',
   'slack-webhook': '../lib/plugins/output/slack-webhook.js',
+  'prometheus-alertmanager': '../lib/plugins/output/prometheus-alertmanager.js',
   'output-kafka': 'logagent-output-kafka',
   'output-files': '../lib/plugins/output/files.js',
   'output-gelf': '../lib/plugins/output/gelfout.js',

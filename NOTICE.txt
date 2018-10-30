@@ -12,5 +12,5 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
 implied.  See the License for the pecific language governing
 permissions and limitations under the License.
 
-This software may not be used in products or services that may be
+This Software may not be used in products or services that may be
 considered competitive with those offered by Sematext Group, Inc.

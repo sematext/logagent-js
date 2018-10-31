@@ -68,7 +68,8 @@ var moduleAlias = {
   'output-aws-elasticsearch': '../lib/plugins/output/aws-elasticsearch.js',
   'output-mqtt': '../lib/plugins/output/mqtt.js',
   'output-zeromq': 'logagent-output-zeromq',
-  'output-influxdb': '../lib/plugins/output/influxdb.js'
+  'output-influxdb': '../lib/plugins/output/influxdb.js',
+  'output-clickhouse': '../lib/plugins/output/clickhouse.js'
 }
 
 function LaCli (options) {

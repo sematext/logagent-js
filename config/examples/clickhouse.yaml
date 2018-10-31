@@ -1,0 +1,36 @@
+# Preparation for the example:
+# Start ClickHouse DB
+#   docker run -d --name clickhouse-server -p 8123:8123 -p 9000:9000 --ulimit nofile=262144:262144 yandex/clickhouse-server
+# Login via ClickHouse client
+#   docker run -it --rm --link clickhouse-server:clickhouse-server yandex/clickhouse-client --host clickhouse-server
+# Run create table statemnt
+#   CREATE TABLE logs(
+#    message String,
+#    severity String,
+#    "@timestamp" UInt64) ENGINE = Log;
+# Run Logagent and enter a text to stdin as log message
+#  logagent --config config/examples/clickhouse.yaml
+
+
+
+# Global options
+options:
+  includeOriginalLine: false
+
+input:
+  stdin: true
+
+
+output:
+  # print parsed logs in YAML format to stdout if supress is set false    
+  clickhouse: 
+    module: output-clickhouse
+    url: http://127.0.0.1 
+    port: 8123
+    debug: false
+    table: default.logs
+    # Fields must be in the same order as specified in CREATE TABLE
+    fields: 
+      - 'severity'
+      - 'message'
+      - '@timestamp'

@@ -74,6 +74,7 @@
     "aws-sdk": "^2.157.0",
     "cassandra-driver": "^3.4.1",
     "chalk": "^1.1.3",
+    "clickhouse": "^1.2.7",
     "co": "^4.6.0",
     "commander": "^2.9.0",
     "docker-loghose": "^1.6.3",

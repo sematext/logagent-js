@@ -1,5 +1,6 @@
 import * as net from 'net';
 import * as http from 'http';
+import * as events from 'events';
 import * as Aedes from 'aedes';
 import * as ws from 'websocket-stream';
 import * as consoleLogger from '../../util/logger.js';
@@ -21,17 +22,17 @@ var ignoreTopicRegEx = /^\$SYS/
  */
 class InputMqttBroker {
   config = null;
-  eventEmitter = null;
+  eventEmitter: events.EventEmitter = null;
   aedes = null;
 
   started: boolean = false;
   server: net.Server = null;
   httpServer: http.Server = null;
 
-  constructor(config, eventEmitter) {
-    this.config = config
-    this.eventEmitter = eventEmitter
-    this.aedes = new Aedes()
+  constructor(config, eventEmitter: events.EventEmitter) {
+    this.config = config;
+    this.eventEmitter = eventEmitter;
+    this.aedes = new Aedes();
   }
 
   /**
@@ -40,15 +41,15 @@ class InputMqttBroker {
    */
   start() {
     if (!this.started) {
-      this.createServer()
-      this.started = true
+      this.createServer();
+      this.started = true;
     }
     try {
       if (this.config.ignoreTopic) {
-        ignoreTopicRegEx = new RegExp(this.config.ignoreTopic)
+        ignoreTopicRegEx = new RegExp(this.config.ignoreTopic);
       }
     } catch (error) {
-      consoleLogger.error('MQTT config property ignoreTopic is not a Regular Expression:' + error)
+      consoleLogger.error('MQTT config property ignoreTopic is not a Regular Expression:' + error);
     }
   }
 
@@ -57,36 +58,42 @@ class InputMqttBroker {
    * we close the server socket here.
    */
   stop(cb) {
-    this.server.close(cb)
+    this.server.close(cb);
   }
 
   createServer() {
-    var self = this
-    var config = this.config
+    var self = this;
     if (!this.config.port) {
-      this.config.port = 1883
+      this.config.port = 1883;
     }
-    this.server = net.createServer(this.aedes.handle)
+    this.server = net.createServer(this.aedes.handle);
     this.server.listen(this.config.port, function () {
-      consoleLogger.log('MQTT server listening on port ' + self.config.port)
-    })
+      consoleLogger.log('MQTT server listening on port ' + self.config.port);
+    });
     if (this.config.websocketPort) {
-      this.httpServer = http.createServer()
+      this.httpServer = http.createServer();
       ws.createServer({
         server: self.httpServer
-      }, this.aedes.handle)
+      }, this.aedes.handle);
       this.httpServer.listen(this.config.websocketPort, function () {
         consoleLogger.log('MQTT websocket server listening on port ' + self.config.websocketPort)
-      })
+      });
+    }
+    if (this.config.username && this.config.password) {
+      this.aedes.authenticate = function (client, username, password, callback) {
+        callback(null, (username === self.config.username && password === self.config.password));
+      }
+    } else if (this.config.authenticate && typeof this.config.authenticate == 'function') {
+      this.aedes.authenticate = this.config.authenticate;
     }
     this.aedes.on('clientError', function (client, err) {
       consoleLogger.error('MQTT client error ' + client.id + ': ' + err.message)
-    })
+    });
 
     this.aedes.on('publish', function (packet, client) {
       // ignore messages e.g. from 'internal' $SYS topic (e.g. client connect/disconnect)
       if (packet.topic && ignoreTopicRegEx.test(packet.topic)) {
-        return
+        return;
       }
       var context = {
         name: 'input.mqtt',
@@ -95,33 +102,33 @@ class InputMqttBroker {
         topic: packet.topic,
         qos: packet.qos,
         retain: packet.retain
-      }
+      };
       if (packet.payload) {
-        self.eventEmitter.emit('data.raw', packet.payload.toString(), context)
+        self.eventEmitter.emit('data.raw', packet.payload.toString(), context);
       }
       if (self.config.debug === true) {
-        consoleLogger.log('Published:' + JSON.stringify(packet))
+        consoleLogger.log('Published:' + JSON.stringify(packet));
       }
-    })
+    });
 
     this.aedes.on('subscribe', function (subscriptions, client) {
-      if (client && config.debug) {
-        consoleLogger.error('MQTT subscribe from client ' + client.id + ': ' + subscriptions)
+      if (client && self.config.debug) {
+        consoleLogger.error('MQTT subscribe from client ' + client.id + ': ' + subscriptions);
       }
-    })
+    });
     // fired when a client connects
     this.aedes.on('client', function (client) {
-      if (config.debug) {
-        consoleLogger.log('Client connected: ' + client.id)
+      if (self.config.debug) {
+        consoleLogger.log('Client connected: ' + client.id);
       }
-    })
+    });
     // fired when a client disconnects
     this.aedes.on('clientDisconnected', function (client) {
-      if (config.debug) {
-        consoleLogger.log('Client disconnected: ' + client.id)
+      if (self.config.debug) {
+        consoleLogger.log('Client disconnected: ' + client.id);
       }
-    })
-    this.started = true
+    });
+    this.started = true;
   }
 
 }

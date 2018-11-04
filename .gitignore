@@ -34,3 +34,6 @@ spmlogs
 spmdb
 .spmagentrc
 
+typings/
+
+yarn.*

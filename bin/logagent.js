@@ -388,7 +388,6 @@ LaCli.prototype.initState = function () {
   process.once('SIGTERM', function () { self.terminate('SIGTERM') })
   process.once('beforeExit', self.terminate)
   process.once('uncaughtException', function (error) { self.terminate(error.message) })
-  process.once('unhandledRejection', function (reason) { self.terminate(reason) })
 }
 
 LaCli.prototype.log = function (err, data) {

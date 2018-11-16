@@ -18,7 +18,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-process.on('unhandledRejection', (p, reason) => {
+process.on('unhandledRejection', (reason, p) => {
   console.log('Possibly Unhandled Rejection at: Promise ', p, 'reason: ', reason)
 })
 var consoleLogger = require('../lib/util/logger.js')
@@ -387,6 +387,7 @@ LaCli.prototype.initState = function () {
   process.once('SIGQUIT', function () { self.terminate('SIGQUIT') })
   process.once('SIGTERM', function () { self.terminate('SIGTERM') })
   process.once('beforeExit', self.terminate)
+  process.once('uncaughtException', function (error) { self.terminate(error.message) })
 }
 
 LaCli.prototype.log = function (err, data) {

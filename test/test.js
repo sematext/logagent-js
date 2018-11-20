@@ -4,22 +4,24 @@ process.env.GEOIP_ENABLED = 'true'
 var Logagent = require('../lib/parser/parser.js')
 describe('Logagent parse JSON', function () {
   it('should return correct message with timestamp', function (done) {
-    this.timeout(20000)
-    var la = new Logagent()
-    la.parseLine(JSON.stringify({
-      message: 'hello world',
-      counter: 1
-    }), 'json', function (err, data) {
+    this.timeout(30000)
+    var doneFunc = function (err, data) {
       if (err) {
         done(err)
       } else {
-        if (data.message === 'hello world' && data.counter === 1 && data['@timestamp']) {
+        if (data && data.message === 'hello world' && data.counter === 1 && data['@timestamp'] !== undefined) {
           done()
         } else {
           done(new Error('message is wrong: ' + data.message))
         }
       }
-    })
+    }
+    var la = new Logagent()
+    la.cfg.json = {enabled: true, debug: true}
+    la.parseLine(
+      JSON.stringify({message: 'hello world', counter: 1}),
+      'json',
+      doneFunc)
   })
 })
 
@@ -54,20 +56,20 @@ describe('Logagent parse web server Log', function () {
     this.la = new Logagent(null, null, function ready (laReady) {
       // console.log('ready', arguments)
       laReady.parseLine('91.67.80.14 - - [03/Apr/2016:06:25:38 +0000] "GET /about/ HTTP/1.1" 200 14243 "https://sematext.com/consulting/elasticsearch/" "Mozilla/5.0 (iPhone; CPU iPhone OS 8_1_1 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) Mobile/12B436 Twitter for iPhone"',
-      'nginx', function (err, data) {
-        if (err) {
-          return done(err)
-        } else {
-          if (data.ts) {
-            return done(new Error('parserd obj includes temp. ts field'))
-          }
-          if (data.message === 'GET /about/' && data.client_ip === '91.67.80.14' && data.geoip && data.status_code === 200 && data['@timestamp']) {
-            done()
+        'nginx', function (err, data) {
+          if (err) {
+            return done(err)
           } else {
-            done(new Error('message is wrong: ' + JSON.stringify(data)))
+            if (data.ts) {
+              return done(new Error('parserd obj includes temp. ts field'))
+            }
+            if (data.message === 'GET /about/' && data.client_ip === '91.67.80.14' && data.geoip && data.status_code === 200 && data['@timestamp']) {
+              done()
+            } else {
+              done(new Error('message is wrong: ' + JSON.stringify(data)))
+            }
           }
-        }
-      })
+        })
     })
   })
 })

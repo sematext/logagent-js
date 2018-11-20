@@ -3,13 +3,13 @@ var OutputPrometheusAlertmanager = require('../lib/plugins/output/prometheus-ale
 describe('OutputPrometheusAlertmanager', function () {
   describe('#new', function () {
     it('throws if no config given', function () {
-      assert.throws(function() {
+      assert.throws(function () {
         new OutputPrometheusAlertmanager({})
       }, /Please specify Prometheus Alertmanager "url"/)
     })
 
     it('throws if no config.url given', function () {
-      assert.throws(function() {
+      assert.throws(function () {
         new OutputPrometheusAlertmanager()
       }, /Please specify Prometheus Alertmanager "url"/)
     })

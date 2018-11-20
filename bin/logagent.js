@@ -367,16 +367,16 @@ LaCli.prototype.initState = function () {
               self.eventEmitter.parsedEvent(filteredData, context)
             }
           }, function (e) {
-              // consoleLogger.error(e.stack)
+            // consoleLogger.error(e.stack)
           })
         }
       }
 
       setImmediate(function laParse () {
         self.la.parseLine(
-            trimmedLine.replace(self.removeAnsiColor, ''),
-            context.sourceName || self.argv.sourceName,
-            parserCb)
+          trimmedLine.replace(self.removeAnsiColor, ''),
+          context.sourceName || self.argv.sourceName,
+          parserCb)
       })
     }, function (e) {
       // consoleLogger.error(e.stack)

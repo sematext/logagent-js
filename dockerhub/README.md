@@ -1,11 +1,11 @@
 
 The [Logagent](https://sematext.com/logagent) docker container can be configured through the following environment variables:
 
-* **REGION**: Sematext Cloud region **US** or **EU** (default: US). The receiver URL will be set to EU/US default values. When using REGION, you don't need to set LOGSENE_RECEIVER_URL (see below).
-* **LOGSENE_RECEIVER_URL**: The URL of your Elasticsearch Endpoint _(defaults to Sematext Cloud US https://logsene-receiver.sematext.com)_. 
+* **REGION**: Sematext Cloud region **US** or **EU** (default: US). The receiver URL will be set to EU/US default values. When using REGION, you don't need to set LOGS_RECEIVER_URL (see below).
+* **LOGS_RECEIVER_URL**: The URL of your Elasticsearch Endpoint _(defaults to Sematext Cloud US https://logsene-receiver.sematext.com)_. 
   - For Sematext Europe use https://logsene-receiver.eu.sematext.com. 
   - For Elasticsearch https://elasticserch-server-name:9200.
-* **LOGSENE_TOKEN**: The index where the agent should log to _(for [Sematext Cloud](https://sematext.com/cloud) users the logs token)_
+* **LOGS_TOKEN**: The index where the agent should log to _(for [Sematext Cloud](https://sematext.com/cloud) users the logs token)_
 * **LOG_GLOB**: Semicolon-separated list of file globs __(e.g. /mylogs/**/*.log;/var/log/**/*.log)__. Mount your server log files into the container using a Docker volume e.g. `-v /var/log:/mylogs`. 
 * **LOGAGENT_ARGS**: Additional [command line arguments for Logagent](https://sematext.com/docs/logagent/cli-parameters/) _(e.g. LOGAGENT_ARGS="-n httpd" to specify a log source name or LOGAGENT_ARGS="-u 514" to act as syslog server)_. Please refer to Logagent command line argumetns in the [Logagent Documentation](https://sematext.com/docs/logagent/cli-parameters/)
 
@@ -21,7 +21,7 @@ Run a container:
 ```
 docker run --name logagent \
 -v /var/run/docker.sock:/var/run/docker.sock \
--e LOGSENE_TOKEN=YOUR_LOGSENE_TOKEN_HERE \
+-e LOGS_TOKEN=YOUR_LOGS_TOKEN_HERE \
 sematext/logagent
 ```
 
@@ -29,8 +29,8 @@ sematext/logagent
 ```
 docker service create --mode global --name logagent \
 --mount type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock \
--e LOGSENE_TOKEN=YOUR_LOGSENE_TOKEN_HERE \
--e LOGSENE_RECEIVER_URL=https://logsene-receiver.sematext.com  \
+-e LOGS_TOKEN=YOUR_LOGS_TOKEN_HERE \
+-e LOGS_RECEIVER_URL=https://logsene-receiver.sematext.com  \
 sematext/logagent
 ```
 
@@ -44,8 +44,8 @@ docker run -d --name logagent \
 -v /var/log:/mylogs \
 -p 1514:514 \
 -e LOG_GLOB="/mylogs/**/.log" \
--e LOGSENE_RECEIVER_URL=https://logsene-receiver.sematext.com \
--e LOGSENE_TOKEN=YOUR_LOGSENE_TOKEN_HERE \
+-e LOGS_RECEIVER_URL=https://logsene-receiver.sematext.com \
+-e LOGS_TOKEN=YOUR_LOGS_TOKEN_HERE \
 -e LOGAGENT_ARGS="-u 514" \
 sematext/logagent
 ```
@@ -64,7 +64,7 @@ sematext/logagent
 <td><strong>Required Parameters</strong></td>
 <td></td>
 </tr>
-<td>LOGSENE_TOKEN</td>
+<td>LOGS_TOKEN</td>
 <td>Logsene Application Token enables logging to Logsene, see logging specific parameters for filter options and Log Routing section to route logs from different containers to separate Logsene applications</td>
 </tr>
 <tr>
@@ -75,7 +75,7 @@ sematext/logagent
 <td></td>
 </tr>
 <tr><td>REGION</td>
-  <td>Sematext Cloud region **US** or **EU** (default: US). The receiver URL will be set to EU/US default values. When using REGION, you don't need to set LOGSENE_RECEIVER_URL (see below).
+  <td>Sematext Cloud region **US** or **EU** (default: US). The receiver URL will be set to EU/US default values. When using REGION, you don't need to set LOGS_RECEIVER_URL (see below).
   </td>
 </tr>
 <tr>
@@ -95,11 +95,8 @@ sematext/logagent
 <td>URL for a proxy server (behind firewalls)</td>
 </tr>
 <tr>
-<td>LOGSENE_RECEIVER_URL</td>
-<td>URL for bulk inserts into Logsene. Required for Sematext Enterprise (local IP:PORT) or Sematext Cloud Europe: https://logsene-receiver.eu.sematext.com</td>
-</tr>
-<td>EVENTS_RECEIVER_URL</td>
-<td>URL for SPM events receiver. Required for Sematext Enterprise (local IP:PORT) or Sematext Cloud Europe: https://event-receiver.eu.sematext.com</td>
+<td>LOGS_RECEIVER_URL</td>
+<td>URL for bulk inserts into Sematext Cloud. Required for Sematext Enterprise (local IP:PORT) or Sematext Cloud Europe: https://logsene-receiver.eu.sematext.com</td>
 </tr>
 <tr>
 <td><strong>Docker Logs Parameters</strong></td>
@@ -167,7 +164,7 @@ sematext/logagent
 </tr>
 <tr>
 <td>ENABLE_LOGSENE_STATS</td>
-<td>Enables logging of transmission stats to Logsene. Default value 'false'. Provides a number of logs received, a number of logs shipped, number of failed/successful HTTP transmissions (bulk requests to Logsene) and retransmissions of failed requests.</td>
+<td>Enables logging of transmission stats to Sematext Cloud. Default value 'false'. Provides a number of logs received, a number of logs shipped, number of failed/successful HTTP transmissions (bulk requests to Sematext Cloud) and retransmissions of failed requests.</td>
 </tr>
 <tr>
 <td>LOGSENE_REMOVE_FIELDS</td>

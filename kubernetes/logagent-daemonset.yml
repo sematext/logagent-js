@@ -20,8 +20,10 @@ spec:
         image: sematext/logagent:latest
         imagePullPolicy: "Always"
         env:
-        - name: LOGSENE_TOKEN
-          value: "YOUR_LOGSENE_TOKEN"
+          - name: LOGS_TOKEN
+            value: "YOUR_LOGS_TOKEN"
+          - name: LOGS_RECEIVER_URL
+            value: "https://logsene-receiver.sematext.com"
         volumeMounts:
           - mountPath: /var/run/docker.sock
             name: docker-sock

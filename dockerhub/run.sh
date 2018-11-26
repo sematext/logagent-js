@@ -1,7 +1,20 @@
 #!/bin/bash
+# check docker secrets volume 
+export CONFIG_FILE=${CONFIG_FILE:-/run/secrets/logagent}
+set -o allexport
+if [ -f "$CONFIG_FILE" ]
+then
+  echo "Reading configuration from file: ${CONFIG_FILE}"
+  source $CONFIG_FILE
+fi
+
+export MAX_CLIENT_SOCKETS=${MAX_CLIENT_SOCKETS:-1}
+export LOGSENE_ENABLED_DEFAULT=${LOGSENE_ENABLED_DEFAULT:-true}
 
 export LOGSENE_RECEIVER_URL
 export RECEIVERS_CONFIG="/etc/sematext/receivers.config"
+export LOGSENE_TMP_DIR=/log-buffer
+mkdir -p $LOGSENE_TMP_DIR
 
 # be backward compatible
 if [[ -z "$LOGSENE_RECEIVER_URL" ]]; then

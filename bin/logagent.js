@@ -72,7 +72,28 @@ var moduleAlias = {
   'output-clickhouse': '../lib/plugins/output/clickhouse.js'
 }
 
+function downloadPatterns (cb) {
+  if (!process.env.PATTERNS_URL) {
+    return cb()
+  }
+  const fs = require('fs')
+  const download = require('download')
+  fs.unlink('/etc/logagent/patterns.yml', () => {
+    download(process.env.PATTERNS_URL,
+      '/etc/logagent',
+      {filename: 'patterns.yml'}
+    ).then((a, b, c) => {
+      consoleLogger.log('Downloaded patterns ' + process.env.PATTERNS_URL + ' ')
+      return cb()
+    }).catch((error) => {
+      consoleLogger.log('Error downloading patterns: ' + process.env.PATTERNS_URL + ' ' + error)
+      return cb(error)
+    })
+  })
+}
+
 function LaCli (options) {
+  downloadPatterns(function () {})
   this.eventEmitter = require('../lib/core/logEventEmitter.js')
   this.eventEmitter.on('error', function (err) {
     consoleLogger.error(err)

@@ -268,9 +268,6 @@ LaCli.prototype.loadPlugins = function (configFile) {
       }
     })
   }
-  if (this.argv.rtailPort) {
-    plugins.push('../lib/plugins/output/rtail')
-  }
   if ((this.argv.args && this.argv.args.length > 0) || this.argv.glob) {
     plugins.push('../lib/plugins/input/files')
     this.argv.stdinExitEnabled = false

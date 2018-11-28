@@ -2,8 +2,9 @@
 # apiVersion: extensions/v1beta1
 # Kubernetes >= v1.9
 # apiVersion: extensions/v1beta2
-# Kubernetes >= v1.10
-apiVersion: apps/v1beta2
+# Kubernetes v1.10
+# apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: sematext-logagent

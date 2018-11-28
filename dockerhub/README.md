@@ -32,4 +32,4 @@ docker run -d --name logagent \
 # Documentation
 
 For further information please read the [setup manual](https://sematext.com/docs/logagent/installation-docker/).
-You find in the manual all configuration options and the setup steps for Kubernetes, OpenShift, Mesos, Docker Enterprise etc. 
+You find in the manual all configuration options and the setup instructins for Kubernetes, OpenShift, Mesos, Docker Enterprise etc. 

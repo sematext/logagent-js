@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sematext-agent-patterns
+data:
+  patterns.yml: |-
+    # Put your custom patterns below.
+    # Watch out on indentation to follow this comment!

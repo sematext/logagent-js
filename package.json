@@ -13,7 +13,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha",
+    "test": "mocha --exit",
     "standard": "standard lib/**/**/*.js bin/*.js",
     "eslint": "eslint lib/**/**/*.js bin/*.js",
     "start": "node bin/logagent.js -s --heroku $PORT",

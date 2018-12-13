@@ -37,8 +37,7 @@ fi
 
 if [[ ! -r /var/run/docker.sock ]]; then
   if [[ -z "$LOG_GLOB" ]]; then
-    echo "You need to set the LOG_GLOB in the environment!" >&2
-    exit 1
+    echo "You need to specify a log source. Mount the docker socket or set the LOG_GLOB in the environment!" >&2
   fi
 else
   export LOGAGENT_ARGS="--docker /var/run/docker.sock ${LOGAGENT_ARGS}"

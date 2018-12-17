@@ -27,7 +27,12 @@ output:
     module: output-clickhouse
     url: http://127.0.0.1 
     port: 8123
-    debug: false
+    user: 'nodefault'
+    password: ''
+    basicAuth: null
+    # useGzip: true
+    # database: my_database_name
+    debug: true
     table: default.logs
     # Fields must be in the same order as specified in CREATE TABLE
     fields: 

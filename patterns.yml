@@ -128,6 +128,30 @@ patterns:
   blockStart: !!js/regexp ^\S+\s+-\s\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3}|^\d+\s+\S{3,5}\s+
   sourceName: !!js/regexp /solr/i
   match:
+    - type: apache_solr_v4.6
+      regex: !!js/regexp ^(\S+)\s+-\s(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3});\s(.+?);\s\[(.+?)]\swebapp=(\S+)\spath=(.+?)\sparams={(.*)}.*hits=(\d+)\sstatus=(\d+)\sQTime=(\d+)
+      fields: [severity,ts,class,application,webapp,path,params,hits,status,qtime]
+      dateFormat: YYYY-MM-DD HH:mm:ss.SSS
+      transform: !!js/function >
+        function (p) {
+          if (process.env.PARSE_SOLR_QUERY_PARAMS === '1')
+          {
+            var params = p.params.split('&')
+            p.parsedParams={}
+            for(var i=0;i<params.length;i++)
+            {
+              var key_value = params[i].split('=')
+              if (key_value.length>1) {
+                p.parsedParams[key_value[0]] = key_value[1]
+              }
+            }
+            if (p.parsedParams['NOW']) {
+              p.parsedParams['NOW'] = new Date(p.parsedParams['NOW']*1)
+              // if (!p['@timestamp'])
+              //  p['@timestamp'] = p.paramsParsed['NOW']
+            }
+          }
+        }
     - type: apache_solr
       regex: !!js/regexp ^(\S+)\s+-\s(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3});\s\[\s*(.+?)]\s(\S+);\s.*.*webapp=(\S+)\spath=(.+?)\sparams={(.*)}.*hits=(\d+)\sstatus=(\d+)\sQTime=(\d+)
       fields: [severity,ts,application,class,webapp,path,params,hits,status,qtime]

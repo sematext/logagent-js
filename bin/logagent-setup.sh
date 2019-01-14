@@ -143,18 +143,20 @@ runCommand "tail -n 10 /var/log/logagent.log" 4
 
 function runCommand ()
 {
-	echo $2 $1
-	$1
+  echo $2 $1
+  $1
 }
 
 function generate_la_cfg() 
 {
 # make a backup of original config file 
-if [ -f $SPM_AGENT_CONFIG_FILE ]; then  
+if [ -e "$SPM_AGENT_CONFIG_FILE" ]; then  
+  echo Config file ${SPM_AGENT_CONFIG_FILE} exists already, creating backup file "${SPM_AGENT_CONFIG_FILE}.bak"
   mv  $SPM_AGENT_CONFIG_FILE "${SPM_AGENT_CONFIG_FILE}.bak"
 fi
-if [ -f $3 ]; then  
-  mv  $SPM_AGENT_CONFIG_FILE "${SPM_AGENT_CONFIG_FILE}.bak"
+if [ -e "$3" ]; then  
+  echo Config file ${3} exists already, creating backup file "${3}.bak"
+  mv  "$3" "${3}.bak"
 fi
 
 echo -e \
@@ -228,32 +230,32 @@ runCommand "tail -n 10 /Library/Logs/logagent.log" 4
 
 function install_script ()
 {
-	export SPM_AGENT_CONFIG_FILE="/etc/sematext/logagent.conf"
-	mkdir -p /etc/sematext
+  export SPM_AGENT_CONFIG_FILE="/etc/sematext/logagent.conf"
+  mkdir -p /etc/sematext
+  
+  echo "Create config file: $SPM_AGENT_CONFIG_FILE"
   generate_la_cfg $2 $3
   # echo "-s --logsene-tmp-dir /tmp -t $2 -g $3" > $SPM_AGENT_CONFIG_FILE
   runCommand "chown root $SPM_AGENT_CONFIG_FILE"
   runCommand "chmod 0600 $SPM_AGENT_CONFIG_FILE"
-
-  echo "Create config file: $SPM_AGENT_CONFIG_FILE"
   cat $SPM_AGENT_CONFIG_FILE
 
-	if [[ $PLATFORM = "Darwin" ]]; then
-		echo "Generate launchd script ${LAUNCHCTL_SERVICE_FILE}"
-		generate_launchctl $1 $2 $3
-		return
-	fi
+  if [[ $PLATFORM = "Darwin" ]]; then
+    echo "Generate launchd script ${LAUNCHCTL_SERVICE_FILE}"
+    generate_launchctl $1 $2 $3
+    return
+  fi
 
-	if [[ `/sbin/init --version` =~ upstart ]]>/dev/null  2>&1; then 
-		echo "Generate upstart script ${UPSTART_SERVICE_FILE}"
-		generate_upstart $1 $2 	$3
-		return
-	fi
-	if [[ `systemctl` =~ -\.mount ]]>/dev/null  2>&1; then 
-		echo "Generate systemd script "
-		generate_systemd $1 $2 $3
-		return 
-	fi
+  if [[ `/sbin/init --version` =~ upstart ]]>/dev/null  2>&1; then 
+    echo "Generate upstart script ${UPSTART_SERVICE_FILE}"
+    generate_upstart $1 $2  $3
+    return
+  fi
+  if [[ `systemctl` =~ -\.mount ]]>/dev/null  2>&1; then 
+    echo "Generate systemd script "
+    generate_systemd $1 $2 $3
+    return 
+  fi
   if [[ `. /etc/os-release && echo $VERSION =~ wheezy` ]]; then
     echo "Generate init.d script"
     generate_initd $1 $2 $3
@@ -265,12 +267,12 @@ echo $command
 if [ -n "$TOKEN" ] ; then
   install_script $command $TOKEN "${PATTERN}";
 else 
-	echo "${COLORred}Missing paramaters. Usage:"
-	echo `basename $0` "-i LOGSENE_TOKEN -g '/var/log/**/*.log' -u https://logsene-receiver.sematext.com"
-	echo "Please obtain your application token for US region from https://apps.sematext.com/"
+  echo "${COLORred}Missing paramaters. Usage:"
+  echo `basename $0` "-i LOGSENE_TOKEN -g '/var/log/**/*.log' -u https://logsene-receiver.sematext.com"
+  echo "Please obtain your application token for US region from https://apps.sematext.com/"
   echo "Please obtain your application token for EU region from https://apps.eu.sematext.com/"
   echo "For EU region use -u https://logsene-receiver.eu.sematext.com/$COLORreset"
-	read -p "${COLORblue}Logsene Token: $COLORreset" TOKEN
-	TOKEN=${TOKEN:-none}
+  read -p "${COLORblue}Logsene Token: $COLORreset" TOKEN
+  TOKEN=${TOKEN:-none}
   install_script $command $TOKEN $PATTERN;
 fi 

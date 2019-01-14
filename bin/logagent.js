@@ -72,7 +72,28 @@ var moduleAlias = {
   'output-clickhouse': '../lib/plugins/output/clickhouse.js'
 }
 
+function downloadPatterns (cb) {
+  if (!process.env.PATTERNS_URL) {
+    return cb()
+  }
+  const fs = require('fs')
+  const download = require('download')
+  fs.unlink('/etc/logagent/patterns.yml', () => {
+    download(process.env.PATTERNS_URL,
+      '/etc/logagent',
+      {filename: 'patterns.yml'}
+    ).then((a, b, c) => {
+      consoleLogger.log('Downloaded patterns ' + process.env.PATTERNS_URL + ' ')
+      return cb()
+    }).catch((error) => {
+      consoleLogger.log('Error downloading patterns: ' + process.env.PATTERNS_URL + ' ' + error)
+      return cb(error)
+    })
+  })
+}
+
 function LaCli (options) {
+  downloadPatterns(function () {})
   this.eventEmitter = require('../lib/core/logEventEmitter.js')
   this.eventEmitter.on('error', function (err) {
     consoleLogger.error(err)
@@ -84,7 +105,7 @@ function LaCli (options) {
   this.argv = options || require('../lib/core/cliArgs.js')
 
   this.globPattern = this.argv.glob || process.env.GLOB_PATTERN
-  this.logseneToken = this.argv.index || process.env.LOGSENE_TOKEN
+  this.logseneToken = this.argv.index || process.env.LOGSENE_TOKEN || process.env.LOGS_TOKEN
   this.loggers = {}
   this.WORKERS = process.env.WEB_CONCURRENCY || 1
   this.removeAnsiColor = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g
@@ -267,9 +288,6 @@ LaCli.prototype.loadPlugins = function (configFile) {
         index: this.argv.index
       }
     })
-  }
-  if (this.argv.rtailPort) {
-    plugins.push('../lib/plugins/output/rtail')
   }
   if ((this.argv.args && this.argv.args.length > 0) || this.argv.glob) {
     plugins.push('../lib/plugins/input/files')

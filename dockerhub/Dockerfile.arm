@@ -1,5 +1,5 @@
-FROM node:10-alpine
-
+FROM resin/armhf-alpine-node:10-slim
+ENV MAX_MEM="--max-old-space-size=300"
 ENV REGION="US"
 
 RUN \
@@ -11,7 +11,7 @@ RUN \
   mkdir -p /etc/sematext && \
   mkdir -p /opt/logagent && \
   touch /opt/logagent/patterns.yml && \
-  rm -rf /tmp/*
+  rm -rf /tmp/* /root/.npm
 
 COPY patterns.yml /opt/logagent/patterns.yml
 COPY run.sh /run.sh

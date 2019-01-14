@@ -1,9 +1,22 @@
 #!/bin/bash
 
-export LOGSENE_RECEIVER_URL
+# check docker secrets volume 
+export CONFIG_FILE=${CONFIG_FILE:-/run/secrets/logagent}
+set -o allexport
+if [ -f "$CONFIG_FILE" ]
+then
+  echo "Reading configuration from file: ${CONFIG_FILE}"
+  source $CONFIG_FILE
+fi
+
+export MAX_CLIENT_SOCKETS=${MAX_CLIENT_SOCKETS:-1}
+export LOGSENE_ENABLED_DEFAULT=${LOGSENE_ENABLED_DEFAULT:-true}
 export RECEIVERS_CONFIG="/etc/sematext/receivers.config"
+export LOGSENE_TMP_DIR=/log-buffer
+mkdir -p $LOGSENE_TMP_DIR
 
 # be backward compatible
+export LOGSENE_RECEIVER_URL
 if [[ -z "$LOGSENE_RECEIVER_URL" ]]; then
   export LOGSENE_RECEIVER_URL="$LOGS_RECEIVER_URL"
 fi
@@ -18,19 +31,19 @@ fi
 
 
 if [[ -z "$LOGS_TOKEN" ]]; then
-  echo "You need to set the LOG_INDEX or LOGSENE_TOKEN in the environment!" >&2
+  echo "You need to set the LOGS_TOKEN in the environment!" >&2
   exit 1
 fi
 
 if [[ ! -r /var/run/docker.sock ]]; then
   if [[ -z "$LOG_GLOB" ]]; then
-    echo "You need to set the LOG_GLOB in the environment!" >&2
-    exit 1
+    echo "You need to specify a log source. Mount the docker socket or set the LOG_GLOB in the environment!" >&2
   fi
 else
   export LOGAGENT_ARGS="--docker /var/run/docker.sock ${LOGAGENT_ARGS}"
 fi
 
+# Support custom patterns for Logagent
 if [ -n "${PATTERNS_URL}" ]; then
   # Logagent will fetch the patterns file via HTTP
   mkdir -p /etc/logagent

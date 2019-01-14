@@ -21,13 +21,19 @@ input:
   stdin: true
 
 
-output:
-  # print parsed logs in YAML format to stdout if supress is set false    
+output:  
   clickhouse: 
     module: output-clickhouse
     url: http://127.0.0.1 
     port: 8123
-    debug: false
+    # Authentication Options
+    # user: 'default'
+    # password: ''
+    # basicAuth: null
+    # useGzip: true
+    # Set Database Name
+    # database: my_database_name
+    debug: true
     table: default.logs
     # Fields must be in the same order as specified in CREATE TABLE
     fields: 

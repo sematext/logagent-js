@@ -89,6 +89,18 @@ json:
 # A pattern name are things like 'kubernetes hyperkube' or 'Elasticsearch' or 'Apache Solr' below.
 
 patterns:
+ - # sematext/agent logs 
+  sourceName: !!js/regexp /sematext\/agent/
+  blockStart: !!js/regexp /^panic\:|(^INFO|^ERRO|^WARN|^FAT|^TRAC|^DEB)|time=|^S+/
+  match:
+    - type: sematext_agent
+      regex: !!js/regexp /time=(\S+)\slevel=(\S+?)\smsg="(.+?)"\ssource="(.+?)"/i
+      fields: [ts, severity, message, source]
+      dateFormat: YY-MM-DDTHH:mm:ss
+    - type: sematext_agent
+      regex: !!js/regexp /([A-Z]+)\[(.+?)\]\s(.*)/i
+      fields: [severity, ts, message]
+      dateFormat: YY-MM-DDTHH:mm:ss
  - # kubernetes hyperkube
   sourceName: !!js/regexp /hyperkube/
   match:

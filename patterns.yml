@@ -91,7 +91,7 @@ json:
 patterns:
  - # sematext/agent logs 
   sourceName: !!js/regexp /sematext\/agent/
-  blockStart: !!js/regexp /^panic\:|(^INFO|^ERRO|^WARN|^FAT|^TRAC|^DEB)|^time=|^S{2,}/
+  blockStart: !!js/regexp /^panic\:|^unexpected fault address|(^INFO|^ERRO|^WARN|^FAT|^TRAC|^DEB)|^time=|^S{2,}/
   match:
     - type: sematext_agent_golang
       regex: !!js/regexp /time=(\S+)\slevel=(\S+?)\smsg="(.+?)"\ssource="(.+?)"/i

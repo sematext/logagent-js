@@ -9,6 +9,19 @@ then
   source $CONFIG_FILE
 fi
 
+
+if [[ -z "$APP_ROOT" ]]; then
+  export PATTERN_DIR=/etc/logagent
+else
+  export PATTERN_DIR=${APP_ROOT}
+fi
+
+if [[ -z "$APP_ROOT" ]]; then
+  export LA_CONFIG=/etc/sematext/logagent.conf
+else
+  export LA_CONFIG=${APP_ROOT}/logagent.conf}
+fi
+
 export MAX_CLIENT_SOCKETS=${MAX_CLIENT_SOCKETS:-1}
 export LOGSENE_ENABLED_DEFAULT=${LOGSENE_ENABLED_DEFAULT:-true}
 export RECEIVERS_CONFIG="/etc/sematext/receivers.config"
@@ -46,27 +59,26 @@ fi
 # Support custom patterns for Logagent
 if [ -n "${PATTERNS_URL}" ]; then
   # Logagent will fetch the patterns file via HTTP
-  mkdir -p /etc/logagent
+  mkdir -p $PATTERN_DIR
 fi
 
 if [ -n "${LOGAGENT_PATTERNS}" ]; then
   if [ "${LOGAGENT_PATTERNS_BASE64}" == "true" ]; then
     # If the logagent patterns file is an environment variable, and base64 encoded
-    mkdir -p /etc/logagent
-    echo "writing LOGAGENT_PATTERNS to /etc/logagent/patterns.yml"
-    echo "$LOGAGENT_PATTERNS" | base64 -d > /etc/logagent/patterns.yml
+    mkdir -p $PATTERN_DIR
+    echo "writing LOGAGENT_PATTERNS to ${PATTERN_DIR}/patterns.yml"
+    echo "$LOGAGENT_PATTERNS" | base64 -d > $PATTERN_DIR/patterns.yml
   else
-    mkdir -p /etc/logagent
-    echo "writing LOGAGENT_PATTERNS to /etc/logagent/patterns.yml"
-    echo "$LOGAGENT_PATTERNS" > /etc/logagent/patterns.yml
+    mkdir -p $PATTERN_DIR
+    echo "writing LOGAGENT_PATTERNS to ${PATTERN_DIR}/patterns.yml"
+    echo "$LOGAGENT_PATTERNS" > ${PATTERN_DIR}/patterns.yml
   fi
 fi
 
 
 echo "Preparing environment..."
 
-touch /etc/sematext/logagent.conf
-chmod 600 /etc/sematext/logagent.conf
+touch $LA_CONFIG
 
 generate_config() {
   if [[ ! -z "$LOGSENE_RECEIVER_URL" ]]; then
@@ -96,7 +108,7 @@ LOGSENE_RECEIVER_URL=https://logsene-receiver.eu.sematext.com" >"$RECEIVERS_CONF
 
 generate_config
 
-cat >/etc/sematext/logagent.conf <<EOF
+cat >$LA_CONFIG <<EOF
 options:
   printStats: 60
   suppress: true
@@ -104,26 +116,26 @@ options:
   diskBufferDir: /tmp/sematext-logagent
 parser:
   patternFiles:
-    - /opt/logagent/patterns.yml
+    - ${APP_ROOT}/patterns.yml
     - /etc/logagent/patterns.yml
 EOF
 
 echo "$LOG_GLOB"
 if [ "${LOG_GLOB}" ]; then 
-cat >>/etc/sematext/logagent.conf <<EOF
+cat >>$LA_CONFIG <<EOF
 input:
   files:
 EOF
 
   while IFS=';' read -ra ADDR; do
     for i in "${ADDR[@]}"; do
-      echo "    - ${i}" >>/etc/sematext/logagent.conf
+      echo "    - ${i}" >>$LA_CONFIG
     done
   done <<<"$LOG_GLOB"
 fi
 
 # if [ -r /var/run/docker.sock ]; then
-# cat >>/etc/sematext/logagent.conf <<EOF
+# cat >>$LA_CONFIG <<EOF
 #   dockerLogs:
 #     module: docker-logs
 #     labelFilter: .*
@@ -135,7 +147,7 @@ fi
 # EOF
 # fi
 
-cat >>/etc/sematext/logagent.conf <<EOF
+cat >>$LA_CONFIG <<EOF
 output:
   logsene:
     module: elasticsearch
@@ -143,9 +155,9 @@ output:
     index: ${LOGS_TOKEN}
 EOF
 
-echo "Content of /etc/sematext/logagent.conf:"
-cat "/etc/sematext/logagent.conf"
+echo "Content of ${LA_CONFIG}:"
+cat $LA_CONFIG
 
-echo "/usr/local/bin/logagent -c /etc/sematext/logagent.conf ${LOGAGENT_ARGS}"
-exec /usr/local/bin/logagent -c /etc/sematext/logagent.conf ${LOGAGENT_ARGS}
-cat /etc/sematext/logagent.conf
+echo "logagent -c $LA_CONFIG ${LOGAGENT_ARGS}"
+exec logagent -c $LA_CONFIG ${LOGAGENT_ARGS}
+

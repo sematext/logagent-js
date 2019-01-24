@@ -116,8 +116,7 @@ options:
   diskBufferDir: /tmp/sematext-logagent
 parser:
   patternFiles:
-    - ${APP_ROOT}/patterns.yml
-    - /etc/logagent/patterns.yml
+    - ${PATTERN_DIR}/patterns.yml
 EOF
 
 echo "$LOG_GLOB"

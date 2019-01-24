@@ -13,7 +13,7 @@ RUN \
   touch /opt/logagent/patterns.yml && \
   rm -rf /tmp/*
 
-COPY patterns.yml /opt/logagent/patterns.yml
+COPY patterns.yml /etc/logagent/patterns.yml
 COPY run.sh /run.sh
 RUN chmod +x /run.sh
 

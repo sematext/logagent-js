@@ -107,7 +107,7 @@ patterns:
   match:
     - type: clickhouse
       regex: !!js/regexp /(\d{4}.\d{2}.\d{2}[\s|T][\d+|\:]+.\d+)\s\[\s(\d+)\s]\s\{(\S*)\}\s<(\S+)>\s((.+?)\:[\s|\S]+)/i
-      fields: [ts, pid, hash, severity, message, module]
+      fields: [ts, threadNumber, hash, severity, message, module]
       dateFormat: YYYY.MM.DD HH:mm:ss.SSS
  - # kubernetes hyperkube
   sourceName: !!js/regexp /hyperkube/

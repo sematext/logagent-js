@@ -16,11 +16,12 @@ RUN \
   touch /opt/logagent/patterns.yml && \
   rm -rf /tmp/* /root/.npm
 
+RUN [ "cross-build-end" ]
+
 COPY patterns.yml /opt/logagent/patterns.yml
 COPY run.sh /run.sh
 RUN chmod +x /run.sh
 
-RUN [ "cross-build-end" ]
 
 ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["/run.sh"]

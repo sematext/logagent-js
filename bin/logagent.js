@@ -79,22 +79,30 @@ function downloadPatterns (cb) {
     return cb()
   }
   fs.unlink('/etc/logagent/patterns.yml', () => {
+    var cbCalled = false
     var patternFileWs = fs.createWriteStream('/etc/logagent/patterns.yml')
     patternFileWs.on('error', (ioerr) => {
-      consoleLogger.log('Error writing patterns to /etc/logagent/patterns.yml:' + process.env.PATTERNS_URL + ' ' + ioerr)
+      consoleLogger.error('Error writing patterns to /etc/logagent/patterns.yml:' + process.env.PATTERNS_URL + ' ' + ioerr)
+      if (!cbCalled) {
+        cb(ioerr)
+      }
     })
     patternFileWs.on('close', () => {
       consoleLogger.log('Patterns stored in /etc/logagent/patterns.yml (' + process.env.PATTERNS_URL + ')')
+      cb()
     })
-
-    var req = request.get(process.env.PATTERNS_URL)
-    req.on('error', (error) => {
-      consoleLogger.log('Patterns download failed: ' + process.env.PATTERNS_URL + ' ' + error)
-      return cb(error)
-    }).on('response', (response) => {
-      consoleLogger.log('Patterns downloaded ' + process.env.PATTERNS_URL + ' ')
-      return cb(null, response)
-    }).pipe(patternFileWs)
+    try {
+      var req = request.get(process.env.PATTERNS_URL)
+      req.on('error', (error) => {
+        consoleLogger.error('Patterns download failed: ' + process.env.PATTERNS_URL + ' ' + error)
+      }).on('response', (response) => {
+        consoleLogger.log('Patterns downloaded ' + process.env.PATTERNS_URL + ' ')
+      }).pipe(patternFileWs)
+    } catch (ex) {
+      consoleLogger.error(ex.message)
+      cbCalled = true
+      cb(ex)
+    }
   })
 }
 

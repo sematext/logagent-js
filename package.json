@@ -79,7 +79,6 @@
     "commander": "^2.19.0",
     "docker-loghose": "^1.6.4",
     "dockerode": "^2.5.6",
-    "download": "^7.1.0",
     "elasticsearch": "^15.2.0",
     "eventemitter3": "^3.1.0",
     "fast-safe-stringify": "^2.0.6",

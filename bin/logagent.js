@@ -27,6 +27,8 @@ var LogAnalyzer = require('../lib/parser/parser.js')
 var mkpath = require('mkpath')
 process.setMaxListeners(0)
 var co = require('co')
+const fs = require('fs')
+const request = require('request')
 var moduleAlias = {
   // inputs
   'command': '../lib/plugins/input/command.js',
@@ -76,19 +78,23 @@ function downloadPatterns (cb) {
   if (!process.env.PATTERNS_URL) {
     return cb()
   }
-  const fs = require('fs')
-  const download = require('download')
   fs.unlink('/etc/logagent/patterns.yml', () => {
-    download(process.env.PATTERNS_URL,
-      '/etc/logagent',
-      {filename: 'patterns.yml'}
-    ).then((a, b, c) => {
-      consoleLogger.log('Downloaded patterns ' + process.env.PATTERNS_URL + ' ')
-      return cb()
-    }).catch((error) => {
-      consoleLogger.log('Error downloading patterns: ' + process.env.PATTERNS_URL + ' ' + error)
-      return cb(error)
+    var patternFileWs = fs.createWriteStream('/etc/logagent/patterns.yml')
+    patternFileWs.on('error', (ioerr) => {
+      consoleLogger.log('Error writing patterns to /etc/logagent/patterns.yml:' + process.env.PATTERNS_URL + ' ' + ioerr)
     })
+    patternFileWs.on('close', () => {
+      consoleLogger.log('Patterns stored in /etc/logagent/patterns.yml (' + process.env.PATTERNS_URL + ')')
+    })
+
+    var req = request.get(process.env.PATTERNS_URL)
+    req.on('error', (error) => {
+      consoleLogger.log('Patterns download failed: ' + process.env.PATTERNS_URL + ' ' + error)
+      return cb(error)
+    }).on('response', (response) => {
+      consoleLogger.log('Patterns downloaded ' + process.env.PATTERNS_URL + ' ')
+      return cb(null, response)
+    }).pipe(patternFileWs)
   })
 }
 
@@ -173,8 +179,8 @@ LaCli.prototype.loadPlugins = function (configFile) {
     stdInConfig = this.argv
   }
   var plugins = [
-    {module: '../lib/plugins/input/stdin', config: stdInConfig, globalConfig: configFile},
-    {module: '../lib/plugins/output/stdout', config: stdOutConfig, globalConfig: configFile}
+    { module: '../lib/plugins/input/stdin', config: stdInConfig, globalConfig: configFile },
+    { module: '../lib/plugins/output/stdout', config: stdOutConfig, globalConfig: configFile }
   ]
   // load 3rd paty modules
   if (configFile && configFile.input) {

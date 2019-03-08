@@ -46,6 +46,7 @@ var moduleAlias = {
   'input-mqtt-broker': '../lib/plugins/input/mqtt-broker.js',
   'input-mqtt-client': '../lib/plugins/input/mqtt-client.js',
   'input-zeromq': 'logagent-input-zeromq',
+  'input-syslog': '../lib/plugins/input/syslog',
   'apple-location': 'logagent-apple-location',
   'cassandra-query': '../lib/plugins/input/cassandra.js',
   'docker-logs': '../lib/plugins/input/docker/docker.js',

@@ -1,4 +1,9 @@
 # Global options
+#debug: true
+#env: 
+#  HTTP_PROXY: http://myproxy
+#  NO_PROXY: github.com
+
 options:
   # print stats every 60 seconds 
   printStats: 60
@@ -16,7 +21,9 @@ input:
   #    - '/var/log/**/*.log'
   # listen to udp syslog protocol  
   syslog: 
+    module: input-syslog
     port: 1514
+    address: 127.0.0.0
   # Receive data from Heroku log drains via http
   #heroku: 
   #  port: 9999
@@ -65,12 +72,4 @@ output:
         - auth\.log
   # print parsed logs in YAML format to stdout    
   stdout: yaml # use 'pretty' for pretty json and 'ldjson' for line delimited json (default)
-  # forward logs to rtail real-time log viewer
-  #rtail:
-    # rtail host to send logs to
-    # host: localhost
-    # rtails port to send logs to 
-    # udpPort: 3434
-    # start rtail-server with given http port and bind to hostname
-    #webPort: 8080
-    #webHost: localhost
+  

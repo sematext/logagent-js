@@ -21,7 +21,7 @@ originalLine: false
 # All lines that start with a whitespace  or contain only one char 
 # would be attached to previous lines
 multiline:
-  defaultSeparator:  ^\S{2,}
+  defaultSeparator: ^\S{2,}
 
 # Please note when geoIP: true
 # There will be a slight delay during first start of logagent while maxmind
@@ -89,6 +89,26 @@ json:
 # A pattern name are things like 'kubernetes hyperkube' or 'Elasticsearch' or 'Apache Solr' below.
 
 patterns:
+ - # sematext/agent logs 
+  sourceName: !!js/regexp /sematext\/agent/
+  blockStart: !!js/regexp /^panic\:|^unexpected fault address|(^INFO|^ERRO|^WARN|^FAT|^TRAC|^DEB)|^time=|^S{2,}/
+  match:
+    - type: sematext_agent_golang
+      regex: !!js/regexp /time=(\S+)\slevel=(\S+?)\smsg="(.+?)"\ssource="(.+?)"/i
+      fields: [ts, severity, message, source]
+      dateFormat: YY-MM-DDTHH:mm:ss
+    - type: sematext_agent_golang
+      regex: !!js/regexp /([A-Z]+)\[(.+?)\]\s(.*)/i
+      fields: [severity, ts, message]
+      dateFormat: YY-MM-DDTHH:mm:ss
+ - # Yandex Clickhouse 
+  sourceName: !!js/regexp /clickhouse/
+  blockStart: !!js/regexp /(\d{4}.\d{2}.\d{2}[\s|T][\d+|\:]+.\d+)\s\[\s(\d+)\s]\s\{(\S*)\}/
+  match:
+    - type: clickhouse
+      regex: !!js/regexp /(\d{4}.\d{2}.\d{2}[\s|T][\d+|\:]+.\d+)\s\[\s(\d+)\s]\s\{(\S*)\}\s<(\S+)>\s((.+?)\:[\s|\S]+)/i
+      fields: [ts, threadNumber, queryId, severity, message, module]
+      dateFormat: YYYY.MM.DD HH:mm:ss.SSS
  - # kubernetes hyperkube
   sourceName: !!js/regexp /hyperkube/
   match:
@@ -128,6 +148,30 @@ patterns:
   blockStart: !!js/regexp ^\S+\s+-\s\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3}|^\d+\s+\S{3,5}\s+
   sourceName: !!js/regexp /solr/i
   match:
+    - type: apache_solr_v4.6
+      regex: !!js/regexp ^(\S+)\s+-\s(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3});\s(.+?);\s\[(.+?)]\swebapp=(\S+)\spath=(.+?)\sparams={(.*)}.*hits=(\d+)\sstatus=(\d+)\sQTime=(\d+)
+      fields: [severity,ts,class,application,webapp,path,params,hits,status,qtime]
+      dateFormat: YYYY-MM-DD HH:mm:ss.SSS
+      transform: !!js/function >
+        function (p) {
+          if (process.env.PARSE_SOLR_QUERY_PARAMS === '1')
+          {
+            var params = p.params.split('&')
+            p.parsedParams={}
+            for(var i=0;i<params.length;i++)
+            {
+              var key_value = params[i].split('=')
+              if (key_value.length>1) {
+                p.parsedParams[key_value[0]] = key_value[1]
+              }
+            }
+            if (p.parsedParams['NOW']) {
+              p.parsedParams['NOW'] = new Date(p.parsedParams['NOW']*1)
+              // if (!p['@timestamp'])
+              //  p['@timestamp'] = p.paramsParsed['NOW']
+            }
+          }
+        }
     - type: apache_solr
       regex: !!js/regexp ^(\S+)\s+-\s(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3});\s\[\s*(.+?)]\s(\S+);\s.*.*webapp=(\S+)\spath=(.+?)\sparams={(.*)}.*hits=(\d+)\sstatus=(\d+)\sQTime=(\d+)
       fields: [severity,ts,application,class,webapp,path,params,hits,status,qtime]

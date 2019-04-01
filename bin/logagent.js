@@ -454,7 +454,10 @@ LaCli.prototype.initState = function () {
   process.once('SIGQUIT', function () { self.terminate('SIGQUIT') })
   process.once('SIGTERM', function () { self.terminate('SIGTERM') })
   process.once('beforeExit', self.terminate)
-  process.once('uncaughtException', function (error) { self.terminate(error) })
+  process.once('uncaughtException', function (error) {
+    console.dir(error)
+    // self.terminate(error)
+  })
 }
 
 LaCli.prototype.log = function (err, data) {
@@ -502,7 +505,7 @@ LaCli.prototype.parseChunks = function (chunk, enc, callback) {
 }
 
 LaCli.prototype.terminate = function (reason) {
-  consoleLogger.log('terminate reason: ' + JSON.stringify(reason, null, '\t'))
+  consoleLogger.log('terminate reason: ' + reason.message + ' ' + reason.stack)
   if (this.argv.heroku && reason !== 'exitWorker') {
     return
   }

@@ -20,6 +20,7 @@
  */
 process.on('unhandledRejection', (reason, p) => {
   console.log('Possibly Unhandled Rejection at: Promise ', p, 'reason: ', reason)
+  console.dir(reason)
 })
 var clone = require('clone')
 var consoleLogger = require('../lib/util/logger.js')
@@ -453,7 +454,7 @@ LaCli.prototype.initState = function () {
   process.once('SIGQUIT', function () { self.terminate('SIGQUIT') })
   process.once('SIGTERM', function () { self.terminate('SIGTERM') })
   process.once('beforeExit', self.terminate)
-  process.once('uncaughtException', function (error) { self.terminate(error.message) })
+  process.once('uncaughtException', function (error) { self.terminate(error) })
 }
 
 LaCli.prototype.log = function (err, data) {
@@ -501,7 +502,7 @@ LaCli.prototype.parseChunks = function (chunk, enc, callback) {
 }
 
 LaCli.prototype.terminate = function (reason) {
-  consoleLogger.log('terminate reason: ' + reason)
+  consoleLogger.log('terminate reason: ' + JSON.stringify(reason, null, '\t'))
   if (this.argv.heroku && reason !== 'exitWorker') {
     return
   }

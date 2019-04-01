@@ -14,7 +14,7 @@
 debug: false
 # set originalLine to false when auothash fields
 # the original line might include sensitive data!
-originalLine: true
+originalLine: false
 # default seperator for multiline logs, 
 # which don't have a blockStart property
 # The default /^\S{2,}/ would match typical stack traces

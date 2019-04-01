@@ -21,6 +21,7 @@
 process.on('unhandledRejection', (reason, p) => {
   console.log('Possibly Unhandled Rejection at: Promise ', p, 'reason: ', reason)
 })
+var clone = require('clone')
 var consoleLogger = require('../lib/util/logger.js')
 var StatsPrinter = require('../lib/core/printStats.js')
 var LogAnalyzer = require('../lib/parser/parser.js')
@@ -51,6 +52,7 @@ var moduleAlias = {
   'cassandra-query': '../lib/plugins/input/cassandra.js',
   'docker-logs': '../lib/plugins/input/docker/docker.js',
   // input filters
+  'input-filter-k8s-containerd': '../lib/plugins/input-filter/kubernetesContainerd.js',
   'grep': '../lib/plugins/input-filter/grep.js',
   'grok': 'logagent-input-filter-grok',
   // output filters
@@ -73,6 +75,19 @@ var moduleAlias = {
   'output-zeromq': 'logagent-output-zeromq',
   'output-influxdb': '../lib/plugins/output/influxdb.js',
   'output-clickhouse': '../lib/plugins/output/clickhouse.js'
+}
+
+function getFunctionArgumentNames(func) {
+  // First match everything inside the function argument parens.
+  var args = func.toString().match(/function\s.*?\(([^)]*)\)/)[1]
+  // Split the arguments string into an array comma delimited.
+  return args.split(',').map(function(arg) {
+    // Ensure no inline comments are parsed and trim the whitespace.
+    return arg.replace(/\/\*.*\*\//, '').trim()
+  }).filter(function(arg) {
+    // Ensure no undefined values are added.
+    return arg
+  })
 }
 
 function downloadPatterns (cb) {
@@ -142,7 +157,14 @@ LaCli.prototype.initFilter = function (type, filterFunctions) {
       }
       var filter = {
         func: ff,
-        config: filterFunctions[i].config || filterFunctions[i] || {}
+        config: filterFunctions[i].config || filterFunctions[i] || {},
+        argNames: getFunctionArgumentNames(ff)
+      }
+      // ensure API changes work for input filter, and don't break old input-filters
+      if (type === 'inputFilter') {
+        if (filter.argNames && filter.argNames[0] && filter.argNames[0] === 'context') {
+          filter.useContextObjectAsFirstArgument = true
+        }
       }
       this[type].push(filter)
       consoleLogger.log('load ' + type + ': ' + i + ' ' + filterName)
@@ -164,7 +186,6 @@ LaCli.prototype.initPlugins = function (plugins) {
       if (plugin.config) {
         plugin.config.configFile = plugin.globalConfig
       }
-
       var p = new Plugin(plugin.config || this.argv, eventEmitter)
       this.plugins.push(p)
       p.start.bind(p)()
@@ -217,6 +238,12 @@ LaCli.prototype.loadPlugins = function (configFile) {
       if (configFile.inputFilter[key].module) {
         inputFilter.push(configFile.inputFilter[key])
       }
+    })
+  }
+  if (this.argv.k8sContainerd) {
+    inputFilter.push({
+      module: 'input-filter-k8s-containerd',
+      config: {}
     })
   }
   this.initFilter('inputFilter', inputFilter)
@@ -352,8 +379,9 @@ LaCli.prototype.initState = function () {
   }, 1000)
   self.tid.unref()
 
-  self.eventEmitter.on('data.raw', function parseRaw (line, context) {
+  self.eventEmitter.on('data.raw', function parseRaw (line, contextObj) {
     self.lastParsedTS = Date.now()
+    var context = contextObj 
     var trimmedLine = line
     if (line && Buffer.byteLength(line, 'utf8') > self.argv.maxLogSize) {
       var cutMsg = new Buffer(self.argv.maxLogSize)
@@ -365,7 +393,12 @@ LaCli.prototype.initState = function () {
     co(function * processInput () {
       for (var i = 0; i < self.inputFilter.length; i++) {
         trimmedLine = yield function (callback) {
-          self.inputFilter[i].func(context.sourceName || self.argv.sourceName, self.inputFilter[i].config, trimmedLine, callback)
+          if (self.inputFilter[i].useContextObjectAsFirstArgument) {
+            context = clone(contextObj)
+            self.inputFilter[i].func(context, self.inputFilter[i].config, line, callback)
+          } else {
+            self.inputFilter[i].func(context.sourceName || self.argv.sourceName, self.inputFilter[i].config, trimmedLine, callback)
+          }
         }
       }
     }).then(function () {
@@ -400,7 +433,7 @@ LaCli.prototype.initState = function () {
               self.eventEmitter.parsedEvent(filteredData, context)
             }
           }, function (e) {
-            // consoleLogger.error(e.stack)
+            consoleLogger.debug(e.stack)
           })
         }
       }

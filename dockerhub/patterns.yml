@@ -14,7 +14,7 @@
 debug: false
 # set originalLine to false when auothash fields
 # the original line might include sensitive data!
-originalLine: false
+originalLine: true
 # default seperator for multiline logs, 
 # which don't have a blockStart property
 # The default /^\S{2,}/ would match typical stack traces
@@ -657,23 +657,28 @@ patterns:
   match:
     -
       type: system_log
+      regex: !!js/regexp /^([\w|\s]+\s+\d{1,2}\s[\d|\:|\.]+)\s+(\S+)\s+(.*)\.(.+)\s(.+?)\[(\d+)\]\:\s+(.*)/
+      fields: [ts,syslog_host,syslog_facility,severity,syslog_service,syslog_pid,message]
+      dateFormat: MMM DD HH:mm:ss
+    -
+      type: system_log
       regex: !!js/regexp /^([\w|\s]+\s+\d{2}\s[\d|\:]+)\s(.+?)\s(.+?)\s<(.+)>(.*)/
-      fields: [ts,host,service,severity,message]
+      fields: [ts,syslog_host,service,severity,message]
       dateFormat: MMM DD HH:mm:ss
     -
       type: system_log
       regex: !!js/regexp /^([\w|\s]+\s+\d{1,2}\s[\d|\:]+)\s(\S+)\s(\S+)\[(\d+)\]\s{0,4}<(.+)>\:\s{0,2}(.+)/
-      fields: [ts,host,service,pid,severity,message]
+      fields: [ts,syslog_host,service,pid,severity,message]
       dateFormat: MMM DD HH:mm:ss
     -
       type: system_log
       regex: !!js/regexp /^([\w|\s]+\s+\d{1,2}\s[\d|\:]+)\s(\S+)\s(\S+)\[(\d+)\]\:\s(.+)/
-      fields: [ts,host,service,pid,message]
+      fields: [ts,host_syslog,service,pid,message]
       dateFormat: MMM DD HH:mm:ss
     -
       type: system_log
-      regex: !!js/regexp /^([\w|\s]+\s+\d{1,2}\s[\d|\:|\.]+)\s+(\S+)\s+(.*)\:\s(.*)/
-      fields: [ts,host,service,message]
+      regex: !!js/regexp /^([\w|\s]+\s+\d{1,2}\s[\d|\:|\.]+)\s+(\S+)\s+(\S+)\:\s(.*)/
+      fields: [ts,host_syslog,service,message]
       dateFormat: MMM DD HH:mm:ss
     - 
       type: log

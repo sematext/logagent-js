@@ -90,7 +90,7 @@ json:
 
 patterns:
  - # sematext/agent logs 
-  sourceName: !!js/regexp /sematext\/agent/
+  sourceName: !!js/regexp /sematext\/agent|containerd|dockerd/
   blockStart: !!js/regexp /^panic\:|^unexpected fault address|(^INFO|^ERRO|^WARN|^FAT|^TRAC|^DEB)|^time=|^S{2,}/
   match:
     - type: sematext_agent_golang

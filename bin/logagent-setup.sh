@@ -171,7 +171,7 @@ options:
   # Startup of logagent might be slower, when downloading the GeoIP database
   geoipEnabled: false
   # Directory to store Logagent status and temporary files
-  # this is equals to LOGSNE_TMP_DIR env variable 
+  # this is equals to LOGS_TMP_DIR env variable 
   diskBufferDir: /tmp/sematext-logagent
 
 input:

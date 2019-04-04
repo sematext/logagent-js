@@ -75,17 +75,18 @@ var moduleAlias = {
   'output-mqtt': '../lib/plugins/output/mqtt.js',
   'output-zeromq': 'logagent-output-zeromq',
   'output-influxdb': '../lib/plugins/output/influxdb.js',
-  'output-clickhouse': '../lib/plugins/output/clickhouse.js'
+  'output-clickhouse': '../lib/plugins/output/clickhouse.js',
+  'output-http': '../lib/plugins/output/output-http.js'
 }
 
-function getFunctionArgumentNames(func) {
+function getFunctionArgumentNames (func) {
   // First match everything inside the function argument parens.
   var args = func.toString().match(/function\s.*?\(([^)]*)\)/)[1]
   // Split the arguments string into an array comma delimited.
-  return args.split(',').map(function(arg) {
+  return args.split(',').map(function (arg) {
     // Ensure no inline comments are parsed and trim the whitespace.
     return arg.replace(/\/\*.*\*\//, '').trim()
-  }).filter(function(arg) {
+  }).filter(function (arg) {
     // Ensure no undefined values are added.
     return arg
   })
@@ -382,7 +383,7 @@ LaCli.prototype.initState = function () {
 
   self.eventEmitter.on('data.raw', function parseRaw (line, contextObj) {
     self.lastParsedTS = Date.now()
-    var context = contextObj 
+    var context = contextObj
     var trimmedLine = line
     if (line && Buffer.byteLength(line, 'utf8') > self.argv.maxLogSize) {
       var cutMsg = new Buffer(self.argv.maxLogSize)

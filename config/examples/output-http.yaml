@@ -1,0 +1,25 @@
+input: 
+  stdin: true 
+
+output: 
+  sematext-spm:
+    module: output-http
+    url: http://127.0.0.1:8086
+    # flush interval in seconds
+    flushInterval: 1
+    # max buffer size to force flush
+    maxBufferSize: 1
+    debug: true
+    tags: 
+      role: backend
+      version: "1.0.0"
+      region: eu
+    # following message fields are not used  
+    # as tags or fields influxDB output
+    ignoreFields: 
+      - logSource
+      - message
+    # optional filter settings matching data field with regular expressions
+    filter: 
+      field: logSource
+      match: .*

@@ -2,7 +2,7 @@ input:
   stdin: true 
 
 output: 
-  sematext-spm:
+  http-forwarding:
     module: output-http
     url: http://127.0.0.1:8086
     # flush interval in seconds

@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: st-logagent
+spec:
+  selector:
+    matchLabels:
+      app: st-logagent
+  template:
+    metadata:
+      labels:
+        app: st-logagent
+    spec:
+      #nodeSelector: {}
+      hostNetwork: true
+      dnsPolicy: "ClusterFirst"
+      restartPolicy: "Always"
+      containers:
+      - name: st-logagent
+        image: sematext/logagent
+        imagePullPolicy: "Always"
+        env:
+          - name: LOG_GLOB
+            value: "/var/log/containers/*.log;/var/log/*.log"
+          - name: LOGS_TOKEN
+            value: "YOUR_SEMATEXT_LOGS_TOKEN"
+          - name: LOGS_RECEIVER_URL
+            value: "https://logsene-receiver.sematext.com"
+            # value: "https://logsene-receiver.eu.sematext.com"
+        volumeMounts:
+          - mountPath: /var/log
+            name: var-log
+          - mountPath: /var/data/kubeletlogs
+            name: kubeletlogs
+          - mountPath: /etc/localtime
+            name: localtime
+        securityContext:
+          privileged: true
+      volumes:
+        - name: var-log
+          hostPath:
+            path: /var/log
+        - name: kubeletlogs
+          hostPath:
+            path: /var/data/kubeletlogs
+        - name: localtime
+          hostPath:
+            path: /etc/localtime

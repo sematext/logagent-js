@@ -215,6 +215,18 @@ LaCli.prototype.loadPlugins = function (configFile) {
     { module: '../lib/plugins/input/stdin', config: stdInConfig, globalConfig: configFile },
     { module: '../lib/plugins/output/stdout', config: stdOutConfig, globalConfig: configFile }
   ]
+  if (this.argv.journald) {
+    var systemdUnitFilter = process.env.SYSTEMD_UNIT_FILTER || '.*'
+    plugins.push({
+      module: 'input-journald-upload',
+      config: {
+        port: this.argv.journald,
+        systemdUnitFilter: {
+          include: new RegExp(systemdUnitFilter, 'i')
+        }
+      }
+    })
+  }
   // load 3rd paty modules
   if (configFile && configFile.input) {
     var inputSections = Object.keys(configFile.input)
@@ -249,6 +261,7 @@ LaCli.prototype.loadPlugins = function (configFile) {
       config: {}
     })
   }
+  
   this.initFilter('inputFilter', inputFilter)
 
   // load output plugins

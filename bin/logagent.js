@@ -38,6 +38,7 @@ var moduleAlias = {
   'mssql-query': '../lib/plugins/input/mssql.js',
   'postgresql-query': '../lib/plugins/input/postgresql.js',
   'input-tcp': '../lib/plugins/input/tcp.js',
+  'input-journald-upload': '../lib/plugins/input/journaldUpload.js',
   'input-kafka': 'logagent-input-kafka',
   'input-influxdb-http': '../lib/plugins/input/influxHttp.js',
   'elasticsearch-query': '../lib/plugins/input/elasticsearchQuery.js',

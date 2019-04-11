@@ -1,0 +1,15 @@
+# Global options
+options:
+  includeOriginalLine: true
+
+input:
+   journald-upload:
+    module: input-journald-upload
+    port: 9090
+    # worker: 0
+      
+output: 
+  stdout: yaml
+  #es-local:
+  # module: elasticsearch
+  # url: http://localhost:9200

@@ -48,6 +48,17 @@ if [[ -z "$LOGS_TOKEN" ]]; then
   exit 1
 fi
 
+
+if [[ -n "${JOURNALD_UPLOAD_PORT}" ]]; then
+  # enable journald log collection
+  export LOGAGENT_ARGS="--journald {JOURNALD_UPLOAD_PORT} ${LOGAGENT_ARGS}"  
+fi
+
+if [[ -z "$LOG_GLOB" ]]; then
+  echo "You need to specify a log source. Mount the docker socket or set the LOG_GLOB in the environment!" >&2
+fi
+
+
 if [[ ! -r /var/run/docker.sock ]]; then
   if [[ -n "${KUBERNETES_SERVICE_HOST}" ]]; then
     # no docker socket & K8S env -> use containerd plugin
@@ -119,6 +130,7 @@ options:
   suppress: true
   geoipEnabled: true
   diskBufferDir: /tmp/sematext-logagent
+
 parser:
   patternFiles:
     - ${PATTERN_DIR}/patterns.yml

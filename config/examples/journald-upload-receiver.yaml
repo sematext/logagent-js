@@ -6,8 +6,39 @@ input:
    journald-upload:
     module: input-journald-upload
     port: 9090
-    # worker: 0
-      
+    worker: 0
+    systemdUnitFilter: 
+      include: !!js/regexp /.*/i
+    #  exclude: !!js/regexp /docker|containerd/i
+    # add static fields to every log entry 
+    tags:
+      _index: MY_INDEX_FOR_ELASTICSEARCH_OUTPUT
+      node_role: kubernetes_worker
+    # journald might provide many fields, to reduce storage usage you can remove 
+    # non-relevant fields
+    removeFields:
+      - __CURSOR
+      - __REALTIME_TIMESTAMP
+      - _SOURCE_REALTIME_TIMESTAMP
+      - __MONOTONIC_TIMESTAMP
+      - _TRANSPORT
+      - JOURNAL_NAME
+      - JOURNAL_PATH
+      - CURRENT_USE
+      - CURRENT_USE_PRETTY
+      - MAX_USE
+      - MAX_USE_PRETTY
+      - DISK_KEEP_FREE
+      - DISK_KEEP_FREE_PRETTY
+      - DISK_AVAILABLE_PRETTY
+      - DISK_AVAILABLE
+      - LIMIT
+      - LIMIT_PRETTY
+      - AVAILABLE
+      - AVAILABLE_PRETTY
+      - _CAP_EFFECTIVE
+      - _SYSTEMD_SLICE
+
 output: 
   stdout: yaml
   #es-local:

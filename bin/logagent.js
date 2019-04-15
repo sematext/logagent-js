@@ -50,6 +50,7 @@ var moduleAlias = {
   'input-mqtt-client': '../lib/plugins/input/mqtt-client.js',
   'input-zeromq': 'logagent-input-zeromq',
   'input-syslog': '../lib/plugins/input/syslog',
+  'input-kubernetes-events': '../lib/plugins/input/kubernetesEvents.js',
   'apple-location': 'logagent-apple-location',
   'cassandra-query': '../lib/plugins/input/cassandra.js',
   'docker-logs': '../lib/plugins/input/docker/docker.js',
@@ -227,6 +228,13 @@ LaCli.prototype.loadPlugins = function (configFile) {
       }
     })
   }
+  if (this.argv.k8sEvents) {
+    plugins.push({
+      module: 'input-kubernetes-events',
+      config: {}
+    })
+  }
+
   // load 3rd paty modules
   if (configFile && configFile.input) {
     var inputSections = Object.keys(configFile.input)
@@ -261,6 +269,7 @@ LaCli.prototype.loadPlugins = function (configFile) {
       config: {}
     })
   }
+  
   
   this.initFilter('inputFilter', inputFilter)
 

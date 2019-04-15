@@ -70,6 +70,7 @@
   "license": "Apache-2.0",
   "//": "!!! bithound claims maxmind-geolite-mirror is not used, it is! Don't remove ...",
   "dependencies": {
+    "@brickblock/kube-watch": "0.0.9",
     "alasql": "^0.4.11",
     "aws-sdk": "^2.359.0",
     "cassandra-driver": "^3.5.0",
@@ -91,6 +92,8 @@
     "influx-line-protocol-parser": "^0.2.0",
     "js-yaml": "^3.12.0",
     "json-influx": "^0.3.0",
+    "json-stream": "^1.0.0",
+    "kubernetes-client": "^6.12.1",
     "logsene-js": "^1.1.54",
     "lru-cache": "^5.1.1",
     "maxmind": "^2.11.0",

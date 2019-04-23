@@ -253,9 +253,38 @@ patterns:
   blockStart: !!js/regexp /^\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+\s+/
   match:
     - type: apache_zookeeper
-      regex: !!js/regexp /^(\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+)\s+(\S+)\s+-\s+(\S+)\s+\[(.+)\]\s-\s+([\S|\s]+)/
-      fields: [ts,pid,severity,thread_info,message]
+      regex: !!js/regexp /^(\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+)\s+\[(\S+?):{0,1}\]\s+-\s+(\S+)\s+\[(.+)\]\s-\s+([\S|\s]+[client|from]\s\/(.+?)\:(\d+).*sessionid.+(0x.+).*)/
+      fields: 
+        - ts
+        - machineId:string
+        - severity:string,
+        - thread_info:string
+        - message:string
+        - client_ip:string
+        - client_port:number
+        - session_id:string
       dateFormat: YYYY-MM-DD HH:mm:ss,SS
+    - type: apache_zookeeper
+      regex: !!js/regexp /^(\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+)\s+\[(\S+?):{0,1}\]\s+-\s+(\S+)\s+\[(.+)\]\s-\s+([\S|\s]+[client|from]\s\/(.+?)\:(\d+).*)/
+      fields: 
+        - ts
+        - machineId:string
+        - severity:string,
+        - thread_info:string
+        - message:string
+        - client_ip:string
+        - client_port:number
+      dateFormat: YYYY-MM-DD HH:mm:ss,SS
+    - type: apache_zookeeper
+      regex: !!js/regexp /^(\d{4}-\d{2}-\d{2}\s[\d|\:]+,\d+)\s+\[(\S+?):{0,1}\]\s+-\s+(\S+)\s+\[(.+)\]\s-\s+([\S|\s]+)/
+      fields: 
+        - ts
+        - machineId:string
+        - severity:string,
+        - thread_info:string
+        - message:string
+      dateFormat: YYYY-MM-DD HH:mm:ss,SS
+
 
  - # Apache Cassandra
   sourceName: !!js/regexp cassandra

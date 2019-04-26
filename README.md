@@ -18,7 +18,7 @@ Details about the the Logagent Docker image are described in the [Docker Hub Rea
 Official Node.js [downloads and instructions](https://nodejs.org/en/download/). E.g. for Debian/Ubuntu:
 
 ```
-curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
 sudo apt-get install -y nodejs
 Install Logagent with npm
 sudo npm i -g @sematext/logagent

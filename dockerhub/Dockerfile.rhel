@@ -30,7 +30,9 @@ RUN mkdir -p $APP_ROOT/logagent
 # Setup Node.js 
 RUN microdnf install git openssl --enablerepo=rhel-7-server-rpms
 RUN microdnf clean all && microdnf update
-RUN microdnf install gcc-c++ rh-nodejs6 rh-nodejs6-npm --enablerepo=rhel-7-server-devtools-rpms --enablerepo=rhel-7-server-rpms --enablerepo=rhel-server-rhscl-7-rpms 
+RUN microdnf install gcc-c++ --enablerepo=rhel-7-server-devtools-rpms --enablerepo=rhel-7-server-rpms --enablerepo=rhel-server-rhscl-7-rpms 
+RUN microdnf install rh-nodejs6 --enablerepo=rhel-7-server-devtools-rpms --enablerepo=rhel-7-server-rpms --enablerepo=rhel-server-rhscl-7-rpms 
+RUN microdnf install rh-nodejs6-npm --enablerepo=rhel-7-server-devtools-rpms --enablerepo=rhel-7-server-rpms --enablerepo=rhel-server-rhscl-7-rpms 
 # --enablerepo=rhel-7-server-rpms 
 RUN microdnf clean all
 RUN microdnf update 

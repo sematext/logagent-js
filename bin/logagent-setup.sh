@@ -30,7 +30,7 @@ while getopts ":i:u:g:" opt; do
 done
 
 export LOGSENE_RECEIVER_URL=${LOGSENE_RECEIVER_URL:-https://logsene-receiver.sematext.com}
-echo Set Logsene receiver url: $LOGSENE_RECEIVER_URL
+echo Set Logs receiver url: $LOGSENE_RECEIVER_URL
 
 
 function generate_upstart()
@@ -184,7 +184,7 @@ output:
   elasticsearch: 
     module: elasticsearch
     url: $LOGSENE_RECEIVER_URL
-    # default index (Logsene token) to use:
+    # default index (Logs token) to use:
     index: $TOKEN
 " > $SPM_AGENT_CONFIG_FILE
 }
@@ -268,11 +268,12 @@ if [ -n "$TOKEN" ] ; then
   install_script $command $TOKEN "${PATTERN}";
 else 
   echo "${COLORred}Missing paramaters. Usage:"
-  echo `basename $0` "-i LOGSENE_TOKEN -g '/var/log/**/*.log' -u https://logsene-receiver.sematext.com"
-  echo "Please obtain your application token for US region from https://apps.sematext.com/"
-  echo "Please obtain your application token for EU region from https://apps.eu.sematext.com/"
+  echo `basename $0` "-i LOGS_TOKEN -g '/var/log/**/*.log' -u https://logsene-receiver.sematext.com"
+  echo "Please obtain your Logs App token for US region from https://apps.sematext.com/"
+  echo "Please obtain your Logs App token for EU region from https://apps.eu.sematext.com/"
   echo "For EU region use -u https://logsene-receiver.eu.sematext.com/$COLORreset"
-  read -p "${COLORblue}Logsene Token: $COLORreset" TOKEN
+  read -p "${COLORblue}Logs Token: $COLORreset" TOKEN
   TOKEN=${TOKEN:-none}
   install_script $command $TOKEN $PATTERN;
 fi 
+echo "Logagent documentation: https://sematext.com/docs/logagent" 

@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/rhel-atomic:7
+FROM registry.access.redhat.com/rhel-atomic:7.6
 MAINTAINER Sematext Group Inc. <redhat@sematext.com>
 ### Atomic/OpenShift Labels - https://github.com/projectatomic/ContainerApplicationGenericLabels
 LABEL name="sematext/logagent" \

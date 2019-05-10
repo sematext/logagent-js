@@ -12,8 +12,7 @@ LABEL name="sematext/logagent" \
       version="2.0" \
       release="2" \
       summary="Sematext Logagent" \
-      description="Sematext Logagent is a modern, open-source, container-native log collection agent for Docker. It runs as a tiny container on every Docker host and provides automatic collection and processing of Docker Logs for all cluster nodes and all auto-discove
-red containers. It works with Open Shift/Kubernetes or any other platform supporting Docker containers." \
+      description="Sematext Logagent is a modern, open-source, container-native log collection agent for Docker. It runs as a tiny container on every Docker host and provides automatic collection and processing of Docker Logs for all cluster nodes and all auto-discovered containers. It works with Open Shift/Kubernetes or any other platform supporting Docker containers." \
 ### Required labels above - recommended below
       url="https://sematext.com/docker" \
       run='docker run --privileged --name ${NAME} -e LOGS_TOKEN=${LOGS_TOKEN} -v /var/run/docker.sock:/var/run/docker.sock ${IMAGE}' \

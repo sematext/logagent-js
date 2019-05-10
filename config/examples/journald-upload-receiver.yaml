@@ -7,6 +7,8 @@ input:
     module: input-journald-upload
     port: 9090
     worker: 0
+    # support parsing index from URL path /myElasticSearchIndex/
+    # useIndexFromUrlPath: true
     systemdUnitFilter: 
       include: !!js/regexp /.*/i
     #  exclude: !!js/regexp /docker|containerd/i

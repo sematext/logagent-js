@@ -21,12 +21,14 @@ LABEL name="sematext/logagent" \
       io.openshift.tags="sematext,logging,log management,container logs"
 
 
+COPY ./LICENSE /licenses/LICENSE
+COPY ./help.1 /help.1
+
 ENV APP_ROOT=/opt/sematext 
 ENV USER_NAME=default \
     USER_UID=10001 
 RUN mkdir -p $APP_ROOT/licenses
-COPY ./LICENSE $APP_ROOT/licenses/LICENSE
-COPY ./help.1 /help.1
+
 COPY ./run.sh $APP_ROOT/bin/run.sh 
 
 ENV APP_HOME=${APP_ROOT}/src  PATH=$PATH:${APP_ROOT}/bin

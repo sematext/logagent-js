@@ -1,0 +1,21 @@
+# Global options
+options:
+  includeOriginalLine: false
+
+# Receive Kubernetes Audit events via HTTP server
+input:
+   kubernetesAudit:
+    module: input-kubernetes-audit
+    port: 9091
+    # dynamic index setting by posting audit logs to /indexName/ URL 
+    useIndexFromUrlPath: false
+    worker: 0
+    tags:
+      _index: MY_INDEX_FOR_ELASTICSEARCH_OUTPUT
+      receiver: logagent_kubernetes_audit
+
+output: 
+  stdout: yaml
+  #sematext-cloud:
+  # module: elasticsearch
+  # url: http://logsene-receiver.sematext.com

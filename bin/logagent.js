@@ -51,6 +51,7 @@ var moduleAlias = {
   'input-zeromq': 'logagent-input-zeromq',
   'input-syslog': '../lib/plugins/input/syslog',
   'input-kubernetes-events': '../lib/plugins/input/kubernetesEvents.js',
+  'input-kubernetes-audit': '../lib/plugins/input/kubernetesAudit.js',
   'input-docker-events': '../lib/plugins/input/docker/dockerEvents.js',
   'apple-location': 'logagent-apple-location',
   'cassandra-query': '../lib/plugins/input/cassandra.js',

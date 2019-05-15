@@ -538,6 +538,10 @@ patterns:
       - code:string
       - message:string
      dateFormat: YYYY-MM-DDTHH:mm:ssZ
+     transform: !!js/function >
+        function (p) {
+          p.os = {host: p.node}
+        }
    - type: couchdb_http
      regex: !!js/regexp /^\[(\S+)\]\s(\S+)\s(\S+)\s(\S+)\s(\S{10})\s(\S+):(\d+)\s(\S+)\s(\S+)\s(GET|PUT|POST|DELETE|HEAD)\s(\S+)\s(\d+)\s(\S|\s+)/
      fields: 
@@ -554,6 +558,10 @@ patterns:
       - url:string
       - status_code:number
       - response:string
+     transform: !!js/function >
+        function (p) {
+          p.os = {host: p.node}
+        }
      dateFormat: YYYY-MM-DDTHH:mm:ssZ
 
  - # Heroku Syslog Messages
@@ -567,6 +575,7 @@ patterns:
       dateFormat: YYYY-MM-DDTHH:mm:ssZ
       transform: !!js/function >
         function (p) {
+          p.os = {host: p.host}
           const SEVERITY = [
             'emerg',
             'alert',
@@ -668,6 +677,7 @@ patterns:
           p.facility = FACILITY[p.prio>>3] || String(p.prio>>3)
           p.severity = SEVERITY[p.prio&7] || String(p.prio&7)
           delete p.prio
+          p.os = {host: p.host}
         }
  - # Docker Swarm 
   sourceName: !!js/regexp /swarm/ # catch all .log files  

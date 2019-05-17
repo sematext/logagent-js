@@ -16,7 +16,7 @@
     "build-linux-64": "nexe -t linux-x64-12.0.0 bin/logagent.js -o logagent-linux-x64",
     "build-linux-x86": "nexe -t linux-x64-12.0.0 bin/logagent.js -o logagent-linux-x86",
     "build-macos": "nexe -t mac-x64-12.2.0 bin/logagent.js -o logagent-macos",
-    "build-windows": "nexe -t windows-x64-12.0.0 bin/logagent.js logagent-win-x64",
+    "build-windows": "nexe -t windows-x64-12.0.0 bin/logagent-windows.js logagent-win-x64",
     "build-all": "npm run build-linux-64 && npm run build-linux-x86 && npm run build-windows && npm run build-macos",
     "test": "mocha --exit",
     "standard": "standard lib/**/**/*.js bin/*.js",

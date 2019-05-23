@@ -22,6 +22,7 @@ process.on('unhandledRejection', (reason, p) => {
   console.log('Possibly Unhandled Rejection at: Promise ', p, 'reason: ', reason)
   console.dir(reason)
 })
+
 var clone = require('clone')
 var consoleLogger = require('../lib/util/logger.js')
 var StatsPrinter = require('../lib/core/printStats.js')
@@ -278,8 +279,7 @@ LaCli.prototype.loadPlugins = function (configFile) {
       config: {}
     })
   }
-  
-  
+
   this.initFilter('inputFilter', inputFilter)
 
   // load output plugins
@@ -538,7 +538,7 @@ LaCli.prototype.parseChunks = function (chunk, enc, callback) {
 }
 
 LaCli.prototype.terminate = function (reason) {
-  consoleLogger.log('terminate reason: ' + reason.message + ' ' + reason.stack)
+  consoleLogger.error('terminate reason: ' + reason.message + ' ' + reason.stack)
   if (this.argv.heroku && reason !== 'exitWorker') {
     return
   }
@@ -594,6 +594,23 @@ if (require.main === module) {
   if (logagent) {
     consoleLogger.log('Logagent initialized')
   }
+  var errorCounter
+  process.on('uncaughtException', function (err) {
+    // uncaughtErrors can happen in dockermodem/docekrode e.g. when Docker daemon restarts
+    if (String(err).indexOf('Bad response from Docker engine') > -1 ||
+      err.code === 'ENOENT') {
+      logagent.terminate({
+        message: 'Lost connection to Docker socket, EXIT_ON_DOCKER_SOCKET_ERROR',
+        stack: err.stack
+      })
+    }
+    console.error('Please contact support@sematext.com to report the error:')
+    console.error('UncaughtException:' + err + '\n  ' + err.stack)
+    errorCounter++
+    if (errorCounter > 50) {
+      logagent.terminate({ message: 'more than 50 uncaught errors -> exit.', stack: err.stack })
+    }
+  })
 } else {
   module.exports = LaCli
 }

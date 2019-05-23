@@ -1,6 +1,6 @@
 {
   "name": "@sematext/logagent",
-  "version": "2.0.162",
+  "version": "2.0.163",
   "description": "Smart log parser written in Node",
   "main": "lib/parser/parser.js",
   "bin": {
@@ -139,7 +139,7 @@
     "eslint": "^5.9.0",
     "mocha": "^5.2.0",
     "precommit": "^1.2.2",
-    "standard": "12.0.1", 
+    "standard": "12.0.1",
     "nexe": "^3.2.0"
   },
   "pkg": {

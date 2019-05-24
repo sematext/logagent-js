@@ -85,7 +85,7 @@
     "co": "^4.6.0",
     "commander": "^2.19.0",
     "docker-events": "0.0.2",
-    "docker-loghose": "^1.6.4",
+    "docker-loghose": "^1.6.5",
     "dockerode": "^2.5.6",
     "elasticsearch": "^15.2.0",
     "eventemitter3": "^3.1.0",

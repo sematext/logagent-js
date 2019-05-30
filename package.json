@@ -1,6 +1,6 @@
 {
   "name": "@sematext/logagent",
-  "version": "2.0.170",
+  "version": "2.0.171",
   "description": "Smart log parser written in Node",
   "main": "lib/parser/parser.js",
   "bin": {
@@ -150,7 +150,9 @@
     "github": {
       "release": true,
       "releaseNotes": "npx auto-changelog --stdout --commit-limit false -u --template ./changelog.hbs",
-      "assets": ["dist/logagent-*"]
+      "assets": [
+        "dist/logagent-*"
+      ]
     },
     "scripts": {
       "beforeStage": "npx auto-changelog -p",

@@ -13,10 +13,10 @@
     "test": "test"
   },
   "scripts": {
-    "build-linux-64": "nexe -t linux-x64-12.0.0 bin/logagent.js -o logagent-linux-x64",
-    "build-linux-x86": "nexe -t linux-x64-12.0.0 bin/logagent.js -o logagent-linux-x86",
-    "build-macos": "nexe -t mac-x64-12.2.0 bin/logagent.js -o logagent-macos",
-    "build-windows": "nexe -t windows-x64-12.0.0 bin/logagent-windows.js -o logagent-win-x64",
+    "build-linux-64": "nexe -t linux-x64-12.0.0 bin/logagent.js -o dist/logagent-linux-x64",
+    "build-linux-x86": "nexe -t linux-x86-12.0.0 bin/logagent.js -o dist/logagent-linux-x86",
+    "build-macos": "nexe -t mac-x64-12.2.0 bin/logagent.js -o dist/logagent-macos",
+    "build-windows": "nexe -t windows-x64-12.0.0 bin/logagent-windows.js -o dist/logagent-win-x64.exe",
     "build-all": "npm run build-linux-64 && npm run build-linux-x86 && npm run build-windows && npm run build-macos",
     "test": "mocha --exit",
     "standard": "standard lib/**/**/*.js bin/*.js",
@@ -149,7 +149,8 @@
   "release-it": {
     "github": {
       "release": true,
-      "releaseNotes": "npx auto-changelog --stdout --commit-limit false -u --template ./changelog.hbs"
+      "releaseNotes": "npx auto-changelog --stdout --commit-limit false -u --template ./changelog.hbs",
+      "assets": ["dist/logagent-*"]
     },
     "scripts": {
       "beforeStage": "npx auto-changelog -p",

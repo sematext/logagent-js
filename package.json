@@ -149,7 +149,7 @@
   "release-it": {
     "github": {
       "release": true,
-      "changelog": "npx auto-changelog --stdout --commit-limit false -u --template ./changelog.hbs"
+      "releaseNote": "npx auto-changelog --stdout --commit-limit false -u --template ./changelog.hbs"
     },
     "scripts": {
       "beforeStage": "npx auto-changelog -p",

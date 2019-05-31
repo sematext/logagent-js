@@ -19,6 +19,7 @@ RUN \
 COPY patterns.yml /opt/logagent/patterns.yml
 COPY run.sh /run.sh
 RUN chmod +x /run.sh
+HEALTHCHECK --interval=1m --timeout=10s CMD ps -ef | grep -v grep | grep -e logagent || exit 1
 
 RUN [ "cross-build-end" ]
 

@@ -16,6 +16,6 @@ RUN \
 COPY patterns.yml /etc/logagent/patterns.yml
 COPY run.sh /run.sh
 RUN chmod +x /run.sh
-
+HEALTHCHECK --interval=1m --timeout=10s CMD ps -ef | grep -v grep | grep -e logagent || exit 1
 ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["/run.sh"]

@@ -47,6 +47,7 @@ RUN chmod -R ug+x ${APP_ROOT}/bin && sync && \
 
 ### Containers should NOT run as root as a good practice
 USER 10001
+HEALTHCHECK --interval=1m --timeout=10s CMD ps -ef | grep -v grep | grep -e logagent || exit 1
 
 ENTRYPOINT ["/opt/sematext/bin/tini", "--"]
 CMD ["/opt/sematext/bin/run.sh"]

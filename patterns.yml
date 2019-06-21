@@ -27,7 +27,7 @@ multiline:
 # There will be a slight delay during first start of logagent while maxmind
 # database is downloaded. Logagent downloads the MaxMind database every 24hrs or 
 # during startup.
-geoIP: true
+geoIP: false
 
 # The database is stored in a temporary directory
 # The path could be modified via env. variable MAXMIND_DB_DIR

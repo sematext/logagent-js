@@ -68,6 +68,7 @@ var moduleAlias = {
   'aes-encrypt-fields': '../lib/plugins/output-filter/aes-encrypt-fields.js',
   'ip-truncate-fields': '../lib/plugins/output-filter/ip-truncate-fields.js',
   'remove-fields': '../lib/plugins/output-filter/remove-fields.js',
+  'drop-events-filter': '../lib/plugins/output-filter/dropEventsFilter.js',
   'docker-enrichment': '../lib/plugins/output-filter/docker-log-enrichment.js',
   // output plugins
   'elasticsearch': '../lib/plugins/output/elasticsearch.js',

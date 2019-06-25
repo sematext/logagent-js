@@ -1,0 +1,10 @@
+outputFilter:
+  dropEventsFilter:
+    module: drop-events-filter
+    debug: false
+    filters:
+      severity:
+        # include: !!js/regexp error|warning
+        exclude: !!js/regexp debug
+      service:
+        exclude: !!js/regexp snmpd

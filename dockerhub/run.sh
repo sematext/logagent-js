@@ -16,11 +16,14 @@ else
   export PATTERN_DIR=${APP_ROOT}
 fi
 
-if [[ -z "$APP_ROOT" ]]; then
-  export LA_CONFIG=/etc/sematext/logagent.conf
-else
-  export LA_CONFIG=${APP_ROOT}/logagent.conf}
+if [[ -z "$LA_CONFIG" ]]; then
+  if [[ -z "$APP_ROOT" ]]; then
+    export LA_CONFIG=/etc/sematext/logagent.conf
+  else
+    export LA_CONFIG=${APP_ROOT}/logagent.conf}
+  fi
 fi
+echo $LA_CONFIG
 
 export MAX_CLIENT_SOCKETS=${MAX_CLIENT_SOCKETS:-1}
 export LOGSENE_ENABLED_DEFAULT=${LOGSENE_ENABLED_DEFAULT:-true}

@@ -22,8 +22,10 @@ if [[ -z "$LA_CONFIG" ]]; then
   else
     export LA_CONFIG=${APP_ROOT}/logagent.conf}
   fi
+  export GENERATE_CONFIG_FILE="true"
 fi
-echo $LA_CONFIG
+
+echo $LA_CONFIG 
 
 export MAX_CLIENT_SOCKETS=${MAX_CLIENT_SOCKETS:-1}
 export LOGSENE_ENABLED_DEFAULT=${LOGSENE_ENABLED_DEFAULT:-true}
@@ -127,6 +129,8 @@ LOGSENE_RECEIVER_URL=https://logsene-receiver.eu.sematext.com" >"$RECEIVERS_CONF
 
 generate_config
 
+if [[ -n "${GENERATE_CONFIG_FILE}" ]]; then
+echo "Creating Logagent config file: $LA_CONFIG"
 cat >$LA_CONFIG <<EOF
 options:
   printStats: 60
@@ -173,6 +177,8 @@ output:
     url: $LOGSENE_RECEIVER_URL
     index: ${LOGS_TOKEN}
 EOF
+
+fi
 
 echo "Content of ${LA_CONFIG}:"
 cat $LA_CONFIG

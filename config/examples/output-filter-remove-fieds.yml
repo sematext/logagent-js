@@ -1,8 +1,20 @@
 outputFilter:
   remove-fields:
     module: remove-fields
-    # JS regeular expression to match log source name
-    matchSource: !!js/regexp nginx
+    # JS regular expression to match log source name
+    matchSource: !!js/regexp .*
     fields:
       - client_ip
       - user
+    # List of fields, where teh values from removed field should be 
+    # replaced with maskValuesString
+    maskValuesInFields: 
+      - message
+      - originalLine
+    # String to replace masked values from removed fields
+    maskValuesString: "ANONYMIZED-DATA"
+
+# Exmple, input: 
+# {"client_ip": "127.0.0.1", "message": "Client connect: 127.0.0.1", "originalLine": "INFO Client connect: 127.0.0.1"}
+# Example, output
+# {"client_ip": "127.0.0.1", "message": "Client connect: ANONYMIZED-DATA", "originalLine": "INFO Client connect: ANONYMIZED-DATA"}

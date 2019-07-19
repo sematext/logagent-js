@@ -32,6 +32,7 @@ process.setMaxListeners(0)
 var co = require('co')
 const fs = require('fs')
 const request = require('request')
+const PATTERN_DIR = process.env.PATTERN_DIR || '/etc/logagent'
 var moduleAlias = {
   // inputs
   'command': '../lib/plugins/input/command.js',
@@ -102,17 +103,18 @@ function downloadPatterns (cb) {
   if (!process.env.PATTERNS_URL) {
     return cb()
   }
-  fs.unlink('/etc/logagent/patterns.yml', () => {
+  var patternFileName = PATTERN_DIR + '/patterns.yml' 
+  fs.unlink(patternFileName, () => {
     var cbCalled = false
-    var patternFileWs = fs.createWriteStream('/etc/logagent/patterns.yml')
+    var patternFileWs = fs.createWriteStream(patternFileName)
     patternFileWs.on('error', (ioerr) => {
-      consoleLogger.error('Error writing patterns to /etc/logagent/patterns.yml:' + process.env.PATTERNS_URL + ' ' + ioerr)
+      consoleLogger.error('Error writing patterns to ' + patternFileName + ': ' + process.env.PATTERNS_URL + ' ' + ioerr)
       if (!cbCalled) {
         cb(ioerr)
       }
     })
     patternFileWs.on('close', () => {
-      consoleLogger.log('Patterns stored in /etc/logagent/patterns.yml (' + process.env.PATTERNS_URL + ')')
+      consoleLogger.log('Patterns stored in ' + patternFileName + ' (' + process.env.PATTERNS_URL + ')')
       cb()
     })
     try {
@@ -131,7 +133,7 @@ function downloadPatterns (cb) {
 }
 
 function LaCli (options) {
-  downloadPatterns(function () {})
+  var self = this
   this.eventEmitter = require('../lib/core/logEventEmitter.js')
   this.eventEmitter.on('error', function (err) {
     consoleLogger.error(err)
@@ -148,7 +150,9 @@ function LaCli (options) {
   this.WORKERS = process.env.WEB_CONCURRENCY || 1
   this.removeAnsiColor = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g
   this.laStats = StatsPrinter
-  this.initState()
+  downloadPatterns(function (err, result) {
+    self.initState()
+  })
 }
 LaCli.prototype.initFilter = function (type, filterFunctions) {
   consoleLogger.log('init filter: ' + type)

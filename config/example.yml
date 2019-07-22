@@ -1,75 +1,1043 @@
+################################################################
+# Logagent configuration file
+#
+# Documentation: https://sematext.com/docs/logagent/
+# Github Repository: https://github.com/sematext/logagent-js
+################################################################
+#
+# 1. What is the file format? 
+#    The file format is JS-YAML
+#
+# 2. For identations use 2 spaces, no tabs! 
+#   options: 
+#     canIUseTabsForIdentation: 'no!'
+#     OkHowManySpaces: 2
+#     isItConfigurable: false
+#     whyDoYouUseJS-YAML: 
+#      - 'YAML is a very popular configuration format!' 
+#      - 'JS-YAML provides extenions for JavaScript!'
+#      - 'With JS-YAML we can make log processing scriptable!'
+#
+# 3. JavaScript types can be used in various properties - looks strange, but it just works! 
+# - Regular Expressions 
+#   regexp: !!js/regexp /DEBUG|INFO|WARN|ERROR/i  
+# - JavaScript Functions
+#   myFunction: !!js/function >
+#     function foobar() {
+#       return 'Wow! JS-YAML Rocks!';
+#     }
+# - Lists/Arrays use a dash for each item or array notation [a,b,c] 
+#   myList: 
+#     - first
+#     - second
+#   otherList: ["first", "second"]
+################################################################
+
+################################################################
 # Global options
-#debug: true
-#env: 
+################################################################
+debug: false
+
+# SET AND OVERWRITE ENVIRONMENT VARIABLES 
+# Notesome nodejs modules can be configured via ENV variables
+# e.g. the HTTP request module for proxy settings
+env:
 #  HTTP_PROXY: http://myproxy
 #  NO_PROXY: github.com
 
 options:
   # print stats every 60 seconds 
   printStats: 60
-  # don't write parsed logs to stdout
-  suppress: false
+  # Don't write parsed logs to stdout
+  # The default value in the command line mode is "false"
+  # Running Logagent as a service we recommend to set suppress:true 
+  suppress: true
   # Enable/disable GeoIP lookups
   # Startup of logagent might be slower, when downloading the GeoIP database
   geoipEnabled: false
   # Directory to store Logagent status and temporary files
   diskBufferDir: ./tmp
 
+##############################################
+#
+# INPUT PLUGINS 
+#
+##############################################
 input:
-  # a list of glob patterns to watch files to tail
-  #files:
-  #    - '/var/log/**/*.log'
-  # listen to udp syslog protocol  
-  syslog: 
-    module: input-syslog
-    port: 1514
-    address: 127.0.0.0
-  # Receive data from Heroku log drains via http
-  #heroku: 
-  #  port: 9999
-  # Receive data from Cloud Foundry log drains via http  
-  #cloudFoundry:
-  #  port: 8888
+  ##############################################
+  # FILE INPUT  
+  # Tail multiple files from various directories 
+  # See: https://en.wikipedia.org/wiki/Glob_(programming)
+  ##############################################
+  files:
+      - '/var/log/**/*.log'
+     # - '/var/log/nginx/access_log'
+     # - '/opt/myapp/logs/*.log'
 
+  ##############################################
+  # STDIN INPUT  
+  # Read data from standard input (stdin stream, e.g.unix pipe: cat test.log | logagent --yaml )
+  # Disable stding input when Logagent runs as a service   
+  # Documentation: https://sematext.com/docs/logagent/input-plugin-stdin/
+  ##############################################
+  stdin: false
+  # Disable reading from stdin
+  # stdin: false
+  
+  ##############################################
+  # DOCKER INPUT  
+  # Collect Docker Container Logs via Docker API  
+  # Documentation: https://sematext.com/docs/logagent/input-plugin-dockerlogs/
+  # See also: https://sematext.com/docs/logagent/output-filter-dockerenrichment/
+  ##############################################
+  #
+  #docker:
+  #  module: docker-logs
+  #  socket: /var/run/docker.sock
+  #  labelFilter: com.docker.*,io.kubernetes.*,annotation.*
+  # labelFilter: *
+  ##############################################
+  
+  ##############################################
+  # UDP SYSLOG INPUT  
+  # Receive logs via UDP syslog protocol 
+  # Documentation: https://sematext.com/docs/logagent/input-plugin-syslog/ 
+  ##############################################
+  #
+  #syslog: 
+  #  module: input-syslog
+  #  port: 1514
+  #  address: 127.0.0.0
+  #  sourceName: syslog
+  ##############################################
 
-# optional, if not specified default patterns are used
+  ##############################################
+  # TCP RAW INPUT  
+  # Receive log lines via TCP stream 
+  # Documentation: https://sematext.com/docs/logagent/input-plugin-syslog/ 
+  ##############################################
+  #
+  #tcp: 
+  #  module: input-tcp
+  #  port: 45900
+  #  bindAddress: 0.0.0.0
+  #  sourceName: tcpTest
+  #  # return the parsed message as JSON object via TCP 
+  #  returnResult: false
+
+  ##############################################
+  # MQTT CLIENT INPUT  
+  # Receive log lines from MQTT topics (client) 
+  # Documentation: https://sematext.com/docs/logagent/input-plugin-mqtt-client/ 
+  ##############################################
+  #
+  #mqtt-client:
+  #  module: input-mqtt-client
+  #  url: mqtt://test.mosquitto.org
+  #  topics: 
+  #    - log-messages
+  #    - sensor-data
+  #
+  ##############################################
+
+  ##############################################
+  # MQTT BROKER INPUT  
+  # Act as MQTT Broker 
+  # Documentation: https://sematext.com/docs/logagent/input-plugin-mqtt-broker/ 
+  ##############################################
+  #
+  #mqtt-broker:
+  #  module: input-mqtt-broker
+  #  port: 1883
+  #  # regular expression to ignore topics
+  #  ignoreTopic: ^\$SYS
+  #  debug: false
+  #  # enable authentication by setting username and password
+  #  # username: mqtt
+  #  # password: secret
+  #  # The authenticate function can implement custom authentication logic 
+  #  # authenticate: !!js/function > 
+  #  #   function (client, username, password, callback) { 
+  #  #     callback(null, username=='mqtt' && password === 'secret')
+  #  #   }
+  #
+  ##############################################
+  
+  ##############################################
+  # APACHE KAFKA INPUT  
+  # Act as Kafka consumer  
+  # Documentation: https://sematext.com/docs/logagent/input-plugin-kafka/ 
+  ##############################################
+  #
+  #kafka-consumer: 
+  #  module: logagent-input-kafka
+  #  host: localhost
+  #  port: 9092
+  #  groupId: ExampleTestGroup
+  #  topic: test
+  #  autoCommit: true
+  #  sessionTimeout: 15000
+  #  sslEnable: false
+  #  # TLS options: https://nodejs.org/api/tls.html 
+  #  sslOptions: 
+  #    - rejectUnauthorized: false
+  #
+  ##############################################
+  
+
+  ##############################################
+  # GELF INPUT 
+  # Receive logs from Graylog2 agents in GELF format
+  # Note additional node modules are required. 
+  # Install module: sudo npm i -g --unsafe-perm graygelf 
+  # Documentation: https://sematext.com/docs/logagent/input-plugin-gelf/
+  ##############################################
+  #
+  #gelf: 
+  #  module: input-gelf
+  #  port: 12100
+  #  host: 0.0.0.0
+  #
+  ##############################################
+  
+  ##############################################
+  # SYSTEMD JOURNAL-UPLOAD INPUT  
+  # Receive logs via systemd-journal-upload protocol 
+  # Please note all server must run systemd-journal-upload service 
+  # to forward logs to Logagent.
+  # Documentation: https://sematext.com/docs/logagent/input-plugin-journald-upload/
+  ##############################################
+  #
+  #journal-upload:
+  #  module: input-journald-upload
+  #  port: 9090
+  #  worker: 0
+  #  systemdUnitFilter: 
+  #    include: !!js/regexp /.*/i
+  #  #  exclude: !!js/regexp /docker|containerd/i
+  #  # add static tags to every log event 
+  #  tags:
+  #   # _index is special tag for log routing with elasticsearch output-plugin
+  #   _index: MY_INDEX_FOR_ELASTICSEARCH_OUTPUT
+  #   # you can add any other static tag 
+  #   node_role: kubernetes_worker
+  #   log_shipper: logagent
+  #  # journald might provide many fields, 
+  #  # to reduce storage usage you can remove 
+  #  # non-relevant fields
+  #  removeFields:
+  #    - __CURSOR
+  #    - __REALTIME_TIMESTAMP
+  #    - _SOURCE_REALTIME_TIMESTAMP
+  #    - __MONOTONIC_TIMESTAMP
+  
+  ##############################################
+  # COMMAND INPUT  
+  # Run any command and process the command output as log lines - very powerful!   
+  # Documentation: https://sematext.com/docs/logagent/input-plugin-journald-upload/
+  ##############################################
+  # JOURNALD VIA COMMAND INPUT 
+  # Collect journald logs from the local server
+  ##############################################
+  #
+  #journald-json: 
+  #  module: command
+  #  command: journalctl -o json -f
+  #  sourceName: journald
+  #  # time in seconds to repeat the command
+  #  restart: -1 
+  #
+  ###########################################
+  # BRO / ZEEK IDS LOGS VIA COMMAND INPUT 
+  # We start bro program, but we collect logs from /var/log/bro via file-input in this case! 
+  # Read more about it: https://sematext.com/blog/bro-ids-network-security-elasticsearch/
+  #
+  #zeek-start: 
+  #  module: command
+  #  # Store Zeek logs in /var/log/bro in JSON format
+  #  command: mkdir /var/log/bro; cd //var/log/bro; bro -i eth0 -e 'redef LogAscii::use_json=T;'
+  #  sourceName: bro 
+  #  restart: 1
+  #
+  ###########################################
+  # WEATHER DATA / JSON API VIA COMMAND INPUT  
+  # Run a command peridocally and collect its output as log data 
+  #
+  #curl-weather-data: 
+  #  module: command
+  #  command: curl "http://api.openweathermap.org/data/2.5/weather?q=Portland,us&appid=[your API key here]"
+  #  sourceName: weather-map
+  #  # restart the command every 60 seconds after termination
+  #  restart: 60 
+  ###########################################
+  
+  ###########################################
+  # ELASTICSEARCH HTTP INPUT 
+  # Act as Elasticsearch Indexing API server, no queries supported
+  # The plugin is handy for the integration with logstash or filebeat 
+  # or any other tool, which can write to Elasticsearch 
+  # Documentation: https://sematext.com/docs/logagent/input-plugin-elasticsearch-query/
+  ###########################################
+  #
+  #elasticsearch-http:
+  #  module: input-elasticsearch-http
+  #  port: 9200
+  #  worker: 0
+  #
+  ###########################################
+  
+  ###########################################
+  # ELASTICSEARCH QUERY INPUT 
+  # Query Elasticsearch servers periodically 
+  # Documentation: https://sematext.com/docs/logagent/input-plugin-elasticsearch-query/
+  ###########################################
+  #
+  #elasticSearchQuery: 
+  #  # AWS options
+  #  # set to true for Amazon Elasticsearch service
+  #  awsEnabled: false
+  #  # awsConfigFile: ./aws-config.json
+  #  # auth: 'username:password'
+  #  module: elasticsearch-query
+  #  sourceName: errorQuery
+  #  # repeat query every N seconds
+  #  interval: 60
+  #  log: 'error'
+  #  url: https://logsene-receiver.sematext.com
+  #  query: 
+  #    size: 50
+  #    index: cc5e9c1b-xxxx-xxxx-xxxx-2a0b2c01b912
+  #    body:
+  #      query:
+  #        bool:
+  #          must: 
+  #            - query_string:
+  #                query: 'status:>399'
+  #          filter:
+  #            - range:
+  #                '@timestamp':
+  #                  gte: now-1m/m
+  #                  lte: now/m
+  #
+  ###########################################
+
+  ###########################################
+  # MICROSOFT SQL-QUERY INPUT 
+  # Documentation: https://sematext.com/docs/logagent/input-plugin-mssql/
+  ###########################################
+  #
+  #mssql:
+  #  module: mssql-query
+  #  connectioninfo: 
+  #    server: localhost
+  #    port: 1433
+  #    userName: Testuser
+  #    password: Testpassword
+  #    database: testdatabase
+  #    options: 
+  #      database: testdatabase
+  #      encrypt: false
+  #      rowCollectionOnDone: false
+  #      rowCollectionOnRequestCompletion: true
+  #  queryTimezone: America/Los_Angeles 
+  #  queryTimeFormat: YYYY-MM-DD HH:mm:ss
+  #  queries: 
+  #    - sourceName: query1
+  #      sql:  SELECT * FROM employees
+  #  interval: 1
+  #  debug: true
+  #
+  ###########################################
+  
+  ###########################################
+  # MYSQL QUERY INPUT 
+  # Documentation: https://sematext.com/docs/logagent/input-plugin-mysql/
+  ###########################################
+  #
+  #mysql-json:
+  #  module: mysql-query
+  #  server: 
+  #    host: 'localhost'
+  #    user: 'root'
+  #    password: ''
+  #    database: 'test'
+  #  queries: 
+  #    - sourceName: query1
+  #      sql: SELECT * FROM potluck where signup_date < '$queryTime'
+  #    - sourceName: query2      
+  #      sql: SELECT * FROM potluck where name = 'Tina' and signup_date < '$queryTime'
+  #    - sourceName: query3
+  #      sql: SELECT * FROM potluck where name = 'Sandy' and signup_date < '$queryTime'
+  #  interval: 1
+  #  debug: true
+  # 
+  ###########################################
+  
+  ###########################################
+  # POSTGRESQL QUERY INPUT 
+  # Documentation: https://sematext.com/docs/logagent/input-plugin-mysql/
+  ###########################################
+  #
+  #postgresql:
+  #  module: postgresql-query
+  #  server: 
+  #    user: 'postgres'
+  #    database: 'test'
+  #    password: '$Demo123'
+  #    host: 'localhost'
+  #    port: '5432'
+  #  queryTimezone: America/Los_Angeles 
+  #  queryTimeFormat: YYYY-MM-DD HH:mm:ss
+  #  queries: 
+  #    - sourceName: query1
+  #      sql: SELECT name, age FROM company where join_date < '$queryTime'
+  #    - sourceName: query2      
+  #      sql: SELECT name, salary FROM company where join_date < '$queryTime'
+  #  interval: 1
+  #  debug: true
+  # 
+  ###########################################
+  
+  ###########################################
+  # CASSANDRA QUERY INPUT 
+  # Documentation: https://sematext.com/docs/logagent/input-plugin-cassandra/
+  ###########################################
+  #
+  # Query Cassandra database
+  # cassandra-json:
+  #  module: cassandra-query
+  #  server:
+  #    #contact points should be separated by comma ',' for example 'h1', 'h2' 
+  #    host: localhost
+  #    port: '9042'
+  #    keyspace: 'logagent'
+  #  #https://docs.datastax.com/en/developer/nodejs-driver/3.4/features/connection-pooling/
+  #  pooling:
+  #      coreConnectionsPerHost:
+  #        distanceLocal: 2
+  #        distanceRemote: 1
+  #  queryTimezone: America/Los_Angeles 
+  #  queryTimeFormat: YYYY-MM-DD HH:mm:ss          
+  #  queries: 
+  #    - sourceName: query1
+  #      sql: SELECT * FROM logagent.orders_by_day WHERE event_time >= '$queryTime' ALLOW FILTERING
+  #  interval: 1
+  #  debug: true
+  #
+  ###########################################
+  
+
+  ###########################################
+  # INFLUXDB INPUT 
+  # Receives metrics from InfluxDB compatible agents like Telegraf or Sematext Monitoring Agent. 
+  # Logagent behaves like InfluxDB HTTP API /write endpoint. 
+  # Metrics are converted from influx-line-protocol to a JSON structure. 
+  # Documentation: https://sematext.com/docs/logagent/input-plugin-cassandra/
+  ###########################################
+  #
+  #influxDb: 
+  #  module: input-influxdb-http
+  #  port: 8086
+  #  workers: 1
+  ##########################################
+  
+  ###########################################
+  # APPLE DEVICE LOCATION INPUT 
+  # Plugin to track the GPS position of Apple devices using the find-my-iphone API.
+  # Documentation: https://sematext.com/docs/logagent/logagent-apple-location/
+  # Blog Post: Blog post: https://sematext.com/blog/iot-air-pollution-tracking-with-node-js-elastic-stack-and-mqtt/
+  ###########################################
+  #
+  #track-apple-devices: 
+  #  module: logagent-apple-location
+  #  # Your Apple ID (e-mail address)
+  #  # Instead of adding Apple-ID to this config you could set env. variable APPLE_ID
+  #  appleId: your-apple-id@icloud.com 
+  #  # Instead of adding iCloud password to this config you could set env. variable APPLE_PW
+  #  applePassword: your-apple-password
+  #  # Note locating phones might consume more energy on the devices  
+  #  # Query Apple API every N minutes. The minimum value is 1 minute.
+  #  interval: 10 
+  #  # Regular expressions to filter devices by device.name or device.deviceDisplayName
+  #  # blacklist - ignore devices matching following regular expression, case sensitive
+  #  ignoreDeviceName: 'iPhone.4'
+  #  # whitelist - track only devices matching following regular expression
+  #  filterDeviceName: 'iPhone.6'
+  #  # verbose output to console for filter matching
+  #  debug: true
+  ##########################################
+  
+  ##########################################
+  # NOVA SDS011 SENSOR INPUT
+  # SDS011 is a Particular Matter (PM) Sensor to measure Air Pollution
+  # Install module: sudo npm i -g logagent-novasds 
+  # Documentation: https://sematext.com/docs/logagent/logagent-novasds/
+  # Blog Post: https://sematext.com/blog/iot-air-pollution-tracking-with-node-js-elastic-stack-and-mqtt/
+  ##########################################
+  #
+  #novaSDS011:
+  #  module: logagent-novasds
+  #  # COM port for the USB to serial interface
+  #  comPort: /dev/cu.wchusbserialfa1220
+  #  # optional static sensor location
+  #  location:  
+  #    lat: 49.0
+  #    lon: 7.0
+  #    address: "My Street, My City, My Country"
+  #  tags: 
+  #    environment: indoors
+
+##########################################
+# INPUT FILTERS
+# Input filters process raw input from input plugins before log events get parsed
+##########################################
+#
+#inputFilter:
+#  - module: grep
+#    config:
+#      matchSource: !!js/regexp /myapp.log/
+#      include: !!js/regexp /info|error/i
+#      exclude: !!js/regexp /test/i
+#
+##########################################
+
+# enable JSON parsing
+json:
+  enabled: true 
+
+##########################################
+# LOG PARSER
+# A parser matches first sourceName and processes the log event 
+# with a list of pattern definitions for each log source.
+# Documentation: https://sematext.com/docs/logagent/parser/ 
+# Default log patterns: https://github.com/sematext/logagent-js/blob/master/patterns.yml
+##########################################
+# Optinal log parser patterns, if not specified default patterns are used
+# Add your own parser deinitions
+#
 parser:
-  #patternFiles:
-    # load a list of pattern files to parse logs
-    # later files overwrite settings from previous files
-    #- patterns1.yml
-    #- patterns2.yml
-  # Inline pattern definitions are merged with default pattern list and can overwrite existing definitions
-  patterns:
-    - # timestamped messages from /var/log/*.log on Mac OS X
-      sourceName: !!js/regexp /\system\.log/ # catch all system.log files  
-      match:
-        -
-          type: system_log
-          regex: !!js/regexp /([\w|\s]+\s+\d{2}\s[\d|\:]+)\s(.+?)\s(.+?)\s<(.+)>(.*)/
-          fields: [ts,host,service,severity,message]
-          dateFormat: MMM DD HH:mm:ss
+  ##########################################
+  # INCLUDE PATTERN DEFINITION FILES
+  # Load a list of pattern files to parse logs
+  # Later files overwrite settings from previous files
+  # Advantage: hot releoad is performed on any file change
+  # and requires no restart of Logagent 
+  ########################################## 
+  patternFiles:
+    - /etc/logagent/patterns.yml
+    #- /tmp/myLogPatterns.yml
+  
+  ##########################################
+  # INLINE PATTERN DEFINITION
+  # Inline pattern definitions are merged with 
+  # default pattern list and can overwrite existing definitions
+  ########################################## 
+  #patterns: 
+  #  - #  Web Logs
+  #    sourceName: !!js/regexp /httpd|access_log|apache2|nginx|sematext\/frontend-app/
+  #    match: 
+  #      - type: access_log_combined
+  #        regex: !!js/regexp ^([0-9a-f.:]+)\s(-|\S+)\s(-|\S+)\s\[(.*)\]\s\"(\w+)\s(\S+)\s{0,1}(.*)\" ([0-9|\-]+) ([0-9|\-]+) \"([^\"]+)\" \"([^\"]+)\"
+  #        fields: 
+  #           - client_ip:string
+  #           - remote_id:string
+  #           - user:string
+  #           - ts
+  #           - method:string
+  #           - path:string
+  #           - protocol:string
+  #           - status_code:number
+  #           - size:number
+  #           - referer:string
+  #           - user_agent:string
+  #         geoIP: client_ip
+  #         dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
+  #         transform: !!js/function >
+  #           function transformMessage (m) {
+  #             m.message = m.method + ' ' + m.path
+  #             if(m.status_code === '-') {
+  #               m.status_code = 0
+  #             }
+  #             if(m.size === '-') {
+  #               p.size = 0
+  #             }
+  #           }
 
+##########################################
+# OUTPUT FILTERS
+# Output filters process parsed logs
+# Here you can transform and enrich or drop data 
+# before data is transfered to output moudules
+##########################################
+#
+outputFilter:
+  # You can add outputplugins inline in JavaScript
+  #myCustomFilter: 
+  #  # configuration for your custom filter function
+  #  # you can persist status variables in the config object 
+  #  config: 
+  #    init: false
+  #    greeting: 'Hello'
+  #  module: !!js/function >
+  #    function myFilter (context, config, eventEmitter, data, callback) {
+  #      // use config object as status variable
+  #      if (!config.init) { 
+  #        // initialize your status variables
+  #        config.init = true  
+  #      } else {
+  #        // status variables are initialized ...
+  #      }
+  #      // Manipulate your data here 
+  #      // data.greeting = config.greeting
+  #      // Drop data by setting data to null in callback 
+  #      // callback ()
+  #
+  #      // if something goes wrong ...  
+  #      // callback (error, data)
+  #
+  #      // Everything OK, and you want to keep the data  
+  #      callback(null, data)
+  #    }
+
+##########################################
+# DOCKER ENRICHMENT
+# Output filter plugin to add metadata like container labels or 
+# Kubernetes pod information to Docker logs 
+# It can be used to route logs to different Sematext Log Apps by setting  
+# the container label (or environment variable) LOGS_TOKEN=LOGS_TOKEN_FOR_YOUR_CONTAINER.
+##########################################
+#
+#dockerEnrichment:
+#  module: docker-enrichment 
+#  autodetectSeverity: true
+#
+##########################################
+
+##########################################
+# REMOVE FIELDS
+# Documentation: https://sematext.com/docs/logagent/output-filter-removefields/
+##########################################
+#
+#remove-fields:
+#  module: remove-fields
+#  # JS regular expression to match log source name
+#  matchSource: !!js/regexp .*
+#  # List of fields, where the values from removed field should be
+#  # replaced with maskValuesString 
+#  maskValuesInFields:
+#    - message
+#    - path
+#  # String to replace masked values (thos from removed fields)
+#  maskValuesString: "ANONYMIZED-DATA"
+#  fields:
+#    - user
+#    - client_ip
+##########################################
+
+##########################################
+# DROP EVENTS FILTER
+# This plugin drops events. 
+# Documentation: https://sematext.com/docs/logagent/
+########################################## 
+#
+#  dropEventsFilter:
+#    module: drop-events-filter
+#    debug: false
+#    filters:
+#      severity:
+#        # include: !!js/regexp /error|warn/i
+#        exclude: !!js/regexp /debug/i
+#      service:
+#        exclude: !!js/regexp snmpd
+
+
+##########################################
+# DROP EVENTS FILTER
+# This plugin drops events. 
+# Documentation: https://sematext.com/docs/logagent/
+########################################## 
+#
+#  dropEventsFilter:
+#    module: drop-events-filter
+#    debug: false
+#    filters:
+#      severity:
+#        # include: !!js/regexp /error|warn/i
+#        exclude: !!js/regexp /debug/i
+#      service:
+#        exclude: !!js/regexp snmpd
+
+##########################################
+# AES ENCRYPT FIELDS 
+# This plugin encrypts field values with AES  
+# Documentation: https://sematext.com/docs/logagent/output-filter-aesencryptfields/
+########################################## 
+#
+#aes:
+#    module: aes-encrypt-fields
+#    # JS regular expression to match log source name
+#    matchSource: !!js/regexp access.log
+#    fields:
+#      - client_ip
+#      - user
+#    password: "Top secret!"
+#    # algorithms supported by nodejs crypto module, 
+#    # e.g. aes-128-cbc, aes-128-ecb, aes-192-cbc,
+#    # aes-192-ecb, aes-256-cbc, aes-256-ecb
+#    # short names might work as well e.g. "aes256"
+#    # default value is aes256
+#    algorithm: aes-256-ecb
+
+##########################################
+# HASH FIELDS 
+# This plugin encrypts field values with AES  
+# Documentation: https://sematext.com/docs/logagent/output-filter-hashfields/
+########################################## 
+# 
+#hashfields: 
+#    module: hash-fields
+#    # JS regular expression to match log source name
+#    matchSource: !!js/regexp access_log
+#    # algorithms supported by nodejs crypto module, e.g. sha1, sha256, sha512, md5, ...
+#    algorithm: sha256
+#    fields:
+#      - client_ip
+
+##########################################
+# SQL Filter 
+# Aggregate log events with SQL.   
+# Documentation: https://sematext.com/docs/logagent/output-filter-sql/
+########################################## 
+# 
+#sql: 
+#  module: sql
+#  config:
+#    source: !!js/regexp /access.log|httpd/
+#    # SQL statements are applied to a memory buffer 
+#    # contiaining events for N seconds
+#    interval: 1 # 1 second
+#    queries:
+#      - # calculate average page size for different HTTP methods
+#        SELECT 'apache_stats' AS _type, 
+#          AVG(size) AS size_avg, 
+#          COUNT(method) AS method_count, 
+#          method as http_method
+#        FROM ? 
+#        GROUP BY method
+#      - # log each request to the login page 
+#        SELECT * FROM ? 
+#        WHERE path like "/wp-login%" 
+
+
+#########################################
+# OUTPUT PLUGINS 
+# Send events to various destinations 
+# Documentation: https://sematext.com/docs/logagent/plugins/
+########################################## 
+# 
 output:
-  # index logs in Elasticsearch or Logsene
+  #########################################
+  # STDOUT OUTPUT 
+  # Send events to stdout 
+  # Documentation: https://sematext.com/docs/logagent/output-plugin-stdout/
+  ########################################## 
+  # 
+  # Disable stdout 
+  stdout: false 
+  # Write events in YAML format to console
+  #stdout: yaml   # YAML output 
+  #stdout: pretty # pretty JSON output 
+  #stdout: ldjson # line delimited JSON output (default!)
+  
+  #########################################
+  # GELF OUTPUT  
+  # Send events via GELF protocol (Graylog2) 
+  # 3rd party module.
+  # Install: sudo npm i -g --unsafe-perm graygelf 
+  # Documentation: https://sematext.com/docs/logagent/output-plugin-gelf/
+  ########################################## 
+  # 
+  #gelf:
+  #  module: output-gelf
+  #  host: localhost
+  #  # graylog port (default: 12201)
+  #  port: 12201
+  #  # compression 'gzip' or 'deflate' (default: 'deflate')
+  #  compressType: deflate
+  #  # size of chunked messages in bytes (default: 1240)
+  #  chunkSize: 1024
+  
+  #########################################
+  # MQTT OUTPUT - IoT applications 
+  # Send events via MQTT protocol to various topics
+  # Documentation: https://sematext.com/docs/logagent/output-plugin-mqtt/
+  ########################################## 
+  # 
+  #mqtt-all:
+  #  module: output-mqtt
+  #  url: mqtt://test.mosquitto.org
+  #  topic: logs-and-sensor-data
+  #  debug: false
+  #mqtt-sensor-data:
+  #  module: output-mqtt
+  #  url: mqtt://test.mosquitto.org
+  #  topic: sensor-data
+  #  debug: false
+  #  # optional filter settings matching data field with regular expressions
+  #  filter: 
+  #    field: logSource
+  #    match: sensor.*
+  #mqtt-log-data:
+  #  module: output-mqtt
+  #  url: mqtt://test.mosquitto.org
+  #  topic: log-data
+  #  debug: false
+  #  filter: 
+  #    field: logSource
+  #    match: application-logs.*
+  #mqtt-dynamic-topic:
+  #  module: output-mqtt
+  #  url: mqtt://test.mosquitto.org
+  #  topic: log-data
+  #  debug: false
+  #  dynamicTopic: data.logSource
+  #  # for elasticsearch-http input
+  #  # dynamicTopic: data._index 
+  #  # for MQTT input
+  #  # dynamicTopic: context.topic
+
+  #########################################
+  # FILE OUTPUT  
+  # Write events to files
+  # Documentation: https://sematext.com/docs/logagent/output-plugin-files/
+  ########################################## 
+  #files:
+  #  module: output-files
+  #  debug: false
+  #  fileName: '/tmp/{country}.txt'
+  #  # available format values: 
+  #  # 'ldjson' (default), 'yaml', 'pretty' (pretty JSON), 'template'
+  #  format: template
+  #  # define a template for comma separated format
+  #  template: '{country},{anotherField},{andAnotherField}'
+  #  # matches context.sourceName == data.logSource
+  #  sourceName: .*
+  #  # matches data._type field 
+  #  typeName: countryInfo
+  #  # properties for https://www.npmjs.com/search?q=rotating-file-stream
+  #  size: 10M
+  #  maxFiles: 2
+  #  interval: 1d
+  #  compress: true
+  
+  #########################################
+  # AWS ELASTICSEARCH SERVICE 
+  # Write events to AWS Elasticsearch Service
+  # Documentation: https://sematext.com/docs/logagent/output-plugin-aws-elasticsearch/
+  ########################################## 
+  #aws-es: 
+  #  module: output-aws-elasticsearch
+  #  url: https://my-url.es.amazonaws.com
+  #  index: mylogs
+  #  type: myLogType
+  #  # use configuration file, generated by AWS Elasticsearch
+  #  awsConfigFile: ./aws_config.json
+  #  # Elasticsearch client logging options
+  #  log:
+  #    - type: 'stdio'
+  #      # empty array to suppress ES node client logs
+  #      levels: []
+  #      # or configure log level individually 
+  #      # levels:
+  #      #   - 'error' 
+  #      #   - 'warning'
+  #      #   - 'info'  
+  
+
+  #########################################
+  # INFLUXDB OUTPUT 
+  # Write events to InfluxDB
+  # JSON is converted to influx line protocol. 
+  # Documentation: https://sematext.com/docs/logagent/output-plugin-influxdb/
+  ########################################## 
+  #sensor-data:
+  #  module: output-influxdb
+  #  # InfluxDB URL including optional name and password
+  #  url: http://username:password@127.0.0.1:8086
+  #  # InfluxdB datbase name
+  #  db: sensor_data
+  #  # static tags for all metrics
+  #  tags: 
+  #    role: backend
+  #    region: eu
+  #  # flush interval in seconds
+  #  flushInterval: 5
+  #  # max buffer size to force flush
+  #  maxBufferSize: 100
+  #  # Debug option to log influx-line protocol details to stderr
+  #  debug: false
+  #  # A list of message fields, which should be ignored in influxdb output. 
+  #  # Note fields with highly variable content such as log messages could increase InfluxDB memory usage. 
+  #  ignoreFields: 
+  #    - message
+  #    - id
+  #  # Only messages matching the filter (RegEx) will be processed
+  #  filter: 
+  #    field: logSource
+  #    match: .*
+
+  #########################################
+  # APACHE KAFKA OUTPUT 
+  # Write events to Apache Kafka, 3rd party module
+  # Installation: npm i -g logagent-output-kafka
+  # Documentation: https://sematext.com/docs/logagent/output-plugin-kafka/
+  ########################################## 
+  #
+  #kafka: 
+  # module: logagent-output-kafka
+  # host: localhost
+  # port: 9092 
+  # topic: test
+  # requireAcks: 1
+  # sslEnable: false
+  # sslOptions: 
+  #    - rejectUnauthorized: false
+  
+  #########################################
+  # ZERO MQ OUTPUT 
+  # Write events to 0MQ, 3rd party module
+  # Installation: sudo npm i -g logagent-output-zeromq
+  # Documentation: https://sematext.com/docs/logagent/output-plugin-zeromq/
+  ########################################## 
+  #zeromq: 
+  #  module: output-zeromq
+  #  host: 127.0.0.1
+  #  port_zmq: 3000
+  #  # for Publish-subscribe = 0  
+  #  #     Request-response = 1  
+  #  #     Publish-subscribe= 2
+  #  pattern: 1
+  #  topic: topic-example
+  
+  #########################################
+  # CLICKHOUSE DB OUTPUT 
+  # Write events to Clickhouse DB,
+  # Documentation: https://sematext.com/docs/logagent/output-plugin-clickhouse/
+  ########################################## 
+  #clickhouse: 
+  #  module: output-clickhouse
+  #  url: http://127.0.0.1 
+  #  port: 8123
+  #  # Authentication Options
+  #  # user: 'default'
+  #  # password: ''
+  #  # useGzip: true
+  #  # Set Database Name
+  #  # database: default
+  #  debug: true
+  #  table: default.logs
+  #  # Fields must be in the same order as specified in CREATE TABLE
+  #  fields: 
+  #    - 'severity'
+  #    - 'message'
+  #    - '@timestamp'
+
+  #########################################
+  # SLACK CHAT OUTPUT 
+  # Write events to Slack channels
+  # Documentation: https://sematext.com/docs/logagent/output-plugin-slack/
+  ########################################## 
+  #slack:
+  #  debug: false
+  #  module: slack-webhook
+  #  # Webhook URL
+  #  url: https://hooks.slack.com/services/T0H3BXXXX/B55MHXXXX/dXSsTivciZACphXXXXXXXX
+  #  matchSource: !!js/regexp /.*/
+  #  # filter function to decide for notification via slack 
+  #  filter: !!js/function > 
+  #    function (context, data, config) {
+  #      if (data.status > 399 && data.error_count > config.minErrors) {
+  #        return true
+  #      } else {
+  #        return false
+  #      }
+  #    }
+  #  # custom property for filter function above
+  #  minErrors: 3
+  #  # yaml, ld-json, json or template
+  #  format: template
+  #  # Text template for slack message
+  #  # all parsed fields can be used
+  #  template: ':st: <@stefan|stefan> {logSource}: {error_count} http errors "{status}"'
+  #  # Payload template (see Slack API)
+  #  payload:
+  #    username: stefan
+  #    channel: '#test'
+  #    icon_emoji: ':smile:'
+  #    attachments: 
+  #      - title: Alert
+  #        color: danger
+
+  #########################################
+  # PROMETHEUS ALERT MANAGER 
+  # Write events to Prometheus Alert Manager
+  # Documentation: https://sematext.com/docs/logagent/output-plugin-prometheus-alertmanager/
+  ########################################## 
+  #prometheus:
+  #  module: prometheus-alertmanager
+  #  url: http://localhost:9093
+  #  alertTemplate:
+  #    generatorURL: http://kibana/_plugin/kibana/app/kibana#/discover?&_a=(query:(language:lucene,query:'*{host}*'))
+  #    labels:
+  #      host: "{host}"
+  #      environment: "{environment}"
+  #    annotations:
+  #      description: "The env is '{environment}'"
+
+  #########################################
+  # HTTP(S) OUTPUT 
+  # Write events via HTTP(S) post requests
+  # Documentation: https://sematext.com/docs/logagent/
+  ########################################## 
+  #output:
+  #  module: output-http
+  #  url: http://localhost:8080/events
+  #  format: ldjson 
+  #  maxBufferSize: 1
+  #  flushInterval: 1
+  #  tags:
+  #    token: MONITORING_TOKEN
+  #    role: backend
+  #    host: myServerName
+  #  filter:
+  #    field: logSource
+  #    match: sensor.*
+  #  debug: true
+
+  #########################################
+  # SEMATEXT CLOUD LOGS OUTPUT 
+  # ELASTICSEARCH OUTPUT 
+  # Send events via Elasticsearch nulk indexing API  
+  # Documentation: https://sematext.com/docs/logagent/output-elasticsearch/
+  ########################################## 
+  # 
+  # Index logs in Elasticsearch or Sematext Cloud Logs App
   elasticsearch: 
     module: elasticsearch
-    url: https://localhost:9200
-    # default index to use, for all logs that don't match later in indices section
-    index: 0a835c75-9847-4f74-xxxx
+    url: https://logsene-receiver.sematext.com
+    # Default index, for all logs that don't match later in indices section
+    index: YOUR_SEMATEXT_LOGS_TOKEN
     # specific index to use per logSource field of parsed logs
     # logSource is by default the basename of the log file
     # but it can be modified by JS transforms functions in the patterns.yml file
-    indices: 
-      4f70a0c7-9458-43e2-bbc5-xxxx: 
-      # list of RegEx matching logSource (e.g. file name, container image, container name, ...)  
-      # all logs from this source will be indexed to above index
-        - .*wifi.*
-        - .*bluetooth.*
-      999532c9-18f1-4c4b-8753-xxxx: 
-        - system\.log
-        - access\.log
-        - auth\.log
-  # print parsed logs in YAML format to stdout    
-  stdout: yaml # use 'pretty' for pretty json and 'ldjson' for line delimited json (default)
+    #indices: 
+    #  YOUR_2ND_SEMATEXT_LOGS_TOKEN_FOR_WIRELESS_DEVICE: 
+    #  # list of RegEx matching logSource (e.g. file name, container image, container name, ...)  
+    #  # all logs from this source will be indexed to above index
+    #    - .*wifi.*
+    #    - .*bluetooth.*
+    #  YOUR_3RD_SEMATEXT_LOGS_TOKEN_FOR_ACCESS_LOGS: 
+    #    - system\.log
+    #    - access\.log
+    #    - auth\.log
   

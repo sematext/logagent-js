@@ -393,6 +393,7 @@ LaCli.prototype.initState = function () {
   var eventEmitter = self.eventEmitter
   if (self.argv.verbose) {
     process.env.DEBUG = 'true'
+    process.env.DEBUG_PATTERN_LOADING = 'true'
   }
   var plugins = self.loadPlugins(this.argv.configFile)
   self.initPlugins(plugins)

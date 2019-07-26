@@ -103,7 +103,7 @@ function downloadPatterns (cb) {
   if (!process.env.PATTERNS_URL) {
     return cb()
   }
-  var patternFileName = PATTERN_DIR + '/patterns.yml' 
+  var patternFileName = PATTERN_DIR + '/patterns.yml'
   fs.unlink(patternFileName, () => {
     var cbCalled = false
     var patternFileWs = fs.createWriteStream(patternFileName)
@@ -189,6 +189,7 @@ LaCli.prototype.initPlugins = function (plugins) {
   consoleLogger.log('init plugins')
   var eventEmitter = require('../lib/core/logEventEmitter')
   this.plugins = []
+  var self = this
   plugins.forEach(function (plugin) {
     var pluginName = plugin.module || plugin
     consoleLogger.log(pluginName)
@@ -197,6 +198,16 @@ LaCli.prototype.initPlugins = function (plugins) {
       // be compatible with plugins accessing config.configFile property
       if (plugin.config) {
         plugin.config.configFile = plugin.globalConfig
+        if (self.argv.verbose) {
+          plugin.config.debug = true
+          // plugin.config.configFile.debug = true
+        }
+      } else {
+        if (self.argv.verbose && plugin.config) {
+          plugin.config = {
+            debug: true
+          }
+        }
       }
       var p = new Plugin(plugin.config || this.argv, eventEmitter)
       this.plugins.push(p)
@@ -380,6 +391,9 @@ LaCli.prototype.loadPlugins = function (configFile) {
 LaCli.prototype.initState = function () {
   var self = this
   var eventEmitter = self.eventEmitter
+  if (self.argv.verbose) {
+    process.env.DEBUG = 'true'
+  }
   var plugins = self.loadPlugins(this.argv.configFile)
   self.initPlugins(plugins)
 
@@ -402,6 +416,9 @@ LaCli.prototype.initState = function () {
     }
     if (self.argv.includeOriginalLine !== undefined) {
       lp.cfg.originalLine = self.argv.includeOriginalLine
+    }
+    if (self.argv.verbose !== undefined) {
+      lp.cfg.debug = true
     }
     self.cli()
   })

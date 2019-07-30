@@ -1,6 +1,6 @@
 {
   "name": "@sematext/logagent",
-  "version": "2.0.180",
+  "version": "2.0.181",
   "description": "Smart log parser written in Node",
   "main": "lib/parser/parser.js",
   "bin": {

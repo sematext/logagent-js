@@ -97,7 +97,7 @@
     "json-influx": "^0.3.0",
     "json-stream": "^1.0.0",
     "kubernetes-client": "^6.12.1",
-    "logsene-js": "^1.1.63",
+    "logsene-js": "^1.1.64",
     "lru-cache": "^5.1.1",
     "maxmind": "^2.11.0",
     "maxmind-geolite-mirror": "^1.1.0",

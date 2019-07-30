@@ -76,7 +76,7 @@ input:
 
   ##############################################
   # STDIN INPUT  
-  # Read data from standard input (stdin stream, e.g.unix pipe: cat test.log | logagent --yaml )
+  # Read data from standard input (stdin stream, e.g. UNIX pipe: cat test.log | logagent --yaml )
   # Disable stding input when Logagent runs as a service   
   # Documentation: https://sematext.com/docs/logagent/input-plugin-stdin/
   ##############################################
@@ -1017,7 +1017,7 @@ output:
   #########################################
   # SEMATEXT CLOUD LOGS OUTPUT 
   # ELASTICSEARCH OUTPUT 
-  # Send events via Elasticsearch nulk indexing API  
+  # Send events via Elasticsearch bulk indexing API  
   # Documentation: https://sematext.com/docs/logagent/output-elasticsearch/
   ########################################## 
   # 

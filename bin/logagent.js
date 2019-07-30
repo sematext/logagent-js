@@ -157,6 +157,8 @@ function LaCli (options) {
 LaCli.prototype.initFilter = function (type, filterFunctions) {
   consoleLogger.log('init filter: ' + type)
   this[type] = []
+  var defaultCfg = { debug: false }
+  var self = this
   for (var i = 0; i < filterFunctions.length; i++) {
     try {
       var filterName = filterFunctions[i].name || filterFunctions[i].module || 'plugin #' + i
@@ -167,9 +169,18 @@ LaCli.prototype.initFilter = function (type, filterFunctions) {
       } else {
         ff = require(moduleAlias[filterFunctions[i].module] || filterFunctions[i].module)
       }
+      var defaultCfg = {}
+      var cfg = filterFunctions[i].config || filterFunctions[i] || defaultCfg
+      if (self.argv.verbose !== undefined) {
+        cfg.debug = true
+        consoleLogger.log('set cfg to debug=true for ' + filterName)
+      } else {
+        consoleLogger.log('set cfg to debug=false for ' + filterName)
+      }
+
       var filter = {
         func: ff,
-        config: filterFunctions[i].config || filterFunctions[i] || {},
+        config: filterFunctions[i].config || filterFunctions[i] || defaultCfg,
         argNames: getFunctionArgumentNames(ff)
       }
       // ensure API changes work for input filter, and don't break old input-filters

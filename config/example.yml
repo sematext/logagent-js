@@ -635,13 +635,13 @@ outputFilter:
 ##########################################
 
 ##########################################
-# DROP EVENTS FILTER
+# DROP EVENTS
 # This plugin drops events. 
-# Documentation: https://sematext.com/docs/logagent/
+# Documentation: https://sematext.com/docs/logagent/output-filter-dropevents
 ########################################## 
 #
-#  dropEventsFilter:
-#    module: drop-events-filter
+#  dropEvents:
+#    module: drop-events
 #    debug: false
 #    filters:
 #      severity:

@@ -341,6 +341,11 @@ LaCli.prototype.loadPlugins = function (configFile) {
       autodetectSeverity: true
     })
   }
+  if (this.argv.k8sEnrichment) {
+    outputFilter.push({
+      module: 'k8s-enrichment'
+    })
+  }
   if (configFile && configFile.outputFilter) {
     var outputFilterSections = Object.keys(configFile.outputFilter)
     outputFilterSections.forEach(function (key) {

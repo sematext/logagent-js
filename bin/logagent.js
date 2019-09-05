@@ -72,6 +72,7 @@ var moduleAlias = {
   'drop-events': '../lib/plugins/output-filter/dropEventsFilter.js',
   'docker-enrichment': '../lib/plugins/output-filter/docker-log-enrichment.js',
   'kubernetes-enrichment': '../lib/plugins/output-filter/kubernetes-enrichment.js',
+  'geo-ip': '../lib/plugins/output-filter/geo-ip.js',
   // output plugins
   'elasticsearch': '../lib/plugins/output/elasticsearch.js',
   'slack-webhook': '../lib/plugins/output/slack-webhook.js',
@@ -344,6 +345,14 @@ LaCli.prototype.loadPlugins = function (configFile) {
   if (this.argv.k8sEnrichment) {
     outputFilter.push({
       module: 'kubernetes-enrichment'
+    })
+  }
+  // note: CLI argument --geoipEnabled overwrites process.env.GEOIP_ENABLED
+  if (process.env.GEOIP_ENABLED && process.env.GEOIP_ENABLED.toLowerCase() === 'true') {
+    outputFilter.push({
+      module: 'geo-ip',
+      fields: this.argv.geoIPFields || ['client_ip'],
+      debug: false
     })
   }
   if (configFile && configFile.outputFilter) {

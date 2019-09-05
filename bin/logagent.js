@@ -71,6 +71,7 @@ var moduleAlias = {
   'remove-fields': '../lib/plugins/output-filter/remove-fields.js',
   'drop-events': '../lib/plugins/output-filter/dropEventsFilter.js',
   'docker-enrichment': '../lib/plugins/output-filter/docker-log-enrichment.js',
+  'kubernetes-enrichment': '../lib/plugins/output-filter/kubernetes-enrichment.js',
   // output plugins
   'elasticsearch': '../lib/plugins/output/elasticsearch.js',
   'slack-webhook': '../lib/plugins/output/slack-webhook.js',
@@ -338,6 +339,11 @@ LaCli.prototype.loadPlugins = function (configFile) {
     outputFilter.push({
       module: 'docker-enrichment',
       autodetectSeverity: true
+    })
+  }
+  if (this.argv.k8sEnrichment) {
+    outputFilter.push({
+      module: 'kubernetes-enrichment'
     })
   }
   if (configFile && configFile.outputFilter) {

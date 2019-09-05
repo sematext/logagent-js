@@ -296,17 +296,32 @@ patterns:
   # name of the docker image
   # example: "1:M 22 Jul 21:58:28.146 # Server started, Redis version 3.0.2"
   sourceName: !!js/regexp /redis/i
+  blockStart: !!js/regexp /^\d+:.\s\d+/
   match:
   - type: redis
-    fields: [pid,node_type,ts,message]
-    regex: !!js/regexp /^(\d+):\w+\s(\d\d\s\w+.+)\s\W\s(.*)/
-  - type: redis
-    fields: [pid,ts,message]
-    regex: !!js/regexp /^\[(\d+)\]\s(.+?)\s\*\s(.+)/i
+    blockStart: !!js/regexp /^\d+:.\s\d+/
+    fields: [pid,role,ts,level,message]
+    regex: !!js/regexp /^(\d+):(\w+)\s+(\d\d\s\w+.+)\s+(\S)\s+([\S|\s]+)/
     dateFormat: DD MMM HH:mm:ss.SSS
-  - type: redis
-    regex: !!js/regexp /^(.*)/i
-    fields: message
+    transform: !!js/function >
+      function transformMessage (p) {
+        levels = {
+          '.': 'debug',
+          '-': 'verbose',
+          '*': 'notice',
+          '#': 'warning'
+        }
+        roles = {
+          'X': 'sentinel',
+          'C': 'RDB/AOF writing child',
+          'S': 'slave',
+          'M': 'master'
+        }
+        p.role = roles[p.role]
+        p.severity = levels[p.level] || p.level
+        // p.message = p.message.replace(/\r/g,'')
+        delete p.level 
+      } 
 
  - # Sonatype Nexus
   sourceName: !!js/regexp /nexus/

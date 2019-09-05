@@ -614,6 +614,24 @@ outputFilter:
 ##########################################
 
 ##########################################
+# KUBERNETES ENRICHMENT
+# Output filter plugin to add metadata from Kubernetes API 
+# Annotations can be used to route logs to different Sematext Log Apps by setting  
+# sematext.com/logs-token=YOUR_LOGS_TOKEN_HERE, disable logs from a pod or remove some log fields.
+# The plugin interprets the following pod annoations: 
+#   sematext.com/logs-token=YOUR_LOGS_TOKEN_HERE,     # set an individaul logs token for a pod
+#   sematext.com/logs-enabled=false                   # disable logs of a pod, 
+#   sematext.com/logs-remove-fields=labels,logSource  # remove fields from logs 
+#
+##########################################
+#
+#kubernetesEnrichment: 
+#  module: kuberntes-enrichment
+#  debug: false
+#
+##########################################
+
+##########################################
 # REMOVE FIELDS
 # Documentation: https://sematext.com/docs/logagent/output-filter-removefields/
 ##########################################

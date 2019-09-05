@@ -62,8 +62,13 @@ if [[ -z "$LOG_GLOB" ]]; then
   echo "You need to specify a log source. Mount the docker socket or set the LOG_GLOB in the environment!" >&2
 fi
 
+if [[ -n "${KUBERNETES_SERVICE_HOST}" ]]; then
+    # K8S env -> use k8sEnrichment plugin
+    export LOGAGENT_ARGS="--k8sEnrichment ${LOGAGENT_ARGS}"  
+fi
 
 if [[ ! -r /var/run/docker.sock ]]; then
+  # no docker socket
   if [[ -n "${KUBERNETES_SERVICE_HOST}" ]]; then
     # no docker socket & K8S env -> use containerd plugin
     export LOGAGENT_ARGS="--k8sContainerd ${LOGAGENT_ARGS}"  

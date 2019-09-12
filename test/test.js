@@ -17,9 +17,9 @@ describe('Logagent parse JSON', function () {
       }
     }
     var la = new Logagent()
-    la.cfg.json = {enabled: true, debug: true}
+    la.cfg.json = { enabled: true, debug: true }
     la.parseLine(
-      JSON.stringify({message: 'hello world', counter: 1}),
+      JSON.stringify({ message: 'hello world', counter: 1 }),
       'json',
       doneFunc)
   })
@@ -51,7 +51,7 @@ describe('Logagent parse bunyan JSON', function () {
 })
 
 describe('Logagent parse web server Log', function () {
-  it('should return client_ip, status_code, geo ip location', function (done) {
+  it('should return client_ip, status_code', function (done) {
     this.timeout(150000)
     this.la = new Logagent(null, null, function ready (laReady) {
       // console.log('ready', arguments)
@@ -63,7 +63,7 @@ describe('Logagent parse web server Log', function () {
             if (data.ts) {
               return done(new Error('parserd obj includes temp. ts field'))
             }
-            if (data.message === 'GET /about/' && data.client_ip === '91.67.80.14' && data.geoip && data.status_code === 200 && data['@timestamp']) {
+            if (data.message === 'GET /about/' && data.client_ip === '91.67.80.14' && data.status_code === 200 && data['@timestamp']) {
               done()
             } else {
               done(new Error('message is wrong: ' + JSON.stringify(data)))

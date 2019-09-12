@@ -72,7 +72,7 @@ var moduleAlias = {
   'drop-events': '../lib/plugins/output-filter/dropEventsFilter.js',
   'docker-enrichment': '../lib/plugins/output-filter/docker-log-enrichment.js',
   'kubernetes-enrichment': '../lib/plugins/output-filter/kubernetes-enrichment.js',
-  'geoip': '../lib/plugins/output-filter/geo-ip.js',
+  'geoip': '../lib/plugins/output-filter/geoip.js',
   // output plugins
   'elasticsearch': '../lib/plugins/output/elasticsearch.js',
   'slack-webhook': '../lib/plugins/output/slack-webhook.js',

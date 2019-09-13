@@ -23,16 +23,6 @@ originalLine: false
 multiline:
   defaultSeparator: ^\S{2,}
 
-# Please note when geoIP: true
-# There will be a slight delay during first start of logagent while maxmind
-# database is downloaded. Logagent downloads the MaxMind database every 24hrs or 
-# during startup.
-geoIP: true
-
-# The database is stored in a temporary directory
-# The path could be modified via env. variable MAXMIND_DB_DIR
-maxmindDbDir: /tmp/
-
 # post process all JSON input
 json:
   enabled: true 
@@ -75,10 +65,6 @@ json:
 #    // this function is called after parsing
 #    // regardless of the logging source 
 #    // for pattern specific functions use transform in pattern definitions
-#    // this.geopip lookups for ip adresses
-#    // this.moment for date parsing
-#    // Example:
-#    // this.enrichGeoIp(parsedObject, 'client_ip')
 #  }
 
 # IMPORTANT:
@@ -391,7 +377,6 @@ patterns:
         - size:number
         - referer:string
         - user_agent:string
-      geoIP: client_ip
       dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
       transform: !!js/function >
         function transformMessage (p) {
@@ -421,7 +406,6 @@ patterns:
         - url:string
         - user_agent:string
       dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
-      geoIP: client_ip
       #transform: !!js/function >
       #  function transformMessage (p) {
       #    p.message = p.method + ' ' + p.path
@@ -444,7 +428,6 @@ patterns:
         - http_version:string
         - status_code:number
         - size:number
-      geoIP: client_ip
       dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
       #transform: !!js/function >
       #  function transformMessage (p) {
@@ -493,7 +476,6 @@ patterns:
         - frontend_name:string
         - backend_url:string
         - response_time:number
-      geoIP: client_ip
       dateFormat: DD/MMM/YYYY:HH:mm:ss ZZ
       transform: !!js/function >
         function transformMessage (p) {

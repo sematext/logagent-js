@@ -5,6 +5,14 @@ output:
   mqtt:
     module: output-mqtt
     url: mqtt://test.mosquitto.org
+    # see https://www.npmjs.com/package/mqtt#connect
+    #connectOptions:
+    #  userName: nobody 
+    #  password: secret
+    #  keepAlive: 60 
+    #  wsOptions: 
+    #    port: 9999
+    #    host: localhost
     topic: sensor-data
     debug: false
     # optional filter settings matching data field with regular expressions

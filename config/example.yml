@@ -134,9 +134,17 @@ input:
   #mqtt-client:
   #  module: input-mqtt-client
   #  url: mqtt://test.mosquitto.org
+  #  # see connect options: https://www.npmjs.com/package/mqtt#connect
+  #  connectOptions: 
+  #    userName: nobody 
+  #    password: secret
   #  topics: 
   #    - log-messages
   #    - sensor-data
+  # # optional filter settings matching data field with regular expressions
+  #  filter: 
+  #    field: logSource
+  #    match: .*
   #
   ##############################################
 

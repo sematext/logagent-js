@@ -350,7 +350,7 @@ LaCli.prototype.loadPlugins = function (configFile) {
   // note: CLI argument --geoipEnabled overwrites process.env.GEOIP_ENABLED
   if (process.env.GEOIP_ENABLED && process.env.GEOIP_ENABLED.toLowerCase() === 'true') {
     outputFilter.push({
-      module: 'geo-ip',
+      module: 'geoip',
       fields: this.argv.geoIPFields || ['client_ip'],
       debug: false
     })

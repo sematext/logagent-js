@@ -7,12 +7,17 @@ input:
     module: command
     command: journalctl -o json -f
     sourceName: journald
-    restart: -1
+    # restart: <N> restarts the command N seconds after termination of the command
+    #          -1 run only once, means NO restart when the command terminates 
+    #           0 restart immediatly
+    #           N values with N > 0 run the command periodically every N seconds
+    restart: 0 # restart the command immediatly 
 
 output:
   elk-local:
     module: elasticsearch
     url: http://localhost:9200
+    # url: https://logsene-receiver.sematext.com/YOUR_LOGS_TOKEN
     index: journald_logs
 
 parser:

@@ -244,17 +244,20 @@ input:
   # Run any command and process the command output as log lines - very powerful!   
   # Documentation: https://sematext.com/docs/logagent/input-plugin-journald-upload/
   ##############################################
-  # JOURNALD VIA COMMAND INPUT 
-  # Collect journald logs from the local server
+  # COMMAND INPUT 
+  # Example: Collect journald logs from the local server
   ##############################################
   #
   #journald-json: 
   #  module: command
   #  command: journalctl -o json -f
   #  sourceName: journald
-  #  # time in seconds to repeat the command
-  #  restart: -1 
-  #
+  #  # restart: <N> restarts the command N seconds after termination of the command
+  #   #          -1 means NO restart when the command terminates 
+  #   #           0 immediate restart
+  #   #           N values with N > 0 run a command periodically every N seconds
+  # restart: 0 # restart the command immediatly after termination
+
   ###########################################
   # BRO / ZEEK IDS LOGS VIA COMMAND INPUT 
   # We start bro program, but we collect logs from /var/log/bro via file-input in this case! 

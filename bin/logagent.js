@@ -58,6 +58,7 @@ var moduleAlias = {
   'apple-location': 'logagent-apple-location',
   'cassandra-query': '../lib/plugins/input/cassandra.js',
   'docker-logs': '../lib/plugins/input/docker/docker.js',
+  'azure-event-hub': '../lib/plugins/input/azure-event-hub.js',
   // input filters
   'input-filter-k8s-containerd': '../lib/plugins/input-filter/kubernetesContainerd.js',
   'grep': '../lib/plugins/input-filter/grep.js',

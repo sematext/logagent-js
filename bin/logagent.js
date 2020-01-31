@@ -1,5 +1,5 @@
 #! /bin/sh
-':' // ; export MAX_MEM="--max-old-space-size=500"; exec "$(command -v node || command -v nodejs)" --harmony "${NODE_OPTIONS:-$MAX_MEM}" "$0" "$@"
+':' // ; export MAX_MEM="--max-old-space-size=300"; exec "$(command -v node || command -v nodejs)" --harmony "${NODE_OPTIONS:-$MAX_MEM}" "$0" "$@"
 'use strict'
 /*
  * See the NOTICE.txt file distributed with this work for additional information
@@ -213,7 +213,7 @@ LaCli.prototype.initPlugins = function (plugins) {
         plugin.config.configFile = plugin.globalConfig
         if (self.argv.verbose) {
           plugin.config.debug = true
-          // plugin.config.configFile.debug = true
+        // plugin.config.configFile.debug = true
         }
       } else {
         if (self.argv.verbose && plugin.config) {
@@ -538,7 +538,7 @@ LaCli.prototype.initState = function () {
   process.once('beforeExit', self.terminate)
   process.once('uncaughtException', function (error) {
     console.dir(error)
-    // self.terminate(error)
+  // self.terminate(error)
   })
 }
 
@@ -572,6 +572,7 @@ LaCli.prototype.parseLine = function (line, sourceName, cbf) {
     var cutMsg = new Buffer(this.argv.maxLogSize)
     cutMsg.write(line)
     trimmedLine = cutMsg.toString()
+    cutMsg = null
   }
   this.laStats.bytes = this.laStats.bytes + bufLength
   this.laStats.count++
@@ -636,6 +637,67 @@ LaCli.prototype.cli = function () {
     setInterval(this.laStats.printStats.bind(this.laStats), ((Number(this.argv.printStats)) || 60) * 1000).unref()
     this.laStats.printStats()
   }
+  var profileCounter = 0
+  function cpuProfiler (duration) {
+    if (!duration) {
+      duration = 30000
+    }
+    consoleLogger.log('signal USR2 received: start CPU profiling and heapdump')
+    var profiler = null
+    try {
+      profiler = require('v8-profiler-next')
+    } catch (err) {
+      consoleLogger.error('v8-profiler-next is not installed, heapdump and cpu profiling is not possible')
+      return
+    }
+    if (!profiler) {
+      return
+    }
+    var snapshot1 = profiler.takeSnapshot()
+    var name = profileCounter++ + '-' + new Date().toISOString()
+    snapshot1.export(function (error, result) {
+      if (!error) {
+        try {
+          var heapdumpFileName = 'snapshot-' + name + '.heapsnapshot'
+          fs.writeFileSync(heapdumpFileName, result)
+          consoleLogger.log('saved heapdump ' + heapdumpFileName)
+        } catch (ex) {
+          consoleLogger.error('Error saving heapdump ' + ex)
+        }
+      } else {
+        consoleLogger.error('Error creating heapdump ' + error)
+      }
+      snapshot1.delete()
+      profiler.startProfiling(name, true)
+      consoleLogger.log('start CPU profiler ... pls. wait ' + (duration / 1000) + ' sec')
+      setTimeout(function () {
+        var profile = profiler.stopProfiling('')
+        profile.export(function (error, result) {
+          try {
+            if (!error) {
+              var cpuFileName = 'cpu-profile-' + name + '.cpuprofile'
+              fs.writeFileSync(cpuFileName, result)
+              consoleLogger.log('saved CPU profile ' + cpuFileName)
+            } else {
+              consoleLogger.error('Error creating cpu profile ' + error)
+            }
+            profile.delete()
+          } catch (ex) {
+            consoleLogger.error('Error saving cpu profile' + ex)
+          }
+        })
+      }, duration)
+    })
+  }
+
+  function startProfiler () {
+    try {
+      cpuProfiler(30000)
+    } catch (err) {
+      consoleLogger.error(err)
+    }
+  }
+  process.on('SIGUSR2', startProfiler)
 }
 
 if (require.main === module) {

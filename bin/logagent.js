@@ -298,6 +298,7 @@ LaCli.prototype.loadPlugins = function (configFile) {
     var inputFilterSections = Object.keys(configFile.inputFilter)
     inputFilterSections.forEach(function (key) {
       if (configFile.inputFilter[key].module) {
+        configFile.inputFilter[key].configName = key
         inputFilter.push(configFile.inputFilter[key])
       }
     })
@@ -320,6 +321,7 @@ LaCli.prototype.loadPlugins = function (configFile) {
         configFile.output[key].module = 'elasticsearch'
       }
       if (configFile.output[key].module) {
+        configFile.output[key].configName = key
         plugins.push({
           module: moduleAlias[configFile.output[key].module] || configFile.output[key].module,
           config: configFile.output[key],
@@ -358,6 +360,7 @@ LaCli.prototype.loadPlugins = function (configFile) {
   if (configFile && configFile.outputFilter) {
     var outputFilterSections = Object.keys(configFile.outputFilter)
     outputFilterSections.forEach(function (key) {
+      configFile.outputFilter[key].configName = key
       if (configFile.outputFilter[key].module) {
         outputFilter.push(configFile.outputFilter[key])
       }
@@ -401,6 +404,7 @@ LaCli.prototype.loadPlugins = function (configFile) {
     plugins.push({
       module: '../lib/plugins/output/elasticsearch',
       config: {
+        configName: `argv_elasticsearch_${this.argv.elasticsearchUrl}/${this.argv.index}`,
         indices: this.argv.indices,
         url: this.argv.elasticsearchUrl,
         index: this.argv.index

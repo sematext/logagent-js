@@ -1,0 +1,18 @@
+# Global options
+options:
+  includeOriginalLine: true
+
+input:
+  github-webhook:
+    module: input-github-webhook
+    port: 7700
+      
+output: 
+  http-forwarding:
+    module: output-http
+    url: https://event-receiver.apps.test.sematext.com/c2425ff2-5e84-4bf2-b81c-a89564438af7/event
+    # flush interval in seconds
+    flushInterval: 1
+    # max buffer size to force flush
+    maxBufferSize: 1
+    debug: true

@@ -1,11 +1,9 @@
-# Global options
-options:
-  includeOriginalLine: true
-
 input:
   github-webhook:
     module: input-github-webhook
     port: 7700
+    tags:
+      github: notification
       
 output: 
   http-forwarding:
@@ -15,4 +13,4 @@ output:
     flushInterval: 1
     # max buffer size to force flush
     maxBufferSize: 1
-    debug: true
+    # debug: true

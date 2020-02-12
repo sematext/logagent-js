@@ -1,6 +1,6 @@
 {
   "name": "@sematext/logagent",
-  "version": "3.0.3",
+  "version": "3.0.13",
   "description": "Smart log parser written in Node",
   "main": "lib/parser/parser.js",
   "bin": {
@@ -96,9 +96,8 @@
     "influx-line-protocol-parser": "^0.2.0",
     "js-yaml": "^3.13.1",
     "json-influx": "^0.3.0",
-    "json-stream": "^1.0.0",
     "kubernetes-client": "^8.3.3",
-    "logsene-js": "^1.1.64",
+    "logsene-js": "^1.1.67",
     "lru-cache": "^5.1.1",
     "maxmind": "^3.1.2",
     "maxmind-geolite-mirror": "^1.1.3",
@@ -106,11 +105,10 @@
     "merge": "^1.2.1",
     "minimatch": "^3.0.4",
     "mkpath": "^1.0.0",
-    "moment": "^2.22.2",
     "moment-timezone": "^0.5.23",
     "mqtt": "^2.18.8",
     "mysql": "^2.16.0",
-    "npm": "^6.13.3",
+    "npm": "^6.13.7",
     "pg": "^7.6.1",
     "prettyjson": "^1.2.1",
     "query-string": "^6.2.0",
@@ -131,14 +129,13 @@
   "optionalDependencies": {
     "aedes": "^0.36.0",
     "date-fns": "2.0.0-alpha.6",
-    "websocket-stream": "^5.1.1"
+    "websocket-stream": "^5.1.1",
+    "v8-profiler-next": "^1.2.1"
   },
   "devDependencies": {
     "eslint": "^5.9.0",
-    "mocha": "^6.1.4",
-    "nexe": "^3.2.0",
-    "precommit": "^1.2.2",
-    "standard": "12.0.1"
+    "mocha": "^7.0.1",
+    "standard": "14.3.1"
   },
   "pkg": {
     "scripts": "lib/**/*.js",

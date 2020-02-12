@@ -99,6 +99,19 @@ input:
   ##############################################
   
   ##############################################
+  # AZURE EVENTHUB INPUT  
+  # Consumes events from Microsoft Azure Eventhub 
+  # Documentation: https://sematext.com/docs/logagent/input-plugin-eventhub/
+  ##############################################
+  #azure-event-hub:
+  #  module: azure-eventhub
+  #  name: hub1
+  #  endpoint: Endpoint=sb://sematextevents.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=oahU9gjxqXvIpvJbOOU/UiTI+cyTY1kKqib43jMXnMQ=
+  #  consumerGroup: '$Default'
+  #  # json property, which containes eventhub records, default: body
+  #  bodyField: body
+
+  ##############################################
   # UDP SYSLOG INPUT  
   # Receive logs via UDP syslog protocol 
   # Documentation: https://sematext.com/docs/logagent/input-plugin-syslog/ 

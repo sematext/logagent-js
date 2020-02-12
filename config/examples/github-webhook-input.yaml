@@ -2,6 +2,7 @@ input:
   github-webhook:
     module: input-github-webhook
     port: 9200
+    useIndexFromUrlPath: true
     tags:
       - github
       - notification
@@ -11,3 +12,12 @@ output:
   # http-forwarding:
   #   module: output-http
   #   url: https://event-receiver.apps.test.sematext.com/c2425ff2-5e84-4bf2-b81c-a89564438af7/event
+  
+  
+  # add sematext-events-output
+  # only use region US or EU and get token from input URL
+  # if STE or test env expose `url`
+  # have all these values in the webhook input URL and parse them from there
+
+  # the URL should be similar to:
+  # webhook.sematext.com/github/<TOKEN>/<REGION>

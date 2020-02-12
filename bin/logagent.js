@@ -157,6 +157,7 @@ function LaCli (options) {
     self.initState()
   })
 }
+
 LaCli.prototype.initFilter = function (type, filterFunctions) {
   consoleLogger.log('init filter: ' + type)
   this[type] = []
@@ -454,6 +455,7 @@ LaCli.prototype.initState = function () {
     }
     self.cli()
   })
+
   self.eventEmitter.once('input.stdin.end', function endOnStdinEof (line, context) {
     self.terminateRequest = true
     self.terminateReason = 'stdin closed'
@@ -467,7 +469,45 @@ LaCli.prototype.initState = function () {
   }, 1000)
   self.tid.unref()
 
-  self.eventEmitter.on('data.raw', function parseRaw (line, contextObj) {
+  // shared function to call output-filters and output plugins
+  // after parsing of DATA_RAW events and receiving DATA_OBJECT events
+  function applyOutputFilters (data, contextObj) {
+    if (data) {
+      var filteredData = data
+      var context = clone(contextObj)
+      co(function * () {
+        for (var i = 0; i < self.outputFilter.length; i++) {
+          filteredData = yield function (callback) {
+            self.outputFilter[i].func(context, self.outputFilter[i].config, eventEmitter, filteredData, callback)
+          }
+        }
+      }).then(function processOutput () {
+        if (!filteredData) {
+          return
+        }
+        if (context.enrichEvent) {
+          Object.keys(context.enrichEvent).forEach(function (key) {
+            data[key] = context.enrichEvent[key]
+          })
+        }
+        if (context.filter) {
+          filteredData = context.filter(data, context)
+        }
+        if (filteredData) {
+          self.eventEmitter.parsedEvent(filteredData, context)
+        }
+      }, function logError (e) {
+        // we avoid logging errors for each log line in prod mode
+        consoleLogger.debug(e.stack)
+      })
+    }
+  }
+
+  /**
+   * DATA_RAW events are emitted by input-plugins, producing text lines,
+   * and must be handled by text based input-filters and parser
+   **/
+  self.eventEmitter.on(eventEmitter.DATA_RAW, function parseRaw (line, contextObj) {
     self.lastParsedTS = Date.now()
     var context = contextObj
     var trimmedLine = line
@@ -489,52 +529,40 @@ LaCli.prototype.initState = function () {
           }
         }
       }
-    }).then(function () {
-      if (!trimmedLine) {
-        return
-      }
-      function parserCb (err, data) {
-        if (err && !data) {
-          consoleLogger.error('error during parsing: ' + err.stack)
+    }).then(
+      function processInput () {
+        if (!trimmedLine) {
+          return
         }
-        if (data) {
-          var filteredData = data
-          co(function * () {
-            for (var i = 0; i < self.outputFilter.length; i++) {
-              filteredData = yield function (callback) {
-                self.outputFilter[i].func(context, self.outputFilter[i].config, eventEmitter, filteredData, callback)
-              }
-            }
-          }).then(function () {
-            if (!filteredData) {
-              return
-            }
-            if (context.enrichEvent) {
-              Object.keys(context.enrichEvent).forEach(function (key) {
-                data[key] = context.enrichEvent[key]
-              })
-            }
-            if (context.filter) {
-              filteredData = context.filter(data, context)
-            }
-            if (filteredData) {
-              self.eventEmitter.parsedEvent(filteredData, context)
-            }
-          }, function (e) {
-            consoleLogger.debug(e.stack)
-          })
+        function parserCb (err, data) {
+          if (err && !data) {
+            consoleLogger.error('error during parsing: ' + err.stack)
+          }
+          applyOutputFilters(data, context)
         }
-      }
 
-      setImmediate(function laParse () {
-        self.la.parseLine(
-          trimmedLine.replace(self.removeAnsiColor, ''),
-          context.sourceName || self.argv.sourceName,
-          parserCb)
+        setImmediate(function laParse () {
+          self.la.parseLine(
+            trimmedLine.replace(self.removeAnsiColor, ''),
+            context.sourceName || self.argv.sourceName,
+            parserCb)
+        })
+      },
+      function logError (e) {
+        // we avoid logging errors for each log line in prod mode
+        consoleLogger.debug(e.stack)
       })
-    }, function (e) {
-      // consoleLogger.error(e.stack)
-    })
+  })
+
+  /**
+   * DATA_OBJECT events are emitted by input plugins, producing structured data,
+   * with no need to be parsed. Such data needs to be processed by output-filters and
+   * output plugins
+   * Skipping text based input filters and parser, and continue with directly output filters
+   * improves performance by saving serialisation to JSON and back to JS objects.
+   **/
+  self.eventEmitter.on(eventEmitter.DATA_OBJECT, function processObjectData (data, contextObj) {
+    applyOutputFilters(data, contextObj)
   })
 
   process.once('SIGINT', function () { self.terminate('SIGINT') })

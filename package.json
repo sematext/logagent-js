@@ -73,7 +73,6 @@
   "//": "!!! bithound claims maxmind-geolite-mirror is not used, it is! Don't remove ...",
   "dependencies": {
     "@azure/event-hubs": "^5.0.0-preview.7",
-    "@brickblock/kube-watch": "0.0.9",
     "alasql": "^0.4.11",
     "aws-sdk": "^2.359.0",
     "cassandra-driver": "^3.5.0",

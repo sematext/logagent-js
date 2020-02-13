@@ -13,6 +13,7 @@ output:
   http-forwarding:
     module: output-http
     url: https://event-receiver.apps.test.sematext.com/d111023d-f37c-4ae8-9999-8749d3ad391b/event
+    debug: true
   
   
   # add sematext-events-output

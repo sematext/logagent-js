@@ -72,6 +72,7 @@
   "license": "Apache-2.0",
   "//": "!!! bithound claims maxmind-geolite-mirror is not used, it is! Don't remove ...",
   "dependencies": {
+    "@sematext/logagent-nodejs-monitor": "file:../logagent-nodejs-monitor",
     "alasql": "^0.4.11",
     "aws-sdk": "^2.359.0",
     "cassandra-driver": "^3.5.0",
@@ -110,6 +111,7 @@
     "pg": "^7.6.1",
     "prettyjson": "^1.2.1",
     "query-string": "^6.2.0",
+    "request": "^2.88.0",
     "requestretry": "^3.0.2",
     "rotating-file-stream": "^1.3.9",
     "set-value": "^3.0.1",

@@ -151,7 +151,8 @@ function LaCli (options) {
   this.loggers = {}
   this.WORKERS = process.env.WEB_CONCURRENCY || 1
   this.removeAnsiColor = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g
-  this.laStats = new StatsPrinter(this.eventEmitter)
+  this.laStats = StatsPrinter
+  StatsPrinter.eventEmitter = this.eventEmitter
   downloadPatterns(function (err, result) {
     self.initState()
   })

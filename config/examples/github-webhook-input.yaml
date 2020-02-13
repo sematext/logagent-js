@@ -5,13 +5,14 @@ input:
     useIndexFromUrlPath: true
     tags:
       - github
+      - webhook
       - notification
       
 output: 
-  stdout: yaml
-  # http-forwarding:
-  #   module: output-http
-  #   url: https://event-receiver.apps.test.sematext.com/c2425ff2-5e84-4bf2-b81c-a89564438af7/event
+  # stdout: yaml
+  http-forwarding:
+    module: output-http
+    url: https://event-receiver.apps.test.sematext.com/d111023d-f37c-4ae8-9999-8749d3ad391b/event
   
   
   # add sematext-events-output

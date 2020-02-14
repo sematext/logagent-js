@@ -58,7 +58,7 @@ var moduleAlias = {
   'apple-location': 'logagent-apple-location',
   'cassandra-query': '../lib/plugins/input/cassandra.js',
   'docker-logs': '../lib/plugins/input/docker/docker.js',
-  'input-github-webhook': '../lib/plugins/input/github.js',
+  'input-github-webhook': '../lib/plugins/input/webhooks/github.js',
   // input filters
   'input-filter-k8s-containerd': '../lib/plugins/input-filter/kubernetesContainerd.js',
   'grep': '../lib/plugins/input-filter/grep.js',

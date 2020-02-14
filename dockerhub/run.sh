@@ -149,6 +149,18 @@ EOF
       echo "    - ${i}" >>$LA_CONFIG
     done
   done <<<"$LOG_GLOB"
+cat >>$LA_CONFIG <<EOF
+  logagentMonitor:
+    module: '@sematext/logagent-nodejs-monitor'
+EOF
+else
+cat >>$LA_CONFIG <<EOF
+
+input: 
+  logagentMonitor:
+    module: '@sematext/logagent-nodejs-monitor'
+
+EOF
 fi
 
 # if [ -r /var/run/docker.sock ]; then

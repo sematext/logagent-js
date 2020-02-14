@@ -128,8 +128,7 @@
   "optionalDependencies": {
     "aedes": "^0.36.0",
     "date-fns": "2.0.0-alpha.6",
-    "websocket-stream": "^5.1.1",
-    "v8-profiler-next": "^1.2.1"
+    "websocket-stream": "^5.1.1"
   },
   "devDependencies": {
     "eslint": "^5.9.0",

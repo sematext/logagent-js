@@ -86,7 +86,8 @@ var moduleAlias = {
   'output-zeromq': 'logagent-output-zeromq',
   'output-influxdb': '../lib/plugins/output/influxdb.js',
   'output-clickhouse': '../lib/plugins/output/clickhouse.js',
-  'output-http': '../lib/plugins/output/output-http.js'
+  'output-http': '../lib/plugins/output/output-http.js',
+  'output-sematext-events': '../lib/plugins/output/output-sematext-events.js'
 }
 
 function getFunctionArgumentNames (func) {

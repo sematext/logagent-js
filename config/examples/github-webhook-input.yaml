@@ -10,16 +10,16 @@ input:
       
 output: 
   # stdout: yaml
-  http-forwarding:
-    module: output-http
-    url: https://event-receiver.apps.test.sematext.com/d111023d-f37c-4ae8-9999-8749d3ad391b/event
-    debug: true
-  
-  # st-events:
-  #   module: output-sematext-events
-  #   region: us # eu
-  #   receiver: https://event-receiver.apps.test.sematext.com
+  # http-forwarding:
+  #   module: output-http
+  #   url: https://event-receiver.apps.test.sematext.com/d111023d-f37c-4ae8-9999-8749d3ad391b/event
   #   debug: true
+  
+  st-events:
+    module: output-sematext-events
+    receiver: https://event-receiver.apps.test.sematext.com
+    debug: true
+    # region: us # eu
   
   # add sematext-events-output
   # only use region US or EU and get token from input URL

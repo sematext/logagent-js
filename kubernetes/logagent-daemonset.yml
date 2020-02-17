@@ -1,20 +1,61 @@
-# Kubernetes < v1.9
-# apiVersion: extensions/v1beta1
-# Kubernetes >= v1.9
-# apiVersion: extensions/v1beta2
-# Kubernetes v1.10
-# apiVersion: apps/v1beta2
+# Cluster Role bindings for Logagent
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: sematext-logagent
+  labels:
+    app: sematext-logagent
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: sematext-logagent
+subjects:
+- kind: ServiceAccount
+  name: sematext-logagent
+  namespace: default
+---
+# Cluster Role for Logagent
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: sematext-logagent
+  labels:
+    app: sematext-logagent
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - events
+  - pods
+  verbs:
+  - list
+  - get
+  - watch
+---
+# Service Account for Logagent
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sematext-logagent
+  labels:
+    app: sematext-logagent
+---
+# Daemonset
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: sematext-logagent
+  name: st-logagent
 spec:
+  selector:
+   matchLabels:
+     app: st-logagent
   template:
     metadata:
       labels:
-        app: sematext-logagent
+        app: st-logagent
     spec:
       nodeSelector: {}
+      serviceAccountName: sematext-logagent
       hostNetwork: true
       dnsPolicy: "ClusterFirst"
       restartPolicy: "Always"

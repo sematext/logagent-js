@@ -58,6 +58,7 @@ var moduleAlias = {
   'apple-location': 'logagent-apple-location',
   'cassandra-query': '../lib/plugins/input/cassandra.js',
   'docker-logs': '../lib/plugins/input/docker/docker.js',
+  'input-github-webhook': '../lib/plugins/input/webhooks/github.js',
   'azure-event-hub': '../lib/plugins/input/azure-event-hub.js',
   // input filters
   'input-filter-k8s-containerd': '../lib/plugins/input-filter/kubernetesContainerd.js',
@@ -86,7 +87,8 @@ var moduleAlias = {
   'output-zeromq': 'logagent-output-zeromq',
   'output-influxdb': '../lib/plugins/output/influxdb.js',
   'output-clickhouse': '../lib/plugins/output/clickhouse.js',
-  'output-http': '../lib/plugins/output/output-http.js'
+  'output-http': '../lib/plugins/output/output-http.js',
+  'output-sematext-events': '../lib/plugins/output/output-sematext-events.js'
 }
 
 function getFunctionArgumentNames (func) {

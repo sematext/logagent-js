@@ -59,6 +59,7 @@ var moduleAlias = {
   'cassandra-query': '../lib/plugins/input/cassandra.js',
   'docker-logs': '../lib/plugins/input/docker/docker.js',
   'azure-event-hub': '../lib/plugins/input/azure-event-hub.js',
+  'unix-socket-reader': '../lib/plugins/input/unixSocketReader.js',
   // input filters
   'input-filter-k8s-containerd': '../lib/plugins/input-filter/kubernetesContainerd.js',
   'grep': '../lib/plugins/input-filter/grep.js',
@@ -349,6 +350,14 @@ LaCli.prototype.loadPlugins = function (configFile) {
   if (this.argv.k8sEnrichment) {
     outputFilter.push({
       module: 'kubernetes-enrichment'
+    })
+  }
+  if (this.argv.unixSocket) {
+    plugins.push({
+      module: 'unix-socket-reader',
+      config: {
+        path: this.argv.unixSocket
+      }
     })
   }
   // note: CLI argument --geoipEnabled overwrites process.env.GEOIP_ENABLED

@@ -19,7 +19,7 @@ input:
     tags:
       _index: MY_INDEX_FOR_ELASTICSEARCH_OUTPUT
       node_role: kubernetes_worker
-    # journald might provide many fields, to reduce storage usage you can remove 
+    # journald might provide many fields. To reduce storage usage you can remove 
     # non-relevant fields. Note you have to use upper case here. 
     removeFields:
       - __CURSOR
@@ -27,7 +27,7 @@ input:
 outputFilter: 
   journald-format: 
     module: journald-format
-    # Run Logagent parser for the message field 
+    # Run Logagent parser for the message field. This will use patterns from patterns.yml file.
     parseMessageField: true
   
   removeFields:
@@ -60,7 +60,7 @@ outputFilter:
       # - available_pretty
       # - _cap_effective
       # - _systemd_slice      
-   # List of fields, where the values from removed field should be
+   # List of fields where the values from removed field should be
    # replaced with maskValuesString 
    # maskValuesInFields:
    #  - message
@@ -69,7 +69,7 @@ outputFilter:
    # maskValuesString: "ANONYMIZED-DATA
 
 output: 
-  # YAML output to cosole, good for testing/debugging
+  # YAML output to console, good for testing/debugging
   stdout: yaml
   #sematext-cloud:
   # module: elasticsearch

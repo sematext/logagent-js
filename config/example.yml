@@ -770,6 +770,19 @@ outputFilter:
 #        SELECT * FROM ? 
 #        WHERE path like "/wp-login%" 
 
+##########################################
+# Journald-format 
+# Formatting journald messages for Sematext common Schema 
+# https://sematext.com/docs/tags/common-schema/   
+# Documentation: https://sematext.com/docs/logagent/output-filter-journaldformat/
+########################################## 
+# 
+#  journald-format: 
+#     module: journald-format
+#     # Run Logagent parser for the message field 
+#     parseMessageField: true 
+#########################################
+
 
 #########################################
 # OUTPUT PLUGINS 

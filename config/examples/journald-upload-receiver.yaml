@@ -1,11 +1,14 @@
 # Global options
 options:
-  includeOriginalLine: true
+  includeOriginalLine: false
 
 input:
    journald-upload:
     module: input-journald-upload
     port: 9090
+    # posts to /indexName/upload set context.index to be used by elasticsearch output plugin
+    useIndexFromUrlPath: false
+    # number of web-worker processes to use multiple CPU cores
     worker: 0
     # support parsing index from URL path /myElasticSearchIndex/
     # useIndexFromUrlPath: true
@@ -17,32 +20,58 @@ input:
       _index: MY_INDEX_FOR_ELASTICSEARCH_OUTPUT
       node_role: kubernetes_worker
     # journald might provide many fields, to reduce storage usage you can remove 
-    # non-relevant fields
+    # non-relevant fields. Note you have to use upper case here. 
     removeFields:
       - __CURSOR
-      - __REALTIME_TIMESTAMP
-      - _SOURCE_REALTIME_TIMESTAMP
-      - __MONOTONIC_TIMESTAMP
-      - _TRANSPORT
-      - JOURNAL_NAME
-      - JOURNAL_PATH
-      - CURRENT_USE
-      - CURRENT_USE_PRETTY
-      - MAX_USE
-      - MAX_USE_PRETTY
-      - DISK_KEEP_FREE
-      - DISK_KEEP_FREE_PRETTY
-      - DISK_AVAILABLE_PRETTY
-      - DISK_AVAILABLE
-      - LIMIT
-      - LIMIT_PRETTY
-      - AVAILABLE
-      - AVAILABLE_PRETTY
-      - _CAP_EFFECTIVE
-      - _SYSTEMD_SLICE
+    
+outputFilter: 
+  journald-format: 
+    module: journald-format
+    # Run Logagent parser for the message field 
+    parseMessageField: true
+  
+  removeFields:
+    module: remove-fields
+    # JS regular expression to match log source name
+    matchSource: !!js/regexp .*
+    # Note: journald format converts to lower case
+    fields:
+      - __cursor
+      - __monotonic_timestamp
+      - _transport
+      # - process.gid
+      # - process.uid
+      # - container.id
+      # - __realtime_timestamp
+      # - _source_realtime_timestamp
+      # - journal_name
+      # - journal_path
+      # - current_use
+      # - current_use_pretty
+      # - max_use
+      # - max_use_pretty
+      # - disk_keep_free
+      # - disk_keep_free_pretty
+      # - disk_available_pretty
+      # - disk_available
+      # - limit
+      # - limit_pretty
+      # - available
+      # - available_pretty
+      # - _cap_effective
+      # - _systemd_slice      
+   # List of fields, where the values from removed field should be
+   # replaced with maskValuesString 
+   # maskValuesInFields:
+   #  - message
+   #  - path
+   # String to replace masked values (thos from removed fields)
+   # maskValuesString: "ANONYMIZED-DATA
 
 output: 
+  # YAML output to cosole, good for testing/debugging
   stdout: yaml
-  #es-local:
+  #sematext-cloud:
   # module: elasticsearch
-  # url: http://localhost:9200
+  # url: https://logsene-receiver.sematext.com
+  # index: YOUR_LOGS_TOKEN_HERE

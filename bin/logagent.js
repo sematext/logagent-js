@@ -40,7 +40,7 @@ var moduleAlias = {
   'mssql-query': '../lib/plugins/input/mssql.js',
   'postgresql-query': '../lib/plugins/input/postgresql.js',
   'input-tcp': '../lib/plugins/input/tcp.js',
-  'input-journald-upload': '../lib/plugins/input/journaldUpload.js',
+  'input-journald-upload': '../lib/plugins/input/journald-upload.js',
   'input-kafka': 'logagent-input-kafka',
   'input-influxdb-http': '../lib/plugins/input/influxHttp.js',
   'elasticsearch-query': '../lib/plugins/input/elasticsearchQuery.js',
@@ -76,6 +76,7 @@ var moduleAlias = {
   'docker-enrichment': '../lib/plugins/output-filter/docker-log-enrichment.js',
   'kubernetes-enrichment': '../lib/plugins/output-filter/kubernetes-enrichment.js',
   'geoip': '../lib/plugins/output-filter/geoip.js',
+  'journald-format': '../lib/plugins/output-filter/journald-format.js',
   // output plugins
   'elasticsearch': '../lib/plugins/output/elasticsearch.js',
   'slack-webhook': '../lib/plugins/output/slack-webhook.js',
@@ -253,18 +254,7 @@ LaCli.prototype.loadPlugins = function (configFile) {
     { module: '../lib/plugins/input/stdin', config: stdInConfig, globalConfig: configFile },
     { module: '../lib/plugins/output/stdout', config: stdOutConfig, globalConfig: configFile }
   ]
-  if (this.argv.journald) {
-    var systemdUnitFilter = process.env.SYSTEMD_UNIT_FILTER || '.*'
-    plugins.push({
-      module: 'input-journald-upload',
-      config: {
-        port: this.argv.journald,
-        systemdUnitFilter: {
-          include: new RegExp(systemdUnitFilter, 'i')
-        }
-      }
-    })
-  }
+  
   if (this.argv.k8sEvents) {
     plugins.push({
       module: 'input-kubernetes-events',
@@ -349,6 +339,23 @@ LaCli.prototype.loadPlugins = function (configFile) {
       autodetectSeverity: true
     })
   }
+  if (this.argv.journald) {
+    var systemdUnitFilter = process.env.SYSTEMD_UNIT_FILTER || '.*'
+    plugins.push({
+      module: 'input-journald-upload',
+      config: {
+        port: this.argv.journald,
+        systemdUnitFilter: {
+          include: new RegExp(systemdUnitFilter, 'i')
+        }
+      }
+    })
+    outputFilter.push({
+      module: 'journald-format',
+      parseMessageField: true
+    })
+  }
+
   if (this.argv.k8sEnrichment) {
     outputFilter.push({
       module: 'kubernetes-enrichment'

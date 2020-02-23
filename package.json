@@ -146,9 +146,8 @@
       "releaseNotes": "npx auto-changelog --stdout --commit-limit false -u --template ./changelog.hbs",
       "____comment": "\"assets\": [\"dist/logagent-*\"]"
     },
-    "scripts": {
-      "beforeStage": "npx auto-changelog -p",
-      "changelog": "npx auto-changelog --stdout --commit-limit false --unreleased --template ./changelog.hbs"
+    "hooks": {
+      "after:bump": "npx auto-changelog -p"
     }
   },
   "standard": {

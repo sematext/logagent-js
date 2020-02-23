@@ -24,7 +24,8 @@
     "start": "node bin/logagent.js -s --heroku $PORT",
     "precommit": "npm run standard && npm run eslint",
     "hook-install": "precommit install",
-    "hook-remove": "precommit remove"
+    "hook-remove": "precommit remove",
+    "release": "release-it"
   },
   "precommit": {
     "tasks": [

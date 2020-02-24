@@ -24,7 +24,9 @@
     "start": "node bin/logagent.js -s --heroku $PORT",
     "precommit": "npm run standard && npm run eslint",
     "hook-install": "precommit install",
-    "hook-remove": "precommit remove"
+    "hook-remove": "precommit remove",
+    "auto-changelog": "auto-changelog",
+    "release": "release-it"
   },
   "precommit": {
     "tasks": [
@@ -131,9 +133,11 @@
     "websocket-stream": "^5.1.1"
   },
   "devDependencies": {
+    "auto-changelog": "^1.16.2",
     "babel-eslint": "^10.0.3",
     "eslint": "^5.9.0",
     "mocha": "^7.0.1",
+    "release-it": "^12.6.0",
     "standard": "14.3.1"
   },
   "pkg": {
@@ -143,12 +147,11 @@
   "release-it": {
     "github": {
       "release": true,
-      "releaseNotes": "npx auto-changelog --stdout --commit-limit false -u --template ./changelog.hbs",
+      "releaseNotes": "npm run auto-changelog --stdout --commit-limit false -u --template ./changelog.hbs",
       "____comment": "\"assets\": [\"dist/logagent-*\"]"
     },
-    "scripts": {
-      "beforeStage": "npx auto-changelog -p",
-      "changelog": "npx auto-changelog --stdout --commit-limit false --unreleased --template ./changelog.hbs"
+    "hooks": {
+      "after:bump": "npm run auto-changelog -p"
     }
   },
   "standard": {

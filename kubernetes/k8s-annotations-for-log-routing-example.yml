@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  annotations:
+    "sematext.com/logs-enabled": "false"
+    #"sematext.com/logs-token": "YOUR_LOGS_TOKEN_FOR_NGINX_LOGS"
+    #"sematext.com/logs-remove-fields": "client_ip,user"
+    #"sematext.com/logs-receiver-url": "https://logsene-receiver.eu.sematext.com"
+    imageregistry: "https://hub.docker.com/"
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: redis1
+  annotations:
+    "sematext.com/logs-enabled": "true"
+    imageregistry: "https://hub.docker.com/"
+spec:
+  containers:
+  - name: redis1
+    image: redis
+    ports:
+    - containerPort: 6379
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: redis2
+  annotations:
+    imageregistry: "https://hub.docker.com/"
+spec:
+  containers:
+  - name: redis
+    image: redis
+    ports:
+    - containerPort: 6379
+---
+# Logagent test pod, in prod it is deployed as daemonset
+apiVersion: v1
+kind: Pod
+metadata:
+  name: st-logagent
+spec:
+  containers:
+  - name: sematext-logagent
+    image: sematext/logagent:latest
+    imagePullPolicy: "IfNotPresent"
+    env:
+      #  verbose output 
+      #- name: LOGAGENT_ARGS
+      #  value: "-v"
+      #- name: DEBUG
+      #  value: "true"
+      #- name: SKIP_BY_IMAGE
+      #  value: 'sematext.logagent'
+      #- name: SKIP_BY_NAME
+      #  value: 'st-logagent'
+      - name: LOGSENE_ENABLED_DEFAULT
+        value: "false"
+      - name: LOGS_TOKEN
+        value: "YOUR_SEMATEXT_LOGS_TOKEN"
+      - name: LOGS_RECEIVER_URL
+        value: "https://logsene-receiver.sematext.com"
+    volumeMounts:
+      - mountPath: /var/run/docker.sock
+        name: docker-sock
+  volumes:
+    - name: docker-sock
+      hostPath:
+        path: /var/run/docker.sock

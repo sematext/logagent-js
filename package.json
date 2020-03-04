@@ -147,6 +147,7 @@
   "release-it": {
     "github": {
       "release": true,
+      "tokenRef": "RELEASE_IT_GITHUB_TOKEN",
       "releaseNotes": "npm run auto-changelog --stdout --commit-limit false -u --template ./changelog.hbs",
       "____comment": "\"assets\": [\"dist/logagent-*\"]"
     },

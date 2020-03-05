@@ -148,11 +148,11 @@
     "github": {
       "release": true,
       "tokenRef": "RELEASE_IT_GITHUB_TOKEN",
-      "releaseNotes": "npm run auto-changelog --stdout --commit-limit false -u --template ./changelog.hbs",
+      "releaseNotes": "npx auto-changelog --stdout --commit-limit false -u --template ./changelog.hbs",
       "____comment": "\"assets\": [\"dist/logagent-*\"]"
     },
     "hooks": {
-      "after:bump": "npm run auto-changelog -p"
+      "after:bump": "npx auto-changelog -p"
     }
   },
   "standard": {

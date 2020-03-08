@@ -1,0 +1,29 @@
+input:
+  github-webhook:
+    module: input-github-webhook
+    port: 9200
+    useIndexFromUrlPath: true
+    tags:
+      - github
+      - webhook
+      - notification
+      
+outputFilter: 
+  github-events-format: 
+    module: github-events-format
+
+output: 
+  # stdout: yaml
+  
+  st-events:
+    module: output-sematext-events
+    # region: us # eu
+    receiver: https://event-receiver.apps.test.sematext.com
+    debug: true
+
+    # if STE or test env add a `receiver`
+    # the `region` value will overwrite the `receiver` value
+    
+    # when running the GitHub input plugin it will start a server and
+    # listen for incoming requests to 0.0.0.0:9200/github/<TOKEN>
+    # set the token in input URL

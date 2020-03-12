@@ -16,9 +16,9 @@ input:
       include: !!js/regexp /.*/i
     #  exclude: !!js/regexp /docker|containerd/i
     # add static fields to every log entry 
-    tags:
-      _index: MY_INDEX_FOR_ELASTICSEARCH_OUTPUT
-      node_role: kubernetes_worker
+    # tags:
+    #   _index: MY_INDEX_FOR_ELASTICSEARCH_OUTPUT
+    #   node_role: kubernetes_worker
     # journald might provide many fields. To reduce storage usage you can remove 
     # non-relevant fields. Note you have to use upper case here. 
     removeFields:
@@ -71,7 +71,9 @@ outputFilter:
 output: 
   # YAML output to console, good for testing/debugging
   stdout: yaml
-  #sematext-cloud:
-  # module: elasticsearch
-  # url: https://logsene-receiver.sematext.com
-  # index: YOUR_LOGS_TOKEN_HERE
+
+  sematext-cloud:
+    module: elasticsearch
+    url: https://logsene-receiver.sematext.com
+    # debug: true
+    # index: YOUR_LOGS_TOKEN_HERE

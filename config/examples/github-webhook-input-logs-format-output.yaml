@@ -1,3 +1,5 @@
+debug: true
+
 input:
   github-webhook:
     module: input-github-webhook
@@ -18,5 +20,5 @@ output:
   sematext-cloud:
     module: elasticsearch
     url: https://logs-token-receiver.apps.test.sematext.com
-    # index: fbe39e0f-34b9-4ee5-981c-5e96b43599e3
+    # index: fb32a047-652e-4e7b-93d2-db199172f89f
     debug: true

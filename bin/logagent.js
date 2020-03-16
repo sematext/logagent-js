@@ -77,6 +77,8 @@ var moduleAlias = {
   'kubernetes-enrichment': '../lib/plugins/output-filter/kubernetes-enrichment.js',
   'geoip': '../lib/plugins/output-filter/geoip.js',
   'journald-format': '../lib/plugins/output-filter/journald-format.js',
+  'github-events-format': '../lib/plugins/output-filter/github-events-format.js',
+  'github-logs-format': '../lib/plugins/output-filter/github-logs-format.js',
   // output plugins
   'elasticsearch': '../lib/plugins/output/elasticsearch.js',
   'slack-webhook': '../lib/plugins/output/slack-webhook.js',

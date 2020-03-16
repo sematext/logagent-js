@@ -1,0 +1,24 @@
+debug: true
+
+input:
+  github-webhook:
+    module: input-github-webhook
+    port: 9200
+    useIndexFromUrlPath: true
+    tags:
+      - github
+      - webhook
+      - notification
+      
+outputFilter: 
+  github-logs-format: 
+    module: github-logs-format
+
+output: 
+  # stdout: yaml
+    
+  sematext-cloud:
+    module: elasticsearch
+    url: https://logs-token-receiver.apps.test.sematext.com
+    # index: fb32a047-652e-4e7b-93d2-db199172f89f
+    debug: true

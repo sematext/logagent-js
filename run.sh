@@ -31,6 +31,7 @@ export MAX_CLIENT_SOCKETS=${MAX_CLIENT_SOCKETS:-5}
 export LOGSENE_ENABLED_DEFAULT=${LOGSENE_ENABLED_DEFAULT:-true}
 export LOGSENE_TMP_DIR=/log-buffer
 mkdir -p $LOGSENE_TMP_DIR
+export LA_CONFIG_OVERRIDE=${LA_CONFIG_OVERRIDE:-false}
 
 # be backward compatible
 export LOGSENE_RECEIVER_URL
@@ -46,10 +47,12 @@ if [[ -z "$LOGS_TOKEN" ]]; then
   export LOGS_TOKEN="$LOG_INDEX"
 fi
 
-
 if [[ -z "$LOGS_TOKEN" ]]; then
-  echo "You need to set the LOGS_TOKEN in the environment!" >&2
-  exit 1
+  if [ "${LA_CONFIG_OVERRIDE}" != "true" ]; then
+    echo "You need to set the LOGS_TOKEN in the environment!" >&2
+    exit 1
+  fi
+  echo "You have selected to override the token configuration in your ${LA_CONFIG}!" >&2
 fi
 
 

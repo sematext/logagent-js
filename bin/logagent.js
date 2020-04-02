@@ -62,6 +62,7 @@ var moduleAlias = {
   'azure-event-hub': '../lib/plugins/input/azure-event-hub.js',
   'unix-socket-reader': '../lib/plugins/input/unixSocketReader.js',
   // input filters
+  'httpDeviceDetector': '../lib/plugins/input-filter/httpDeviceDetector.js',
   'input-filter-k8s-containerd': '../lib/plugins/input-filter/kubernetesContainerd.js',
   'grep': '../lib/plugins/input-filter/grep.js',
   'grok': 'logagent-input-filter-grok',

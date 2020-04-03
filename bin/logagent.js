@@ -62,7 +62,6 @@ var moduleAlias = {
   'azure-event-hub': '../lib/plugins/input/azure-event-hub.js',
   'unix-socket-reader': '../lib/plugins/input/unixSocketReader.js',
   // input filters
-  'httpDeviceDetector': '../lib/plugins/input-filter/httpDeviceDetector.js',
   'input-filter-k8s-containerd': '../lib/plugins/input-filter/kubernetesContainerd.js',
   'grep': '../lib/plugins/input-filter/grep.js',
   'grok': 'logagent-input-filter-grok',
@@ -77,6 +76,7 @@ var moduleAlias = {
   'docker-enrichment': '../lib/plugins/output-filter/docker-log-enrichment.js',
   'kubernetes-enrichment': '../lib/plugins/output-filter/kubernetes-enrichment.js',
   'geoip': '../lib/plugins/output-filter/geoip.js',
+  'httpDeviceDetector': '../lib/plugins/output-filter/httpDeviceDetector.js',
   'journald-format': '../lib/plugins/output-filter/journald-format.js',
   'github-events-format': '../lib/plugins/output-filter/github-events-format.js',
   'github-logs-format': '../lib/plugins/output-filter/github-logs-format.js',

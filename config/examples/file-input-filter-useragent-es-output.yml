@@ -9,12 +9,13 @@ input:
   files:
       - '/var/log/**/*.log'
 
-inputFilter:
-  - module: httpDeviceDetector
+outputFilter:
+  httpDeviceDetector: 
+    module: httpDeviceDetector
     # optional setting to configure the field name for the useragent
-    # will default to 'useragent' if this config is omitted
+    # will default to 'user_agent' if this config is omitted
     # config:
-    #   userAgentFieldName: useragent
+    #   userAgentFieldName: user_agent
 
 output:
   # stdout: yaml  
@@ -22,3 +23,4 @@ output:
     module: elasticsearch
     url: https://logsene-receiver.sematext.com
     index: LOGS_TOKEN
+

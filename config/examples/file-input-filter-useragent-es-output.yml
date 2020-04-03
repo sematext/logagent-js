@@ -1,0 +1,26 @@
+# Global options
+options:
+  includeOriginalLine: false
+  printStats: 10
+  maxInputRate: 1mb # per second
+
+input:
+  stdin: true
+  files:
+      - '/var/log/**/*.log'
+
+outputFilter:
+  httpDeviceDetector: 
+    module: httpDeviceDetector
+    # optional setting to configure the field name for the useragent
+    # will default to 'user_agent' if this config is omitted
+    # config:
+    #   userAgentFieldName: user_agent
+
+output:
+  # stdout: yaml  
+  sematext-logs:
+    module: elasticsearch
+    url: https://logsene-receiver.sematext.com
+    index: LOGS_TOKEN
+

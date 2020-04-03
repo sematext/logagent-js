@@ -83,6 +83,7 @@
     "clone": "^2.1.2",
     "co": "^4.6.0",
     "commander": "^2.19.0",
+    "device-detector-js": "^2.2.1",
     "docker-events": "0.0.2",
     "docker-loghose": "^1.6.5",
     "dockerode": "^2.5.6",

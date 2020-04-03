@@ -138,9 +138,25 @@ patterns:
       dateFormat: yyyy-MM-dd HH:mm:ss,SS
 
  - # Apache Solr
-  blockStart: !!js/regexp ^\S+\s+-\s\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3}|^\d+\s+\S{3,5}\s+
+  blockStart: !!js/regexp ^\S*\s*\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3}|^\d+\s+\S{3,5}\s+
   sourceName: !!js/regexp /solr/i
   match:
+    - type: apache_solr_7_8
+      regex: !!js/regexp ^\S*\s*(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3})\s(.+?)\s+\((.+?)\)\s\[(.+?)]\s(.+?)\s\[(.+?)\]\s+webapp=(.+?)\spath=(.+?)\sparams={(.*)}\sstatus=(\d+)\sQTime=(\d+)
+      fields: [ts,severity,thread,core,class,shard,webapp,path,params,status,qtime]
+      dateFormat: yyyy-MM-dd HH:mm:ss.SSS
+    - type: apache_solr_7_8
+      regex: !!js/regexp ^\S*\s*(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3})\s(.+?)\s+\((.+?)\)\s\[(.+?)]\s(.+?)\s\[(.+?)\]\s+webapp=(.+?)\spath=(.+?)\sparams={(.*)}\shits=(\d+)\sstatus=(\d+)\sQTime=(\d+)
+      fields: [ts,severity,thread,core,class,shard,webapp,path,params,hits,status,qtime]
+      dateFormat: yyyy-MM-dd HH:mm:ss.SSS
+    - type: apache_solr_audit_log
+      regex: !!js/regexp ^\S*\s*(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3})\s(.+?)\s*\((.+?)\)\s\[(.+?)]\s(.+?)\stype="(.*?)"\smessage="(.*?)"\smethod="(.*?)"\sstatus="(.*?)"\srequestType="(.*?)"\susername="(.*?)"\sresource="(.*?)"\squeryString="(.*?)"\scollections=\[?(.*?)\]?.*
+      fields: [ts,severity,thread,core,class,type,message,method,status,requestType,username,resource,querystring,collections]
+      dateFormat: yyyy-MM-dd HH:mm:ss.SSS
+    - type: apache_solr_7_8_generic
+      regex: !!js/regexp ^\S*\s*(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3})\s(.+?)\s+\((.+?)\)\s\[(.+?)]\s(.+?)\s(.*)
+      fields: [ts,severity,thread,core,class,message]
+      dateFormat: yyyy-MM-dd HH:mm:ss.SSS
     - type: apache_solr_v4.6
       regex: !!js/regexp ^(\S+)\s+-\s(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3});\s(.+?);\s\[(.+?)]\swebapp=(\S+)\spath=(.+?)\sparams={(.*)}.*hits=(\d+)\sstatus=(\d+)\sQTime=(\d+)
       fields: [severity,ts,class,application,webapp,path,params,hits,status,qtime]

@@ -7,15 +7,18 @@ options:
 input:
   stdin: true
   files:
-      - '/var/log/**/*.log'
+    - '/var/log/**/*.log'
 
 outputFilter:
   httpDeviceDetector: 
     module: httpDeviceDetector
-    # optional setting to configure the field name for the useragent
-    # will default to 'user_agent' if this config is omitted
+    # optional setting to configure the field name for the
+    # user agent and the user agent details
+    # userAgentFieldName will default to 'user_agent' if this config is omitted
+    # userAgentDetailsFieldName will default to 'user_agent_details' if this config is omitted
     # config:
     #   userAgentFieldName: user_agent
+    #   userAgentDetailsFieldName: user_agent_details
 
 output:
   # stdout: yaml  

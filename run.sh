@@ -28,7 +28,15 @@ fi
 echo $LA_CONFIG 
 
 export MAX_CLIENT_SOCKETS=${MAX_CLIENT_SOCKETS:-5}
+
+# Set both values to be default TRUE
+# Check in the code if they are both TRUE
+# If they are not both TRUE, because user sets at
+# least one of them to FALSE, the env will view 
+# them as FALSE
 export LOGSENE_ENABLED_DEFAULT=${LOGSENE_ENABLED_DEFAULT:-true}
+export LOGS_ENABLED_DEFAULT=${LOGS_ENABLED_DEFAULT:-true}
+
 export LOGSENE_TMP_DIR=/log-buffer
 mkdir -p $LOGSENE_TMP_DIR
 export LA_CONFIG_OVERRIDE=${LA_CONFIG_OVERRIDE:-false}

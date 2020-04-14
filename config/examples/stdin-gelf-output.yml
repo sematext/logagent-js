@@ -11,6 +11,8 @@ output:
     host: localhost
     # graylog port (default: 12201)
     port: 12201
+    # Dump all events
+    debug: false  
     # compression 'gzip' or 'deflate' (default: 'deflate')
     compressType: deflate
     # size of chunked messages in bytes (default: 1240)

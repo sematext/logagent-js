@@ -258,7 +258,7 @@ LaCli.prototype.loadPlugins = function (configFile) {
     { module: '../lib/plugins/input/stdin', config: stdInConfig, globalConfig: configFile },
     { module: '../lib/plugins/output/stdout', config: stdOutConfig, globalConfig: configFile }
   ]
-  
+
   if (this.argv.k8sEvents) {
     plugins.push({
       module: 'input-kubernetes-events',

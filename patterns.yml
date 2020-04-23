@@ -296,6 +296,22 @@ patterns:
         - class:string
         - message:string
       dateFormat: yyyy-MM-dd HH:mm:ss.SSS
+      transform: !!js/function >
+        function (p) {
+          var core = p.core.split(' ')
+
+          //sometimes core=0, sometimes core="c:test s:shard2...."
+          if (core.length>1){
+            p.parsedCore={}
+            for(var i=0;i<core.length;i++)
+            {
+              var key_value = core[i].split(':')
+              if (key_value.length>1) {
+                p.parsedCore[key_value[0]] = key_value[1]
+              }
+            }
+          }
+        }
     - type: apache_solr_v4.6
       regex: !!js/regexp ^(\S+)\s+-\s(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3});\s(.+?);\s\[(.+?)]\swebapp=(\S+)\spath=(.+?)\sparams={(.*)}.*hits=(\d+)\sstatus=(\d+)\sQTime=(\d+)
       fields: [severity,ts,class,application,webapp,path,params,hits,status,qtime]

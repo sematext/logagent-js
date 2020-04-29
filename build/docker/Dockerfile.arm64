@@ -13,7 +13,7 @@ COPY . .
 RUN \
   apk add --no-cache --virtual .build-deps alpine-sdk python && \
   npm install --unsafe-perm --production && \
-  npm install -g --production --unsafe-perm @sematext/logagent-nodejs-monitor && \
+  npm install --unsafe-perm --production @sematext/logagent-nodejs-monitor && \
   mkdir -p /etc/sematext && \
   mkdir -p /etc/logagent && \
   mkdir -p /opt/logagent && \

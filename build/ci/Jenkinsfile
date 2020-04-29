@@ -1,0 +1,191 @@
+properties(
+  [
+    buildDiscarder(
+      logRotator(
+        daysToKeepStr: '7',
+        numToKeepStr: '5',
+        artifactNumToKeepStr: '5'
+      )
+    ),
+    disableConcurrentBuilds()
+  ]
+)
+
+def label = "worker-${UUID.randomUUID().toString()}"
+
+podTemplate(label: label, serviceAccount: 'jenkins', namespace: 'jenkins', containers: [
+  containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine', args: '${computer.jnlpmac} ${computer.name}'),
+  containerTemplate(name: 'docker', image: 'docker:19.03.4', command: 'cat', ttyEnabled: true, alwaysPullImage: true),
+],
+volumes: [
+    hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
+],
+podRetention: never()) {
+  node(label) {
+    def sematextLogagent = checkout ([
+      $class: 'GitSCM',
+      branches: scm.branches,
+      userRemoteConfigs: scm.userRemoteConfigs,
+      extensions: [
+        [$class: 'LocalBranch', localBranch: "**"],
+        [$class: 'CloneOption', noTags: true, depth: 50, shallow: true],
+        [$class: 'RelativeTargetDirectory', relativeTargetDir: 'logagent'],
+      ]
+    ])
+    def gitCommit = sematextLogagent.GIT_COMMIT
+    def gitBranch = sematextLogagent.GIT_LOCAL_BRANCH
+    def gitTag = sematextLogagent.GIT_BRANCH
+
+    stage('Image AMD64') {
+      if (gitBranch == 'master' || !gitTag.startsWith("origin")) {
+        try {
+          container('docker') {
+            dir('logagent') {
+              withCredentials([[$class: 'UsernamePasswordMultiBinding',
+                                credentialsId: 'dockerhub',
+                                usernameVariable: 'DOCKER_HUB_USER',
+                                passwordVariable: 'DOCKER_HUB_PASSWORD']]) {
+                env.DOCKER_CLI_EXPERIMENTAL = 'enabled'
+                sh """
+                  docker login -u ${DOCKER_HUB_USER} -p ${DOCKER_HUB_PASSWORD}
+                  docker build --rm -t sematext/logagent:${gitCommit}-amd64 -f build/docker/Dockerfile.amd64 .
+                """
+                if (gitBranch == 'master') {
+                  sh """
+                    docker tag sematext/logagent:${gitCommit}-amd64 sematext/logagent:dev-amd64
+                    docker push sematext/logagent:dev-amd64
+                  """
+                } else if (!gitTag.startsWith("origin")) {
+                  sh """
+                    docker tag sematext/logagent:${gitCommit}-amd64 sematext/logagent:${gitTag}-amd64
+                    docker push sematext/logagent:${gitTag}-amd64
+                    if echo "${gitTag}" | grep -qE '^[0-9.]*\$'; then
+                      docker tag sematext/logagent:${gitCommit}-amd64 sematext/logagent:latest-amd64
+                      docker push sematext/logagent:latest-amd64
+                    fi
+                  """
+                }
+              }
+            }
+          }
+        }
+        catch (exc) {
+          notifyBuild('Image AMD64', 'FAILURE')
+          throw(exc)
+        }
+      }
+      else {
+        println "Skip"
+      }
+    }
+
+    stage('Image ARM64') {
+      if (gitBranch == 'master' || !gitTag.startsWith("origin")) {
+        try {
+          container('docker') {
+            dir('logagent') {
+              withCredentials([[$class: 'UsernamePasswordMultiBinding',
+                                credentialsId: 'dockerhub',
+                                usernameVariable: 'DOCKER_HUB_USER',
+                                passwordVariable: 'DOCKER_HUB_PASSWORD']]) {
+                env.DOCKER_CLI_EXPERIMENTAL = 'enabled'
+                sh """
+                  docker login -u ${DOCKER_HUB_USER} -p ${DOCKER_HUB_PASSWORD}
+                  docker build --rm -t sematext/logagent:${gitCommit}-arm64 -f build/docker/Dockerfile.arm64 .
+                """
+                if (gitBranch == 'master') {
+                  sh """
+                    docker tag sematext/logagent:${gitCommit}-arm64 sematext/logagent:dev-arm64
+                    docker push sematext/logagent:dev-arm64
+                  """
+                } else if (!gitTag.startsWith("origin")) {
+                  sh """
+                    docker tag sematext/logagent:${gitCommit}-arm64 sematext/logagent:${gitTag}-arm64
+                    docker push sematext/logagent:${gitTag}-arm64
+                    if echo "${gitTag}" | grep -qE '^[0-9.]*\$'; then
+                      docker tag sematext/logagent:${gitCommit}-arm64 sematext/logagent:latest-arm64
+                      docker push sematext/logagent:latest-arm64
+                    fi
+                  """
+                }
+              }
+            }
+          }
+        }
+        catch (exc) {
+          notifyBuild('Image ARM64', 'FAILURE')
+          throw(exc)
+        }
+      }
+      else {
+        println "Skip"
+      }
+    }
+
+    stage('MultiArch') {
+      if (gitBranch == 'master' || !gitTag.startsWith("origin")) {
+        try {
+          container('docker') {
+            dir('logagent') {
+              withCredentials([[$class: 'UsernamePasswordMultiBinding',
+                                credentialsId: 'dockerhub',
+                                usernameVariable: 'DOCKER_HUB_USER',
+                                passwordVariable: 'DOCKER_HUB_PASSWORD']]) {
+                env.DOCKER_CLI_EXPERIMENTAL = 'enabled'
+                sh """
+                  docker login -u ${DOCKER_HUB_USER} -p ${DOCKER_HUB_PASSWORD}
+                """
+                if (gitBranch == 'master') {
+                  sh """
+                    docker manifest create sematext/logagent:dev sematext/logagent:dev-amd64 sematext/logagent:dev-arm64
+                    docker manifest push sematext/logagent:dev
+                  """
+                } else if (!gitTag.startsWith("origin")) {
+                  sh """
+                    docker manifest create sematext/logagent:${gitTag} sematext/logagent:${gitTag}-amd64 sematext/logagent:${gitTag}-arm64
+                    docker manifest push sematext/logagent:${gitTag}
+                    if echo "${gitTag}" | grep -qE '^[0-9.]*\$'; then
+                      docker manifest create sematext/logagent:latest sematext/logagent:latest-amd64 sematext/logagent:latest-arm64
+                      docker manifest push sematext/logagent:latest
+                    fi
+                  """
+                }
+              }
+            }
+          }
+        }
+        catch (exc) {
+          notifyBuild('MultiArch', 'FAILURE')
+          throw(exc)
+        }
+      }
+      else {
+        println "Skip"
+      }
+    }
+
+  }
+}
+
+def notifyBuild(String stage, String status) {
+        def colorName = 'RED'
+        def colorCode = '#FF0000'
+        def subject = "${status} ${stage}: ${env.JOB_NAME} [${env.BUILD_NUMBER}]\n"
+        def summary = "${subject} ${env.BUILD_URL.replace("http:", "https:")}console"
+        if (status == 'STARTED') {
+            color = 'YELLOW'
+            colorCode = '#FFFF00'
+        } else if (status == 'SUCCESSFUL') {
+            color = 'GREEN'
+            colorCode = '#00FF00'
+        } else {
+            color = 'RED'
+            colorCode = 'danger'
+            currentBuild.result = status
+        }
+        slackSend channel: '#jenkins-says',
+            teamDomain: 'sematext',
+            tokenCredentialId: 'slack_token',
+            color: colorCode,
+            message: summary
+}

@@ -1,4 +1,4 @@
-FROM node:12-alpine
+FROM arm64v8/node:12-alpine
 
 ENV REGION="US"
 
@@ -10,8 +10,8 @@ WORKDIR /
 
 COPY . .
 
-RUN \ 
-  apk add --no-cache --virtual .build-deps alpine-sdk python && \ 
+RUN \
+  apk add --no-cache --virtual .build-deps alpine-sdk python && \
   npm install --unsafe-perm --production && \
   npm install -g --production --unsafe-perm @sematext/logagent-nodejs-monitor && \
   mkdir -p /etc/sematext && \
@@ -21,7 +21,7 @@ RUN \
   npm rm -g npm && \
   rm -rf ~/.npm && \
   rm -rf /tmp/* && \
-  apk del .build-deps 
+  apk del .build-deps
 
 COPY patterns.yml /etc/logagent/patterns.yml
 COPY run.sh /run.sh

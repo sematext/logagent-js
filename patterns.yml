@@ -141,22 +141,7 @@ patterns:
   blockStart: !!js/regexp ^\S*\s*\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3}|^\d+\s+\S{3,5}\s+
   sourceName: !!js/regexp /solr/i
   match:
-    - type: apache_solr_7_8
-      regex: !!js/regexp ^\S*\s*(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3})\s(.+?)\s+\((.+?)\)\s\[(.+?)]\s(.+?)\s\[(.+?)\]\s+webapp=(.+?)\spath=(.+?)\sparams={(.*)}\sstatus=(\d+)\sQTime=(\d+)
-      fields: 
-        - ts
-        - severity:string
-        - thread:string
-        - core:string
-        - class:string
-        - shard:string
-        - webapp:string
-        - path:string
-        - params:string
-        - status:number
-        - qtime:number
-      dateFormat: yyyy-MM-dd HH:mm:ss.SSS
-    - type: apache_solr_7_8
+    - type: apache_solr_7_8_hits
       regex: !!js/regexp ^\S*\s*(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3})\s(.+?)\s+\((.+?)\)\s\[(.+?)]\s(.+?)\s\[(.+?)\]\s+webapp=(.+?)\spath=(.+?)\sparams={(.*)}\shits=(\d+)\sstatus=(\d+)\sQTime=(\d+)
       fields: 
         - ts
@@ -172,6 +157,117 @@ patterns:
         - status:number
         - qtime:number
       dateFormat: yyyy-MM-dd HH:mm:ss.SSS
+      transform: !!js/function >
+        function (p) {
+          if (process.env.PARSE_SOLR_QUERY_PARAMS === '1')
+          {
+            var params = p.params.split('&')
+            p.parsedParams={}
+            for(var i=0;i<params.length;i++)
+            {
+              var key_value = params[i].split('=')
+              if (key_value.length>1) {
+                key = key_value[0]
+                if (!/[a-zA-Z]/.test(key)) {
+                  key = "field_" + key
+                }
+
+                if (key in p.parsedParams) {
+                  // convert from single to multivalued
+                  if (typeof p.parsedParams[key] == 'string') {
+                    p.parsedParams[key] = [p.parsedParams[key]]
+                  }
+
+                  p.parsedParams[key].push(key_value[1])
+                } else {
+                  p.parsedParams[key] = key_value[1]
+                }
+              }
+            }
+            if (p.parsedParams['NOW']) {
+              p.parsedParams['NOW'] = new Date(p.parsedParams['NOW']*1)
+              // if (!p['@timestamp'])
+              //  p['@timestamp'] = p.paramsParsed['NOW']
+            }
+          }
+
+          var core = p.core.split(' ')
+
+          //sometimes core=0, sometimes core="c:test s:shard2...."
+          if (core.length>1){
+            p.parsedCore={}
+            for(var i=0;i<core.length;i++)
+            {
+              var key_value = core[i].split(':')
+              if (key_value.length>1) {
+                p.parsedCore[key_value[0]] = key_value[1]
+              }
+            }
+          }
+        }
+    - type: apache_solr_7_8
+      regex: !!js/regexp ^\S*\s*(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3})\s(.+?)\s+\((.+?)\)\s\[(.+?)]\s(.+?)\s\[(.+?)\]\s+webapp=(.+?)\spath=(.+?)\sparams={(.*)}\sstatus=(\d+)\sQTime=(\d+)
+      fields: 
+        - ts
+        - severity:string
+        - thread:string
+        - core:string
+        - class:string
+        - shard:string
+        - webapp:string
+        - path:string
+        - params:string
+        - status:number
+        - qtime:number
+      dateFormat: yyyy-MM-dd HH:mm:ss.SSS
+      transform: !!js/function >
+        function (p) {
+          if (process.env.PARSE_SOLR_QUERY_PARAMS === '1')
+          {
+            var params = p.params.split('&')
+            p.parsedParams={}
+            for(var i=0;i<params.length;i++)
+            {
+              var key_value = params[i].split('=')
+              if (key_value.length>1) {
+                key = key_value[0]
+                if (!/[a-zA-Z]/.test(key)) {
+                  key = "field_" + key
+                }
+
+                if (key in p.parsedParams) {
+                  // convert from single to multivalued
+                  if (typeof p.parsedParams[key] == 'string') {
+                    p.parsedParams[key] = [p.parsedParams[key]]
+                  }
+
+                  p.parsedParams[key].push(key_value[1])
+                } else {
+                  p.parsedParams[key] = key_value[1]
+                }
+              }
+            }
+            if (p.parsedParams['NOW']) {
+              p.parsedParams['NOW'] = new Date(p.parsedParams['NOW']*1)
+              // if (!p['@timestamp'])
+              //  p['@timestamp'] = p.paramsParsed['NOW']
+            }
+          }
+
+          var core = p.core.split(' ')
+
+          //sometimes core=0, sometimes core="c:test s:shard2...."
+          if (core.length>1){
+            p.parsedCore={}
+            for(var i=0;i<core.length;i++)
+            {
+              var key_value = core[i].split(':')
+              if (key_value.length>1) {
+                p.parsedCore[key_value[0]] = key_value[1]
+              }
+            }
+          }
+        }
     - type: apache_solr_audit_log
       regex: !!js/regexp ^\S*\s*(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3})\s(.+?)\s*\((.+?)\)\s\[(.+?)]\s(.+?)\stype="(.*?)"\smessage="(.*?)"\smethod="(.*?)"\sstatus="(.*?)"\srequestType="(.*?)"\susername="(.*?)"\sresource="(.*?)"\squeryString="(.*?)"\scollections=\[?(.*?)\]?.*
       fields: 
@@ -200,6 +296,22 @@ patterns:
         - class:string
         - message:string
       dateFormat: yyyy-MM-dd HH:mm:ss.SSS
+      transform: !!js/function >
+        function (p) {
+          var core = p.core.split(' ')
+
+          //sometimes core=0, sometimes core="c:test s:shard2...."
+          if (core.length>1){
+            p.parsedCore={}
+            for(var i=0;i<core.length;i++)
+            {
+              var key_value = core[i].split(':')
+              if (key_value.length>1) {
+                p.parsedCore[key_value[0]] = key_value[1]
+              }
+            }
+          }
+        }
     - type: apache_solr_v4.6
       regex: !!js/regexp ^(\S+)\s+-\s(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3});\s(.+?);\s\[(.+?)]\swebapp=(\S+)\spath=(.+?)\sparams={(.*)}.*hits=(\d+)\sstatus=(\d+)\sQTime=(\d+)
       fields: [severity,ts,class,application,webapp,path,params,hits,status,qtime]

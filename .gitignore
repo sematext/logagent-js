@@ -35,3 +35,6 @@ spmlogs
 spmdb
 .spmagentrc
 
+# npm config
+.npmrc
+.npmignore

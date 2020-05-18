@@ -20,7 +20,8 @@
     "build-all": "npm run build-linux-64 && npm run build-linux-x86 && npm run build-windows && npm run build-macos",
     "test": "mocha --exit",
     "standard": "standard lib/**/**/*.js bin/*.js",
-    "eslint": "eslint lib/**/**/*.js bin/*.js",
+    "format": "prettier-standard --format",
+    "lint": "prettier-standard --format --lint '**/*.js'",
     "start": "node bin/logagent.js -s --heroku $PORT",
     "precommit": "npm run standard && npm run eslint",
     "hook-install": "precommit install",
@@ -139,7 +140,8 @@
     "eslint": "^5.9.0",
     "mocha": "^7.0.1",
     "release-it": "^12.6.0",
-    "standard": "^14.3.1"
+    "standard": "^14.3.1",
+    "prettier-standard": "^16.3.0"
   },
   "pkg": {
     "scripts": "lib/**/*.js",

@@ -15,13 +15,13 @@ describe('OutputPrometheusAlertmanager', function () {
     })
 
     it('returns instance', function () {
-      new OutputPrometheusAlertmanager({url: 'foo'})
+      new OutputPrometheusAlertmanager({ url: 'foo' })
     })
   })
 
   describe('#buildAlert', function () {
     it('return alert', function () {
-      var output = new OutputPrometheusAlertmanager({url: 'foo'})
+      var output = new OutputPrometheusAlertmanager({ url: 'foo' })
       assert.deepEqual(output.buildAlert(), {
         labels: {},
         annotations: {}
@@ -41,18 +41,21 @@ describe('OutputPrometheusAlertmanager', function () {
           }
         }
       })
-      assert.deepEqual(output.buildAlert({
-        myVarA: 'valOfMyVarA',
-        myVarB: 'valOfMyVarB'
-      }), {
-        generatorURL: 'http://foo?myVarA=valOfMyVarA&myVarB=valOfMyVarB',
-        labels: {
-          myLabel: 'valOfMyVarA-valOfMyVarB'
-        },
-        annotations: {
-          myAnnotation: 'valOfMyVarA and valOfMyVarB'
+      assert.deepEqual(
+        output.buildAlert({
+          myVarA: 'valOfMyVarA',
+          myVarB: 'valOfMyVarB'
+        }),
+        {
+          generatorURL: 'http://foo?myVarA=valOfMyVarA&myVarB=valOfMyVarB',
+          labels: {
+            myLabel: 'valOfMyVarA-valOfMyVarB'
+          },
+          annotations: {
+            myAnnotation: 'valOfMyVarA and valOfMyVarB'
+          }
         }
-      })
+      )
     })
   })
 })

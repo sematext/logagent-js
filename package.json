@@ -76,7 +76,7 @@
   "//": "!!! bithound claims maxmind-geolite-mirror is not used, it is! Don't remove ...",
   "dependencies": {
     "@azure/event-hubs": "^5.0.0-preview.7",
-    "alasql": "^0.4.11",
+    "alasql": "^0.6.0",
     "aws-sdk": "^2.359.0",
     "cassandra-driver": "^3.5.0",
     "chalk": "^2.4.1",
@@ -111,7 +111,7 @@
     "moment-timezone": "^0.5.23",
     "mqtt": "^2.18.8",
     "mysql": "^2.16.0",
-    "npm": "^6.13.7",
+    "npm": "^6.14.5",
     "pg": "^7.6.1",
     "prettyjson": "^1.2.1",
     "query-string": "^6.2.0",
@@ -138,10 +138,11 @@
     "auto-changelog": "^1.16.2",
     "babel-eslint": "^10.1.0",
     "eslint": "^5.9.0",
-    "mocha": "^7.0.1",
-    "release-it": "^12.6.0",
-    "standard": "^14.3.1",
-    "prettier-standard": "^16.3.0"
+    "eslint-plugin-jest": "^23.13.1",
+    "mocha": "^7.1.2",
+    "prettier-standard": "^16.3.0",
+    "release-it": "^13.6.1",
+    "standard": "^14.3.1"
   },
   "pkg": {
     "scripts": "lib/**/*.js",

@@ -19,7 +19,12 @@
  * under the License.
  */
 process.on('unhandledRejection', (reason, p) => {
-  console.log('Possibly Unhandled Rejection at: Promise ', p, 'reason: ', reason)
+  console.log(
+    'Possibly Unhandled Rejection at: Promise ',
+    p,
+    'reason: ',
+    reason
+  )
   console.dir(reason)
 })
 
@@ -35,7 +40,7 @@ const request = require('request')
 const PATTERN_DIR = process.env.PATTERN_DIR || '/etc/logagent'
 var moduleAlias = {
   // inputs
-  'command': '../lib/plugins/input/command.js',
+  command: '../lib/plugins/input/command.js',
   'mysql-query': '../lib/plugins/input/mysql.js',
   'mssql-query': '../lib/plugins/input/mssql.js',
   'postgresql-query': '../lib/plugins/input/postgresql.js',
@@ -62,11 +67,12 @@ var moduleAlias = {
   'azure-event-hub': '../lib/plugins/input/azure-event-hub.js',
   'unix-socket-reader': '../lib/plugins/input/unixSocketReader.js',
   // input filters
-  'input-filter-k8s-containerd': '../lib/plugins/input-filter/kubernetesContainerd.js',
-  'grep': '../lib/plugins/input-filter/grep.js',
-  'grok': 'logagent-input-filter-grok',
+  'input-filter-k8s-containerd':
+    '../lib/plugins/input-filter/kubernetesContainerd.js',
+  grep: '../lib/plugins/input-filter/grep.js',
+  grok: 'logagent-input-filter-grok',
   // output filters
-  'sql': '../lib/plugins/output-filter/sql.js',
+  sql: '../lib/plugins/output-filter/sql.js',
   'access-watch': '../lib/plugins/output-filter/access-watch.js',
   'hash-fields': '../lib/plugins/output-filter/hash-fields.js',
   'aes-encrypt-fields': '../lib/plugins/output-filter/aes-encrypt-fields.js',
@@ -74,14 +80,16 @@ var moduleAlias = {
   'remove-fields': '../lib/plugins/output-filter/remove-fields.js',
   'drop-events': '../lib/plugins/output-filter/dropEventsFilter.js',
   'docker-enrichment': '../lib/plugins/output-filter/docker-log-enrichment.js',
-  'kubernetes-enrichment': '../lib/plugins/output-filter/kubernetes-enrichment.js',
-  'geoip': '../lib/plugins/output-filter/geoip.js',
-  'httpDeviceDetector': '../lib/plugins/output-filter/httpDeviceDetector.js',
+  'kubernetes-enrichment':
+    '../lib/plugins/output-filter/kubernetes-enrichment.js',
+  geoip: '../lib/plugins/output-filter/geoip.js',
+  httpDeviceDetector: '../lib/plugins/output-filter/httpDeviceDetector.js',
   'journald-format': '../lib/plugins/output-filter/journald-format.js',
-  'github-events-format': '../lib/plugins/output-filter/github-events-format.js',
+  'github-events-format':
+    '../lib/plugins/output-filter/github-events-format.js',
   'github-logs-format': '../lib/plugins/output-filter/github-logs-format.js',
   // output plugins
-  'elasticsearch': '../lib/plugins/output/elasticsearch.js',
+  elasticsearch: '../lib/plugins/output/elasticsearch.js',
   'slack-webhook': '../lib/plugins/output/slack-webhook.js',
   'prometheus-alertmanager': '../lib/plugins/output/prometheus-alertmanager.js',
   'output-kafka': 'logagent-output-kafka',
@@ -100,13 +108,16 @@ function getFunctionArgumentNames (func) {
   // First match everything inside the function argument parens.
   var args = func.toString().match(/function\s.*?\(([^)]*)\)/)[1]
   // Split the arguments string into an array comma delimited.
-  return args.split(',').map(function (arg) {
-    // Ensure no inline comments are parsed and trim the whitespace.
-    return arg.replace(/\/\*.*\*\//, '').trim()
-  }).filter(function (arg) {
-    // Ensure no undefined values are added.
-    return arg
-  })
+  return args
+    .split(',')
+    .map(function (arg) {
+      // Ensure no inline comments are parsed and trim the whitespace.
+      return arg.replace(/\/\*.*\*\//, '').trim()
+    })
+    .filter(function (arg) {
+      // Ensure no undefined values are added.
+      return arg
+    })
 }
 
 function downloadPatterns (cb) {
@@ -117,23 +128,46 @@ function downloadPatterns (cb) {
   fs.unlink(patternFileName, () => {
     var cbCalled = false
     var patternFileWs = fs.createWriteStream(patternFileName)
-    patternFileWs.on('error', (ioerr) => {
-      consoleLogger.error('Error writing patterns to ' + patternFileName + ': ' + process.env.PATTERNS_URL + ' ' + ioerr)
+    patternFileWs.on('error', ioerr => {
+      consoleLogger.error(
+        'Error writing patterns to ' +
+          patternFileName +
+          ': ' +
+          process.env.PATTERNS_URL +
+          ' ' +
+          ioerr
+      )
       if (!cbCalled) {
         cb(ioerr)
       }
     })
     patternFileWs.on('close', () => {
-      consoleLogger.log('Patterns stored in ' + patternFileName + ' (' + process.env.PATTERNS_URL + ')')
+      consoleLogger.log(
+        'Patterns stored in ' +
+          patternFileName +
+          ' (' +
+          process.env.PATTERNS_URL +
+          ')'
+      )
       cb()
     })
     try {
       var req = request.get(process.env.PATTERNS_URL)
-      req.on('error', (error) => {
-        consoleLogger.error('Patterns download failed: ' + process.env.PATTERNS_URL + ' ' + error)
-      }).on('response', (response) => {
-        consoleLogger.log('Patterns downloaded ' + process.env.PATTERNS_URL + ' ')
-      }).pipe(patternFileWs)
+      req
+        .on('error', error => {
+          consoleLogger.error(
+            'Patterns download failed: ' +
+              process.env.PATTERNS_URL +
+              ' ' +
+              error
+          )
+        })
+        .on('response', response => {
+          consoleLogger.log(
+            'Patterns downloaded ' + process.env.PATTERNS_URL + ' '
+          )
+        })
+        .pipe(patternFileWs)
     } catch (ex) {
       consoleLogger.error(ex.message)
       cbCalled = true
@@ -155,7 +189,8 @@ function LaCli (options) {
   this.argv = options || require('../lib/core/cliArgs.js')
 
   this.globPattern = this.argv.glob || process.env.GLOB_PATTERN
-  this.logseneToken = this.argv.index || process.env.LOGSENE_TOKEN || process.env.LOGS_TOKEN
+  this.logseneToken =
+    this.argv.index || process.env.LOGSENE_TOKEN || process.env.LOGS_TOKEN
   this.loggers = {}
   this.WORKERS = process.env.WEB_CONCURRENCY || 1
   this.removeAnsiColor = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g
@@ -173,13 +208,15 @@ LaCli.prototype.initFilter = function (type, filterFunctions) {
   var self = this
   for (var i = 0; i < filterFunctions.length; i++) {
     try {
-      var filterName = filterFunctions[i].name || filterFunctions[i].module || 'plugin #' + i
+      var filterName =
+        filterFunctions[i].name || filterFunctions[i].module || 'plugin #' + i
       var ff = null
       if (typeof filterFunctions[i].module === 'function') {
         ff = filterFunctions[i].module
         filterName = String(filterFunctions[i].name || 'plugin #' + i)
       } else {
-        ff = require(moduleAlias[filterFunctions[i].module] || filterFunctions[i].module)
+        ff = require(moduleAlias[filterFunctions[i].module] ||
+          filterFunctions[i].module)
       }
       var defaultCfg = {}
       var cfg = filterFunctions[i].config || filterFunctions[i] || defaultCfg
@@ -197,14 +234,25 @@ LaCli.prototype.initFilter = function (type, filterFunctions) {
       }
       // ensure API changes work for input filter, and don't break old input-filters
       if (type === 'inputFilter') {
-        if (filter.argNames && filter.argNames[0] && filter.argNames[0] === 'context') {
+        if (
+          filter.argNames &&
+          filter.argNames[0] &&
+          filter.argNames[0] === 'context'
+        ) {
           filter.useContextObjectAsFirstArgument = true
         }
       }
       this[type].push(filter)
       consoleLogger.log('load ' + type + ': ' + i + ' ' + filterName)
     } catch (err) {
-      consoleLogger.error('Error loading plugin: ' + i + ' ' + (filterName || 'undefined') + ' ' + err.message)
+      consoleLogger.error(
+        'Error loading plugin: ' +
+          i +
+          ' ' +
+          (filterName || 'undefined') +
+          ' ' +
+          err.message
+      )
     }
   }
 }
@@ -213,32 +261,39 @@ LaCli.prototype.initPlugins = function (plugins) {
   var eventEmitter = require('../lib/core/logEventEmitter')
   this.plugins = []
   var self = this
-  plugins.forEach(function (plugin) {
-    var pluginName = plugin.module || plugin
-    consoleLogger.log(pluginName)
-    try {
-      var Plugin = require(moduleAlias[pluginName] || pluginName)
-      // be compatible with plugins accessing config.configFile property
-      if (plugin.config) {
-        plugin.config.configFile = plugin.globalConfig
-        if (self.argv.verbose) {
-          plugin.config.debug = true
-        // plugin.config.configFile.debug = true
-        }
-      } else {
-        if (self.argv.verbose && plugin.config) {
-          plugin.config = {
-            debug: true
+  plugins.forEach(
+    function (plugin) {
+      var pluginName = plugin.module || plugin
+      consoleLogger.log(pluginName)
+      try {
+        var Plugin = require(moduleAlias[pluginName] || pluginName)
+        // be compatible with plugins accessing config.configFile property
+        if (plugin.config) {
+          plugin.config.configFile = plugin.globalConfig
+          if (self.argv.verbose) {
+            plugin.config.debug = true
+            // plugin.config.configFile.debug = true
+          }
+        } else {
+          if (self.argv.verbose && plugin.config) {
+            plugin.config = {
+              debug: true
+            }
           }
         }
+        var p = new Plugin(plugin.config || this.argv, eventEmitter)
+        this.plugins.push(p)
+        p.start.bind(p)()
+      } catch (err) {
+        consoleLogger.error(
+          'Error loading plugin: ' +
+            (moduleAlias[pluginName] || pluginName) +
+            ' ' +
+            err.stack
+        )
       }
-      var p = new Plugin(plugin.config || this.argv, eventEmitter)
-      this.plugins.push(p)
-      p.start.bind(p)()
-    } catch (err) {
-      consoleLogger.error('Error loading plugin: ' + (moduleAlias[pluginName] || pluginName) + ' ' + err.stack)
-    }
-  }.bind(this))
+    }.bind(this)
+  )
 }
 
 LaCli.prototype.loadPlugins = function (configFile) {
@@ -255,8 +310,16 @@ LaCli.prototype.loadPlugins = function (configFile) {
     stdInConfig = this.argv
   }
   var plugins = [
-    { module: '../lib/plugins/input/stdin', config: stdInConfig, globalConfig: configFile },
-    { module: '../lib/plugins/output/stdout', config: stdOutConfig, globalConfig: configFile }
+    {
+      module: '../lib/plugins/input/stdin',
+      config: stdInConfig,
+      globalConfig: configFile
+    },
+    {
+      module: '../lib/plugins/output/stdout',
+      config: stdOutConfig,
+      globalConfig: configFile
+    }
   ]
 
   if (this.argv.k8sEvents) {
@@ -277,15 +340,19 @@ LaCli.prototype.loadPlugins = function (configFile) {
   if (configFile && configFile.input) {
     var inputSections = Object.keys(configFile.input)
     inputSections.forEach(function (key) {
-      consoleLogger.log('add ' + (configFile.input[key].module || key) + ' to plugin list')
+      consoleLogger.log(
+        'add ' + (configFile.input[key].module || key) + ' to plugin list'
+      )
       if (configFile.input[key].module) {
         plugins.push({
-          module: moduleAlias[configFile.input[key].module] || configFile.input[key].module,
+          module:
+            moduleAlias[configFile.input[key].module] ||
+            configFile.input[key].module,
           config: configFile.input[key],
           globalConfig: configFile
         })
       }
-    /* if (configFile.input[key].module) {
+      /* if (configFile.input[key].module) {
       consoleLogger.log('add ' + configFile.input[key].module + ' to plugin list')
       plugins.push(moduleAlias[configFile.input[key].module] || configFile.input[key].module)
     } */
@@ -315,14 +382,21 @@ LaCli.prototype.loadPlugins = function (configFile) {
   if (configFile && configFile.output) {
     var outputSections = Object.keys(configFile.output)
     outputSections.forEach(function (key) {
-      if (key === 'elasticsearch' && configFile.output[key].module === undefined) {
-        consoleLogger.error('Missing property "module: elasticsearch" in Elasticsearch output configuration')
+      if (
+        key === 'elasticsearch' &&
+        configFile.output[key].module === undefined
+      ) {
+        consoleLogger.error(
+          'Missing property "module: elasticsearch" in Elasticsearch output configuration'
+        )
         configFile.output[key].module = 'elasticsearch'
       }
       if (configFile.output[key].module) {
         configFile.output[key].configName = key
         plugins.push({
-          module: moduleAlias[configFile.output[key].module] || configFile.output[key].module,
+          module:
+            moduleAlias[configFile.output[key].module] ||
+            configFile.output[key].module,
           config: configFile.output[key],
           globalConfig: configFile
         })
@@ -374,7 +448,10 @@ LaCli.prototype.loadPlugins = function (configFile) {
     })
   }
   // note: CLI argument --geoipEnabled overwrites process.env.GEOIP_ENABLED
-  if (process.env.GEOIP_ENABLED && process.env.GEOIP_ENABLED.toLowerCase() === 'true') {
+  if (
+    process.env.GEOIP_ENABLED &&
+    process.env.GEOIP_ENABLED.toLowerCase() === 'true'
+  ) {
     outputFilter.push({
       module: 'geoip',
       fields: this.argv.geoIPFields || ['client_ip'],
@@ -452,20 +529,31 @@ LaCli.prototype.initState = function () {
   var plugins = self.loadPlugins(this.argv.configFile)
   self.initPlugins(plugins)
 
-  self.logseneDiskBufferDir = self.argv['diskBufferDir'] || process.env.LOGSENE_TMP_DIR || require('os').tmpdir()
+  self.logseneDiskBufferDir =
+    self.argv['diskBufferDir'] ||
+    process.env.LOGSENE_TMP_DIR ||
+    require('os').tmpdir()
   mkpath(self.logseneDiskBufferDir, function (err) {
     if (err) {
-      console.error('ERROR: create diskBufferDir (' + self.logseneDiskBufferDir + '): ' + err.message)
+      console.error(
+        'ERROR: create diskBufferDir (' +
+          self.logseneDiskBufferDir +
+          '): ' +
+          err.message
+      )
     }
   })
 
-  this.la = new LogAnalyzer(self.argv.patternFiles, {}, function laReadyCb (lp) {
-    if (self.argv.patterns && (self.argv.patterns instanceof Array)) {
+  this.la = new LogAnalyzer(self.argv.patternFiles, {}, function laReadyCb (
+    lp
+  ) {
+    if (self.argv.patterns && self.argv.patterns instanceof Array) {
       lp.patterns = self.argv.patterns.concat(lp.patterns)
     }
-    var jsonConfigured = (self.argv.configFile !== undefined &&
+    var jsonConfigured =
+      self.argv.configFile !== undefined &&
       self.argv.configFile.parser !== undefined &&
-      self.argv.configFile.parser.json !== undefined)
+      self.argv.configFile.parser.json !== undefined
     if (jsonConfigured) {
       lp.cfg.json = self.argv.configFile.parser.json
     }
@@ -478,7 +566,10 @@ LaCli.prototype.initState = function () {
     self.cli()
   })
 
-  self.eventEmitter.once('input.stdin.end', function endOnStdinEof (line, context) {
+  self.eventEmitter.once('input.stdin.end', function endOnStdinEof (
+    line,
+    context
+  ) {
     self.terminateRequest = true
     self.terminateReason = 'stdin closed'
   })
@@ -500,28 +591,37 @@ LaCli.prototype.initState = function () {
       co(function * () {
         for (var i = 0; i < self.outputFilter.length; i++) {
           filteredData = yield function (callback) {
-            self.outputFilter[i].func(context, self.outputFilter[i].config, eventEmitter, filteredData, callback)
+            self.outputFilter[i].func(
+              context,
+              self.outputFilter[i].config,
+              eventEmitter,
+              filteredData,
+              callback
+            )
           }
         }
-      }).then(function processOutput () {
-        if (!filteredData) {
-          return
+      }).then(
+        function processOutput () {
+          if (!filteredData) {
+            return
+          }
+          if (context.enrichEvent) {
+            Object.keys(context.enrichEvent).forEach(function (key) {
+              data[key] = context.enrichEvent[key]
+            })
+          }
+          if (context.filter) {
+            filteredData = context.filter(data, context)
+          }
+          if (filteredData) {
+            self.eventEmitter.parsedEvent(filteredData, context)
+          }
+        },
+        function logError (e) {
+          // we avoid logging errors for each log line in prod mode
+          consoleLogger.debug(e.stack)
         }
-        if (context.enrichEvent) {
-          Object.keys(context.enrichEvent).forEach(function (key) {
-            data[key] = context.enrichEvent[key]
-          })
-        }
-        if (context.filter) {
-          filteredData = context.filter(data, context)
-        }
-        if (filteredData) {
-          self.eventEmitter.parsedEvent(filteredData, context)
-        }
-      }, function logError (e) {
-        // we avoid logging errors for each log line in prod mode
-        consoleLogger.debug(e.stack)
-      })
+      )
     }
   }
 
@@ -529,7 +629,10 @@ LaCli.prototype.initState = function () {
    * DATA_RAW events are emitted by input-plugins, producing text lines,
    * and must be handled by text based input-filters and parser
    **/
-  self.eventEmitter.on(eventEmitter.DATA_RAW, function parseRaw (line, contextObj) {
+  self.eventEmitter.on(eventEmitter.DATA_RAW, function parseRaw (
+    line,
+    contextObj
+  ) {
     self.lastParsedTS = Date.now()
     var context = contextObj
     var trimmedLine = line
@@ -545,9 +648,19 @@ LaCli.prototype.initState = function () {
         trimmedLine = yield function (callback) {
           if (self.inputFilter[i].useContextObjectAsFirstArgument) {
             context = clone(contextObj)
-            self.inputFilter[i].func(context, self.inputFilter[i].config, line, callback)
+            self.inputFilter[i].func(
+              context,
+              self.inputFilter[i].config,
+              line,
+              callback
+            )
           } else {
-            self.inputFilter[i].func(context.sourceName || self.argv.sourceName, self.inputFilter[i].config, trimmedLine, callback)
+            self.inputFilter[i].func(
+              context.sourceName || self.argv.sourceName,
+              self.inputFilter[i].config,
+              trimmedLine,
+              callback
+            )
           }
         }
       }
@@ -567,13 +680,15 @@ LaCli.prototype.initState = function () {
           self.la.parseLine(
             trimmedLine.replace(self.removeAnsiColor, ''),
             context.sourceName || self.argv.sourceName,
-            parserCb)
+            parserCb
+          )
         })
       },
       function logError (e) {
         // we avoid logging errors for each log line in prod mode
         consoleLogger.debug(e.stack)
-      })
+      }
+    )
   })
 
   /**
@@ -583,22 +698,31 @@ LaCli.prototype.initState = function () {
    * Skipping text based input filters and parser, and continue with directly output filters
    * improves performance by saving serialisation to JSON and back to JS objects.
    **/
-  self.eventEmitter.on(eventEmitter.DATA_OBJECT, function processObjectData (data, contextObj) {
+  self.eventEmitter.on(eventEmitter.DATA_OBJECT, function processObjectData (
+    data,
+    contextObj
+  ) {
     applyOutputFilters(data, contextObj)
   })
 
-  process.once('SIGINT', function () { self.terminate('SIGINT') })
-  process.once('SIGQUIT', function () { self.terminate('SIGQUIT') })
-  process.once('SIGTERM', function () { self.terminate('SIGTERM') })
+  process.once('SIGINT', function () {
+    self.terminate('SIGINT')
+  })
+  process.once('SIGQUIT', function () {
+    self.terminate('SIGQUIT')
+  })
+  process.once('SIGTERM', function () {
+    self.terminate('SIGTERM')
+  })
   process.once('beforeExit', self.terminate)
   process.once('uncaughtException', function (error) {
     console.dir(error)
-  // self.terminate(error)
+    // self.terminate(error)
   })
 }
 
 LaCli.prototype.log = function (err, data) {
-  if (err && (!data)) {
+  if (err && !data) {
     this.laStats.emptyLines++
     return
   }
@@ -606,7 +730,8 @@ LaCli.prototype.log = function (err, data) {
     return
   }
   if (this.argv.tokenMapper) {
-    var tokenForSource = this.argv.tokenMapper.findToken([data.logSource]) || this.argv.index
+    var tokenForSource =
+      this.argv.tokenMapper.findToken([data.logSource]) || this.argv.index
     if (tokenForSource) {
       this.logToLogsene(tokenForSource, data['_type'] || 'logs', data)
     }
@@ -634,7 +759,8 @@ LaCli.prototype.parseLine = function (line, sourceName, cbf) {
   this.la.parseLine(
     trimmedLine.replace(this.removeAnsiColor, ''),
     this.argv.sourceName || sourceName,
-    cbf || this.log.bind(this))
+    cbf || this.log.bind(this)
+  )
 }
 
 LaCli.prototype.parseChunks = function (chunk, enc, callback) {
@@ -643,7 +769,9 @@ LaCli.prototype.parseChunks = function (chunk, enc, callback) {
 }
 
 LaCli.prototype.terminate = function (reason) {
-  consoleLogger.error('terminate reason: ' + reason.message + ' ' + reason.stack)
+  consoleLogger.error(
+    'terminate reason: ' + reason.message + ' ' + reason.stack
+  )
   if (this.argv.heroku && reason !== 'exitWorker') {
     return
   }
@@ -666,12 +794,14 @@ LaCli.prototype.terminate = function (reason) {
   this.plugins.forEach(function pluginStop (p) {
     if (p.stop) {
       try {
-        p.stop(callBackWithATimeout(function () {
-          terminateCounter--
-          if (terminateCounter === 0) {
-            setTimeout(process.exit, 5000)
-          }
-        }, 10 * 1000 * 60))
+        p.stop(
+          callBackWithATimeout(function () {
+            terminateCounter--
+            if (terminateCounter === 0) {
+              setTimeout(process.exit, 5000)
+            }
+          }, 10 * 1000 * 60)
+        )
       } catch (err) {
         consoleLogger.error('Error stopping plugin ' + err)
       }
@@ -689,7 +819,10 @@ LaCli.prototype.terminate = function (reason) {
 
 LaCli.prototype.cli = function () {
   if (this.argv.printStats || this.argv.verbose) {
-    setInterval(this.laStats.printStats.bind(this.laStats), ((Number(this.argv.printStats)) || 60) * 1000).unref()
+    setInterval(
+      this.laStats.printStats.bind(this.laStats),
+      (Number(this.argv.printStats) || 60) * 1000
+    ).unref()
     this.laStats.printStats()
   }
 }
@@ -702,10 +835,13 @@ if (require.main === module) {
   var errorCounter
   process.on('uncaughtException', function (err) {
     // uncaughtErrors can happen in dockermodem/docekrode e.g. when Docker daemon restarts
-    if (String(err).indexOf('Bad response from Docker engine') > -1 ||
-      err.code === 'ENOENT') {
+    if (
+      String(err).indexOf('Bad response from Docker engine') > -1 ||
+      err.code === 'ENOENT'
+    ) {
       logagent.terminate({
-        message: 'Lost connection to Docker socket, EXIT_ON_DOCKER_SOCKET_ERROR',
+        message:
+          'Lost connection to Docker socket, EXIT_ON_DOCKER_SOCKET_ERROR',
         stack: err.stack
       })
     }
@@ -713,7 +849,10 @@ if (require.main === module) {
     console.error('UncaughtException:' + err + '\n  ' + err.stack)
     errorCounter++
     if (errorCounter > 50) {
-      logagent.terminate({ message: 'more than 50 uncaught errors -> exit.', stack: err.stack })
+      logagent.terminate({
+        message: 'more than 50 uncaught errors -> exit.',
+        stack: err.stack
+      })
     }
   })
 } else {

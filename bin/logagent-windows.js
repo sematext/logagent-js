@@ -40,7 +40,10 @@ try {
     if (process.argv.join(',').indexOf('--config') === -1) {
       // use default config
       process.argv.push('--config')
-      process.argv.push(process.env.LOGAGENT_CONFIG || process.env.ProgramData + '\\Sematext\\logagent.conf')
+      process.argv.push(
+        process.env.LOGAGENT_CONFIG ||
+          process.env.ProgramData + '\\Sematext\\logagent.conf'
+      )
     }
     var la = new (require('./logagent.js'))()
     if (!la) {

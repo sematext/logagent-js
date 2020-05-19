@@ -64,6 +64,7 @@ var moduleAlias = {
   'cassandra-query': '../lib/plugins/input/cassandra.js',
   'docker-logs': '../lib/plugins/input/docker/docker.js',
   'input-github-webhook': '../lib/plugins/input/webhooks/github.js',
+  'input-vercel': '../lib/plugins/input/vercel.js',
   'azure-event-hub': '../lib/plugins/input/azure-event-hub.js',
   'unix-socket-reader': '../lib/plugins/input/unixSocketReader.js',
   // input filters
@@ -218,7 +219,7 @@ LaCli.prototype.initFilter = function (type, filterFunctions) {
         ff = require(moduleAlias[filterFunctions[i].module] ||
           filterFunctions[i].module)
       }
-      var defaultCfg = {}
+      defaultCfg = {}
       var cfg = filterFunctions[i].config || filterFunctions[i] || defaultCfg
       if (self.argv.verbose !== undefined) {
         cfg.debug = true
@@ -530,7 +531,7 @@ LaCli.prototype.initState = function () {
   self.initPlugins(plugins)
 
   self.logseneDiskBufferDir =
-    self.argv['diskBufferDir'] ||
+    self.argv.diskBufferDir ||
     process.env.LOGSENE_TMP_DIR ||
     require('os').tmpdir()
   mkpath(self.logseneDiskBufferDir, function (err) {
@@ -733,11 +734,11 @@ LaCli.prototype.log = function (err, data) {
     var tokenForSource =
       this.argv.tokenMapper.findToken([data.logSource]) || this.argv.index
     if (tokenForSource) {
-      this.logToLogsene(tokenForSource, data['_type'] || 'logs', data)
+      this.logToLogsene(tokenForSource, data._type || 'logs', data)
     }
   } else {
     if (this.argv.index) {
-      this.logToLogsene(this.argv.index, data['_type'] || 'logs', data)
+      this.logToLogsene(this.argv.index, data._type || 'logs', data)
     }
   }
 }

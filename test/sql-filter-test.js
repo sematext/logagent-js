@@ -1,7 +1,7 @@
 /* global describe, it */
 var sqlFilter = require('../lib/plugins/output-filter/sql.js')
 // simulate logagent eventEmitter
-var eventEmitter = eventEmitter = new (require('events')).EventEmitter()
+var eventEmitter = (eventEmitter = new (require('events').EventEmitter)())
 // simualte Logagent config object
 var config = {
   matchSource: /.*/,
@@ -9,7 +9,7 @@ var config = {
   queries: []
 }
 // simulate event contect
-var context = {sourceName: 'nginx'}
+var context = { sourceName: 'nginx' }
 
 describe('Execute SQL on JSON', function () {
   it('should return aggergated data', function (done) {
@@ -18,10 +18,11 @@ describe('Execute SQL on JSON', function () {
     config.queries[0] = 'SELECT SUM(size) AS size, path FROM ? group by path'
     var iterations = 10
     var size = 100
-    var data = {size: size, path: '/'}
+    var data = { size: size, path: '/' }
 
     eventEmitter.once('data.parsed', function (payload) {
-      if (payload.size === (iterations * size)) { // 10 * 100 see data below
+      if (payload.size === iterations * size) {
+        // 10 * 100 see data below
         done()
       }
     })
@@ -42,10 +43,11 @@ describe('Emits error for invalid SQL Statements', function () {
   it('should throw error', function (done) {
     this.timeout(150000)
     eventEmitter.removeAllListeners()
-    config.queries[0] = 'INVALID-SQL SUM(size) AS size, path FROM ? group by path'
+    config.queries[0] =
+      'INVALID-SQL SUM(size) AS size, path FROM ? group by path'
     var iterations = 1
     var size = 100
-    var data = {size: size, path: '/'}
+    var data = { size: size, path: '/' }
     eventEmitter.once('error', function (error) {
       // we expect the error
       if (error) {

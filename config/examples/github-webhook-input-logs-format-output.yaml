@@ -13,6 +13,7 @@ input:
 outputFilter: 
   github-logs-format: 
     module: github-logs-format
+    debug: true
 
 output: 
   # stdout: yaml
@@ -20,5 +21,4 @@ output:
   sematext-cloud:
     module: elasticsearch
     url: https://logs-token-receiver.apps.test.sematext.com
-    # index: fb32a047-652e-4e7b-93d2-db199172f89f
     debug: true

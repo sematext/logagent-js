@@ -1,4 +1,4 @@
-debug: true
+debug: false
 
 input:
   vercel:
@@ -7,9 +7,9 @@ input:
     useIndexFromUrlPath: true
     # workers: 4
       
-# outputFilter: 
-#   vercel-format: 
-#     module: vercel-format
+outputFilter: 
+  vercel-format: 
+    module: vercel-format
 
 output: 
   # stdout: yaml
@@ -17,4 +17,4 @@ output:
   sematext-cloud:
     module: elasticsearch
     url: https://logs-token-receiver.apps.test.sematext.com
-    debug: true
+    debug: false

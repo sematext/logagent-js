@@ -89,6 +89,7 @@ var moduleAlias = {
   'github-events-format':
     '../lib/plugins/output-filter/github-events-format.js',
   'github-logs-format': '../lib/plugins/output-filter/github-logs-format.js',
+  'vercel-format': '../lib/plugins/output-filter/vercel-format.js',
   // output plugins
   elasticsearch: '../lib/plugins/output/elasticsearch.js',
   'slack-webhook': '../lib/plugins/output/slack-webhook.js',

@@ -1,0 +1,24 @@
+# Global options
+options:
+  debug: true
+
+input: 
+  files: 
+    # ship everything EXCEPT for auth*.log, system*.log, and kernel*.log
+    - /var/log/!(auth*.log|system*.log|kernel*.log)
+
+    # ship everything EXCEPT for kube*.log, storage*.log, etcd*.log, and coredns*.log
+    - /var/log/containers/!(kube*.log|storage*.log|etcd*.log|coredns*.log)
+
+inputFilter:
+  - module: grep
+    config:
+      matchSource: !!js/regexp /.*log/ # match log files
+      include: !!js/regexp /failed|error|exception/i # include errors
+      exclude: !!js/regexp /super noisy error messages/i # exclude noise
+
+output:
+  elasticsearch:
+    module: elasticsearch
+    url: https://logsene-receiver.sematext.com
+    index: YOUR_LOGS_APP_TOKEN

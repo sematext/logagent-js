@@ -70,6 +70,8 @@ var moduleAlias = {
   // input filters
   'input-filter-k8s-containerd':
     '../lib/plugins/input-filter/kubernetesContainerd.js',
+  'input-filter-k8s-containerd-multiline':
+    '../lib/plugins/input-filter/kubernetesContainerdMultiline.js',
   grep: '../lib/plugins/input-filter/grep.js',
   grok: 'logagent-input-filter-grok',
   // output filters

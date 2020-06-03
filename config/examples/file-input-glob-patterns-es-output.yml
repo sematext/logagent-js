@@ -1,15 +1,14 @@
 # Global options
 options:
   debug: true
-  # maxLogSize: 16384
 
-# input: 
-#   files: 
-#     # ship everything EXCEPT for auth*.log, system*.log, and kernel*.log
-#     - /var/log/!(auth*.log|system*.log|kernel*.log)
+input: 
+  files: 
+    # ship everything EXCEPT for auth*.log, system*.log, and kernel*.log
+    - /var/log/!(auth*.log|system*.log|kernel*.log)
 
-#     # ship everything EXCEPT for kube*.log, storage*.log, etcd*.log, and coredns*.log
-#     - /var/log/containers/!(kube*.log|storage*.log|etcd*.log|coredns*.log)
+    # ship everything EXCEPT for kube*.log, storage*.log, etcd*.log, and coredns*.log
+    - /var/log/containers/!(kube*.log|storage*.log|etcd*.log|coredns*.log)
 
 # inputFilter:
 #   - module: grep
@@ -17,65 +16,10 @@ options:
 #       matchSource: !!js/regexp /.*log/ # match log files
 #       include: !!js/regexp /failed|error|exception/i # include errors
 #       exclude: !!js/regexp /super noisy error messages/i # exclude noise
-
-input:
-  # stdin: true
-  files:
-    - '/home/raha/code/sematext/logagent-js/0.log'
-
-inputFilter:
-  # parse containerd log format, add pod info to log context 
-  - module: input-filter-k8s-containerd
-  # - module: input-filter-k8s-containerd-multiline
-
-# outputFilter:
-  # add k8s metadata via k8s API 
-  # - module: kubernetes-enrichment 
-
-# parser:
-#   patterns:
-#     -
-#       # sourceName: !!js/regexp /\.log/ # catch all system.log files  
-#       sourceName: !!js/regexp /unknown/
-#       # blockStart: !!js/regexp /\d{4}\-\d{2}\-\d{2}\T\d{2}:\d{2}:\d{2}\.\d{9}Z\sstdout\sP/
-#       match:
-#         - type: venkat_custom_log_partial
-#           regex: !!js/regexp /\[(.*)\]\s\[(.*)\]\s\[(.*)\]\s*Parameters:\s(.*)/
-#           fields:
-#             - trace_id
-#             - customer_name
-#             - customer_id
-#             - message
-        # - type: venkat_custom_log
-        #   regex: !!js/regexp /(\d{4}\-\d{2}\-\d{2}\T\d{2}:\d{2}:\d{2}\.\d{9}Z)\sstdout\s(P|F)\s(.*)/
-        #   fields:
-        #     - ts
-        #     - stdout_type
-        #     - message
-        # - type: venkat_custom_log_partial
-        #   regex: !!js/regexp /(\d{4}\-\d{2}\-\d{2}\T\d{2}:\d{2}:\d{2}\.\d{9}Z)\s(stdout\sP)\s\[(.*)\]\s\[(.*)\]\s\[(.*)\]\s*Parameters:\s(.*)/
-        #   fields:
-        #     - ts
-        #     - stdout_type
-        #     - trace_id
-        #     - customer_name
-        #     - customer_id
-        #     - message
-        # - type: venkat_custom_log_full
-        #   regex: !!js/regexp /(\d{4}\-\d{2}\-\d{2}\T\d{2}:\d{2}:\d{2}\.\d{9}Z)\s(stdout\sF)\s\[(.*)\]\s\[(.*)\]\s\[(.*)\]\s*Parameters:\s(.*)/
-        #   fields:
-        #     - ts
-        #     - stdout_type
-        #     - trace_id
-        #     - customer_name
-        #     - customer_id
-        #     - message
+#   - module: input-filter-k8s-containerd # Only needed when running in K8s env with Containerd/CRI-O container runtime 
 
 output:
-  # stdout: yaml
   elasticsearch:
     module: elasticsearch
-    url: https://logs-token-receiver.apps.test.sematext.com
-    index: 174ac025-ea55-426d-b544-fcc3876ad247
-    # maxBufferSize: 1
-    # flushInterval: 10
+    url: https://logsene-receiver.sematext.com
+    index: LOGS_TOKEN

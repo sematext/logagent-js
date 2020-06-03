@@ -22,6 +22,8 @@ spec:
         env:
           - name: LOG_GLOB
             value: "/var/log/containers/*.log;/var/log/*.log"
+          - name: LOGAGENT_ARGS
+            value: "--k8sContainerd"
           - name: LOGS_TOKEN
             value: "YOUR_SEMATEXT_LOGS_TOKEN"
           - name: REGION

@@ -10,15 +10,16 @@ input:
     # ship everything EXCEPT for kube*.log, storage*.log, etcd*.log, and coredns*.log
     - /var/log/containers/!(kube*.log|storage*.log|etcd*.log|coredns*.log)
 
-inputFilter:
-  - module: grep
-    config:
-      matchSource: !!js/regexp /.*log/ # match log files
-      include: !!js/regexp /failed|error|exception/i # include errors
-      exclude: !!js/regexp /super noisy error messages/i # exclude noise
+# inputFilter:
+#   - module: grep
+#     config:
+#       matchSource: !!js/regexp /.*log/ # match log files
+#       include: !!js/regexp /failed|error|exception/i # include errors
+#       exclude: !!js/regexp /super noisy error messages/i # exclude noise
+#   - module: input-filter-k8s-containerd # Only needed when running in K8s env with Containerd/CRI-O container runtime 
 
 output:
   elasticsearch:
     module: elasticsearch
     url: https://logsene-receiver.sematext.com
-    index: YOUR_LOGS_APP_TOKEN
+    index: LOGS_TOKEN

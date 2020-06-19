@@ -8,7 +8,7 @@ e=$'\e'
 COLORblue="$e[0;36m"
 COLORred="$e[0;31m"
 COLORreset="$e[0m"
-#nodeExecutable=`$(which node)||$(which nodejs)`
+#nodeExecutable=`$(command -v node)||$(command -v nodejs)`
 PATTERN="'/var/log/**/*.log'"
 TOKEN=$1
 while getopts ":i:u:g:j" opt; do
@@ -27,7 +27,7 @@ while getopts ":i:u:g:j" opt; do
         echo
         echo "journal-upload service not found. Attempting to install it..."
         echo
-        which apt-get > /dev/null
+        command -v apt-get > /dev/null
         if [ $? -eq 0 ]; then
           apt-get update
           apt-get -y install systemd-journal-remote
@@ -36,7 +36,7 @@ while getopts ":i:u:g:j" opt; do
             exit 1
           fi
         else
-          which yum > /dev/null
+          command -v yum > /dev/null
           if [ $? -eq 0 ]; then
             yum clean all
             yum -y install systemd-journal-gateway
@@ -362,10 +362,10 @@ function install_script ()
     return
   fi
 }
-command=$(which logagent)
-echo $command
+LOGAGENT_COMMAND=$(command -v logagent)
+echo $LOGAGENT_COMMAND
 if [ -n "$TOKEN" ] ; then
-  install_script $command $TOKEN "${PATTERN}";
+  install_script $LOGAGENT_COMMAND $TOKEN "${PATTERN}";
 else 
   echo "${COLORred}Missing paramaters. Usage:"
   echo `basename $0` "-i LOGS_TOKEN -g '/var/log/**/*.log' -u https://logsene-receiver.sematext.com"
@@ -375,7 +375,7 @@ else
   echo "To set up Logagent as a local receiver for journald-upload, add -j"
   read -p "${COLORblue}Logs Token: $COLORreset" TOKEN
   TOKEN=${TOKEN:-none}
-  install_script $command $TOKEN $PATTERN;
+  install_script $LOGAGENT_COMMAND $TOKEN $PATTERN;
 fi
 echo
 echo "Logagent documentation: https://sematext.com/docs/logagent" 

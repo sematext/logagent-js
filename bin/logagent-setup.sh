@@ -26,8 +26,7 @@ while getopts ":i:u:g:j" opt; do
         echo
         echo "journal-upload service not found. Attempting to install it..."
         echo
-        command -v apt-get > /dev/null
-        if [ $? -eq 0 ]; then
+        if [ -x "$(command -v apt-get)" ]; then
           apt-get update
           apt-get -y install systemd-journal-remote
           if [ ! $? eq 0 ]; then
@@ -35,8 +34,7 @@ while getopts ":i:u:g:j" opt; do
             exit 1
           fi
         else
-          command -v yum > /dev/null
-          if [ $? -eq 0 ]; then
+          if [  -x "$(command -v yum)" ]; then
             yum clean all
             yum -y install systemd-journal-gateway
             if [ ! $? -eq 0 ]; then

@@ -22,8 +22,7 @@ while getopts ":i:u:g:j" opt; do
       ;;
     j)
       export JOURNALD=yes
-      ls /lib/systemd/system/systemd-journal-upload.service > /dev/null
-      if [ ! $? -eq 0 ]; then
+      if [ ! -f /lib/systemd/system/systemd-journal-upload.service ]; then
         echo
         echo "journal-upload service not found. Attempting to install it..."
         echo

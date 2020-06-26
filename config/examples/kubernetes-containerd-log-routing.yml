@@ -1,0 +1,27 @@
+# Global options
+options:
+  debug: true
+
+input: 
+  files: 
+    - /var/log/*.log
+    - /var/log/containers/*.log
+
+
+inputFilter:
+  - module: input-filter-k8s-containerd # Only needed when running in K8s env with Containerd/CRI-O container runtime 
+#   - module: grep
+#     config:
+#       matchSource: !!js/regexp /.*log/ # match log files
+#       include: !!js/regexp /failed|error|exception/i # include errors
+#       exclude: !!js/regexp /super noisy error messages/i # exclude noise
+
+output:
+  elasticsearch:
+    module: elasticsearch
+    url: https://logsene-receiver.sematext.com
+    indices: 
+      c332463a-xxxx-xxxx-xxxx-535d18521418: 
+        - app.*\.log
+      c1590c8b-xxxx-xxxx-xxxx-10f8f8281b3d: 
+        - kube-apiserver.*\.log

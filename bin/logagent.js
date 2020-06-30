@@ -461,6 +461,11 @@ LaCli.prototype.loadPlugins = function (configFile) {
       debug: false
     })
   }
+  if (this.argv.cfhttp) {
+    outputFilter.push({
+      module: 'cloudfoundry-format'
+    })
+  }
   if (configFile && configFile.outputFilter) {
     var outputFilterSections = Object.keys(configFile.outputFilter)
     outputFilterSections.forEach(function (key) {

@@ -75,6 +75,7 @@ var moduleAlias = {
   // output filters
   sql: '../lib/plugins/output-filter/sql.js',
   'access-watch': '../lib/plugins/output-filter/access-watch.js',
+  'cloudfoundry-format': '../lib/plugins/output-filter/cloudfoundry-format.js',
   'hash-fields': '../lib/plugins/output-filter/hash-fields.js',
   'aes-encrypt-fields': '../lib/plugins/output-filter/aes-encrypt-fields.js',
   'ip-truncate-fields': '../lib/plugins/output-filter/ip-truncate-fields.js',

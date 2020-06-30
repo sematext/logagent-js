@@ -806,7 +806,55 @@ patterns:
  - # CloudFoundry Syslog Messages
   sourceName: !!js/regexp /cloudfoundry.*|syslog_raw/ 
   match:
-    -
+    - 
+      type: cloudfoundry
+      regex: !!js/regexp ^<(\d+)>(\d)\s(\d+-\d+-\d+T\d+:\d+:\d+\.\d*\+\d+:\d+)\s([a-zA-Z0-9\-\.\_]+)\s([a-zA-Z0-9\-]+)\s([\[\]a-zA-Z0-9\-\.\/\_]+)\s\-\s\[([a-zA-Z0-9\@]+)\sdeployment="([a-zA-Z0-9\-\.\_]+)"\sindex="([a-zA-Z0-9\-]+)"\sinstance_id="(\d+)"\sip="(\d+\.\d+\.\d+\.\d+)"\sjob="([a-zA-Z0-9\-\.\_]+)"\sorigin="([a-zA-Z0-9\-\.\_]+)"\sprocess_id="([a-zA-Z0-9\-]+)"\sprocess_instance_id="([a-zA-Z0-9\-]+)"\sprocess_type="([a-zA-Z0-9\-\.\_]+)"\ssource_id="([a-zA-Z0-9\-]+)"\ssource_type="([\[\]a-zA-Z0-9\-\.\/\_]+)"\]\s(\{.*\})
+      fields: [prio,version,ts,host,process,application,tags,deployment,index,instance_id,ip,job,origin,process_id,process_instance_id,process_type,source_id,source_type,message]
+      dateFormat: iso
+      transform: !!js/function >
+        function (p) {
+          const SEVERITY = [
+            'emerg',
+            'alert',
+            'crit',
+            'err',
+            'warning',
+            'notice',
+            'info',
+            'debug'
+          ]
+          const FACILITY = [
+            'kern',
+            'user',
+            'mail',
+            'daemon',
+            'auth',
+            'syslog',
+            'lpr',
+            'news',
+            'uucp',
+            'cron',
+            'authpriv',
+            'ftp',
+            'ntp',
+            'logaudit',
+            'logalert',
+            'clock',
+            'local0',
+            'local1',
+            'local2',
+            'local3',
+            'local4',
+            'local5',
+            'local6',
+            'local7'
+          ]
+          p.facility = FACILITY[p.prio>>3] || String(p.prio>>3)
+          p.severity = SEVERITY[p.prio&7] || String(p.prio&7)
+          delete p.prio
+          p.os = {host: p.host}
+        }
+    - 
       type: cloudfoundry
       regex: !!js/regexp ^\d*\s{0,1}<(\d+)>(\d+)\s([\d|-]+T[\d|\:|.|\+]+)\s(\S+)\s(.+?)\s\[(.+)\]\s-\s-\s(.+)
       fields: [prio,version,ts,host,applicationID,processID,message]
@@ -854,6 +902,7 @@ patterns:
           delete p.prio
           p.os = {host: p.host}
         }
+
  - # Docker Swarm 
   sourceName: !!js/regexp /swarm/ # catch all .log files  
   match:

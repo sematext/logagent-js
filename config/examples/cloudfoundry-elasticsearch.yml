@@ -1,67 +1,20 @@
 # Global options
 options:
-  includeOriginalLine: true
+  # includeOriginalLine: true
+  # debug: true
 
 input:
   cloudFoundry:
     module: input-cloudfoundry
     port: 9999
 
-# we use here inline patterns, loaded after patterns.yml 
-parser:
-  patterns:
-    - # Cloudfoundry messages 
-      sourceName: !!js/regexp /cloudfoundry.*|syslog_raw/ 
-      match:
-        - type: cloudfoundry
-          regex: !!js/regexp \d*\s{0,1}<(\d+)>(\d+)\s([\d|-]+T[\d|\:|.|\+]+)\s(\S+)\s(.+?)\s\[(.+)\]\s-\s-\s(.+)
-          fields: [prio,version,ts,host,applicationID,processID,message]
-          dateFormat: YYYY-MM-DDTHH:mm:ssZ
-          SEVERITY: 
-            - emerg
-            - alert
-            - crit
-            - err
-            - warning
-            - notice
-            - info
-            - debug
-          FACILITY:
-            - kern
-            - user
-            - mail
-            - daemon
-            - auth
-            - syslog
-            - lpr
-            - news
-            - uucp
-            - cron
-            - authpriv
-            - ftp
-            - ntp
-            - logaudit
-            - logalert
-            - clock
-            - local0
-            - local1
-            - local2
-            - local3
-            - local4
-            - local5
-            - local6
-            - local7
+outputFilter:
+  cloudfoundry-format:
+    module: cloudfoundry-format
 
-          transform: !!js/function >
-            function (parsed, pattern) {
-              parsed.facility = pattern.FACILITY[parsed.prio>>3] || String(parsed.prio>>3)
-              parsed.severity = pattern.SEVERITY[parsed.prio&7] || String(parsed.prio&7)
-              delete parsed.prio
-            }
 output:
-  # print parsed logs in YAML format to stdout if supress is set false    
-  stdout: yaml # use 'pretty' for pretty json and 'ldjson' for line delimited json (default)
   elasticsearch:
     module: elasticsearch
-    url: http://localhost:9200
+    url: https://logsene-receiver.sematext.com
+    # debug: true
   

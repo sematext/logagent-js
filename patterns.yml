@@ -806,107 +806,208 @@ patterns:
  - # CloudFoundry Syslog Messages
   sourceName: !!js/regexp /cloudfoundry.*|syslog_raw/ 
   match:
-    # "(\S+)\s(\S+)\s(\S+)\"\s(\d+)\s(\d+|\"-\"|-)\s(\d+|\"-\"|-)\s(\d+|\"-\"|-)\s\"([^\"]+)\"\s\"(\d+\.\d+\.\d+\.\d+\:\d*)\"\s\"(\d+\.\d+\.\d+\.\d+\:\d*)\"\sx_forwarded_for:\"([^\"]+)\"\sx_forwarded_proto:\"([^\"]+)\"\svcap_request_id:\"([^\"]+)\"\sresponse_time:([\d\.]+)\sgorouter_time:([\d\.]+)\sapp_id:\"([^\"]+)\"\sapp_index:\"([^\"]+)\"\sx_b3_traceid:\"([^\"]+)\"\sx_b3_spanid:\"([^\"]+)\"\sx_b3_parentspanid:\"([^\"]+)\"\sb3:\"([^\"]+)\"
+
+    # ^<(\d+)>(\d)\s(\d+-\d+-\d+T\d+:\d+:\d+\.\d*\+\d+:\d+)\s([a-zA-Z0-9\-\.\_\s]+)\s([a-zA-Z0-9\-]+)\s([\[\]a-zA-Z0-9\-\.\/\_]+)\s\-\s\[([a-zA-Z0-9\@]+)\sapp_id="([a-zA-Z0-9\-]+)"\sapp_name="([a-zA-Z0-9\-]+)"\sdeployment="([a-zA-Z0-9\-\.\_]+)"\sindex="([a-zA-Z0-9\-]+)"\sinstance_id="(\d+)"\sip="(\d+\.\d+\.\d+\.\d+)"\sjob="([a-zA-Z0-9\-\.\_]+)"\sorganization_id="([a-zA-Z0-9\-]+)"\sorganization_name="([^\"]*)"\sorigin="([a-zA-Z0-9\-\.\_]+)"\sprocess_id="([a-zA-Z0-9\-]+)"\sprocess_instance_id="([a-zA-Z0-9\-]+)"\sprocess_type="([a-zA-Z0-9\-\.\_]+)"\ssource_id="([a-zA-Z0-9\-]+)"\ssource_type="([^\"]*)"\sspace_id="([a-zA-Z0-9\-]+)"\sspace_name="([a-zA-Z0-9\-]+)"\]\s(\{.*\})
+
+    # ^<(\d+)>(\d)\s(\d+-\d+-\d+T\d+:\d+:\d+\.\d*\+\d+:\d+)\s([a-zA-Z0-9\-\.\_\s]+)\s([a-zA-Z0-9\-]+)\s([\[\]a-zA-Z0-9\-\.\/\_]+)\s\-\s\[([a-zA-Z0-9\@]+)\sapp_id="([a-zA-Z0-9\-]+)"\sapp_name="([a-zA-Z0-9\-]+)"\sdeployment="([a-zA-Z0-9\-\.\_]+)"\sindex="([a-zA-Z0-9\-]+)"\sinstance_id="(\d+)"\sip="(\d+\.\d+\.\d+\.\d+)"\sjob="([a-zA-Z0-9\-\.\_]+)"\sorganization_id="([a-zA-Z0-9\-]+)"\sorganization_name="([^\"]*)"\sorigin="([a-zA-Z0-9\-\.\_]+)"\sprocess_id="([a-zA-Z0-9\-]+)"\sprocess_instance_id="([a-zA-Z0-9\-]+)"\sprocess_type="([a-zA-Z0-9\-\.\_]+)"\ssource_id="([a-zA-Z0-9\-]+)"\ssource_type="([^\"]*)"\sspace_id="([a-zA-Z0-9\-]+)"\sspace_name="([a-zA-Z0-9\-]+)"\]\s(\{.*\})
+
+    # - 
+    #   type: cloudfoundry
+    #   regex: !!js/regexp ^<(\d+)>(\d)\s(\d+-\d+-\d+T\d+:\d+:\d+\.\d*\+\d+:\d+)\s([a-zA-Z0-9\-\.\_\s]+)\s([a-zA-Z0-9\-]+)\s([\[\]a-zA-Z0-9\-\.\/\_]+)\s\-\s\[([a-zA-Z0-9\@]+)\sapp_id="([a-zA-Z0-9\-]+)"\sapp_name="([a-zA-Z0-9\-]+)"\sdeployment="([a-zA-Z0-9\-\.\_]+)"\sindex="([a-zA-Z0-9\-]+)"\sinstance_id="(\d+)"\sip="(\d+\.\d+\.\d+\.\d+)"\sjob="([a-zA-Z0-9\-\.\_]+)"\sorganization_id="([a-zA-Z0-9\-]+)"\sorganization_name="([^\"]*)"\sorigin="([a-zA-Z0-9\-\.\_]+)"\sprocess_id="([a-zA-Z0-9\-]+)"\sprocess_instance_id="([a-zA-Z0-9\-]+)"\sprocess_type="([a-zA-Z0-9\-\.\_]+)"\ssource_id="([a-zA-Z0-9\-]+)"\ssource_type="([^\"]*)"\sspace_id="([a-zA-Z0-9\-]+)"\sspace_name="([a-zA-Z0-9\-]+)"\]\s(\{.*\})
+    #   fields: [prio,version,ts,host,process,application,tags,deployment,index,instance_id,ip,job,origin,process_id,process_instance_id,process_type,source_id,source_type,message]
+    #   dateFormat: iso
+    #   transform: !!js/function >
+    #     function (p) {
+    #       const SEVERITY = [
+    #         'emerg',
+    #         'alert',
+    #         'crit',
+    #         'err',
+    #         'warning',
+    #         'notice',
+    #         'info',
+    #         'debug'
+    #       ]
+    #       const FACILITY = [
+    #         'kern',
+    #         'user',
+    #         'mail',
+    #         'daemon',
+    #         'auth',
+    #         'syslog',
+    #         'lpr',
+    #         'news',
+    #         'uucp',
+    #         'cron',
+    #         'authpriv',
+    #         'ftp',
+    #         'ntp',
+    #         'logaudit',
+    #         'logalert',
+    #         'clock',
+    #         'local0',
+    #         'local1',
+    #         'local2',
+    #         'local3',
+    #         'local4',
+    #         'local5',
+    #         'local6',
+    #         'local7'
+    #       ]
+    #       p.facility = FACILITY[p.prio>>3] || String(p.prio>>3)
+    #       p.severity = SEVERITY[p.prio&7] || String(p.prio&7)
+    #       delete p.prio
+    #       p.os = {host: p.host}
+    #     }
+    # - 
+    #   type: cloudfoundry
+    #   regex: !!js/regexp ^<(\d+)>(\d)\s(\d+-\d+-\d+T\d+:\d+:\d+\.\d*\+\d+:\d+)\s([a-zA-Z0-9\-\.\_]+)\s([a-zA-Z0-9\-]+)\s([\[\]a-zA-Z0-9\-\.\/\_]+)\s\-\s\[([a-zA-Z0-9\@]+)\s\_\_v1\_type="(.*)"\scomponent="(.*)"\sdeployment="([a-zA-Z0-9\-\.\_]+)"\sindex="([a-zA-Z0-9\-]+)"\sinstance_id="(\d+)"\sip="(\d+\.\d+\.\d+\.\d+)"\sjob="([a-zA-Z0-9\-\.\_]+)"\sorigin="([a-zA-Z0-9\-\.\_]+)"\sprocess_id="([a-zA-Z0-9\-]+)"\sprocess_instance_id="([a-zA-Z0-9\-]+)"\sprocess_type="([a-zA-Z0-9\-\.\_]+)"\ssource_type="([\[\]a-zA-Z0-9\-\.\/\_]+)"\]\s(.*)\s\-\s\[\d*\-\d*-\d*T\d*:\d*:\d*\.\d*Z\]\s.*"(\S+)\s(\S+)\s(\S+)\"\s(\d+)\s(\d+|\"-\"|-)\s(\d+|\"-\"|-)\s(\d+|\"-\"|-)\s\"([^\"]+)\"\s\"(\d+\.\d+\.\d+\.\d+\:\d*)\"\s\"(\d+\.\d+\.\d+\.\d+\:\d*)\"\sx_forwarded_for:\"([^\"]+)\"\sx_forwarded_proto:\"([^\"]+)\"\svcap_request_id:\"([^\"]+)\"\sresponse_time:([\d\.]+)\sgorouter_time:([\d\.]+)\sapp_id:\"([^\"]+)\"\sapp_index:\"([^\"]+)\"\sx_b3_traceid:\"([^\"]+)\"\sx_b3_spanid:\"([^\"]+)\"\sx_b3_parentspanid:\"([^\"]+)\"\sb3:\"([^\"]+)\"
+    #   fields: [prio,version,ts,host,process,application,tags,v1_type,component,deployment,index,instance_id,ip,job,origin,process_id,process_instance_id,process_type,source_type,domain,method,path,http_version,status_code,bytes_out,bytes_in,referrer,user_agent,ip_1,ip_2,x_forwarded_for,x_forwarded_proto,vcap_request_id,response_time,gorouter_time,app_id,app_index,x_b3_traceid,x_b3_spanid,x_b3_parentspanid,b3]
+    #   dateFormat: iso
+    #   transform: !!js/function >
+    #     function (p) {
+    #       const SEVERITY = [
+    #         'emerg',
+    #         'alert',
+    #         'crit',
+    #         'err',
+    #         'warning',
+    #         'notice',
+    #         'info',
+    #         'debug'
+    #       ]
+    #       const FACILITY = [
+    #         'kern',
+    #         'user',
+    #         'mail',
+    #         'daemon',
+    #         'auth',
+    #         'syslog',
+    #         'lpr',
+    #         'news',
+    #         'uucp',
+    #         'cron',
+    #         'authpriv',
+    #         'ftp',
+    #         'ntp',
+    #         'logaudit',
+    #         'logalert',
+    #         'clock',
+    #         'local0',
+    #         'local1',
+    #         'local2',
+    #         'local3',
+    #         'local4',
+    #         'local5',
+    #         'local6',
+    #         'local7'
+    #       ]
+    #       p.facility = FACILITY[p.prio>>3] || String(p.prio>>3)
+    #       p.severity = SEVERITY[p.prio&7] || String(p.prio&7)
+    #       delete p.prio
+    #       p.os = {host: p.host}
+    #     }
+    # - 
+    #   type: cloudfoundry
+    #   regex: !!js/regexp ^<(\d+)>(\d)\s(\d+-\d+-\d+T\d+:\d+:\d+\.\d*\+\d+:\d+)\s([a-zA-Z0-9\-\.\_]+)\s([a-zA-Z0-9\-]+)\s([\[\]a-zA-Z0-9\-\.\/\_]+)\s\-\s\[([a-zA-Z0-9\@]+)\s\_\_v1\_type="(.*)"\scomponent="(.*)"\sdeployment="([a-zA-Z0-9\-\.\_]+)"\sindex="([a-zA-Z0-9\-]+)"\sinstance_id="(\d+)"\sip="(\d+\.\d+\.\d+\.\d+)"\sjob="([a-zA-Z0-9\-\.\_]+)"\sorigin="([a-zA-Z0-9\-\.\_]+)"\sprocess_id="([a-zA-Z0-9\-]+)"\sprocess_instance_id="([a-zA-Z0-9\-]+)"\sprocess_type="([a-zA-Z0-9\-\.\_]+)"\ssource_type="([\[\]a-zA-Z0-9\-\.\/\_]+)"\]\s(.*)\s\-\s\[\d*\-\d*-\d*T\d*:\d*:\d*\.\d*Z\]\s(.*)
+    #   fields: [prio,version,ts,host,process,application,tags,v1_type,component,deployment,index,instance_id,ip,job,origin,process_id,process_instance_id,process_type,source_type,domain,message]
+    #   dateFormat: iso
+    #   transform: !!js/function >
+    #     function (p) {
+    #       const SEVERITY = [
+    #         'emerg',
+    #         'alert',
+    #         'crit',
+    #         'err',
+    #         'warning',
+    #         'notice',
+    #         'info',
+    #         'debug'
+    #       ]
+    #       const FACILITY = [
+    #         'kern',
+    #         'user',
+    #         'mail',
+    #         'daemon',
+    #         'auth',
+    #         'syslog',
+    #         'lpr',
+    #         'news',
+    #         'uucp',
+    #         'cron',
+    #         'authpriv',
+    #         'ftp',
+    #         'ntp',
+    #         'logaudit',
+    #         'logalert',
+    #         'clock',
+    #         'local0',
+    #         'local1',
+    #         'local2',
+    #         'local3',
+    #         'local4',
+    #         'local5',
+    #         'local6',
+    #         'local7'
+    #       ]
+    #       p.facility = FACILITY[p.prio>>3] || String(p.prio>>3)
+    #       p.severity = SEVERITY[p.prio&7] || String(p.prio&7)
+    #       delete p.prio
+    #       p.os = {host: p.host}
+    #     }
+    # - 
+    #   type: cloudfoundry
+    #   regex: !!js/regexp ^<(\d+)>(\d)\s(\d+-\d+-\d+T\d+:\d+:\d+\.\d*\+\d+:\d+)\s([a-zA-Z0-9\-\.\_]+)\s([a-zA-Z0-9\-]+)\s([\[\]a-zA-Z0-9\-\.\/\_]+)\s\-\s\[([a-zA-Z0-9\@]+)\sdeployment="([a-zA-Z0-9\-\.\_]+)"\sindex="([a-zA-Z0-9\-]+)"\sinstance_id="(\d+)"\sip="(\d+\.\d+\.\d+\.\d+)"\sjob="([a-zA-Z0-9\-\.\_]+)"\sorigin="([a-zA-Z0-9\-\.\_]+)"\sprocess_id="([a-zA-Z0-9\-]+)"\sprocess_instance_id="([a-zA-Z0-9\-]+)"\sprocess_type="([a-zA-Z0-9\-\.\_]+)"\ssource_id="([a-zA-Z0-9\-]+)"\ssource_type="([\[\]a-zA-Z0-9\-\.\/\_]+)"\]\s(\{.*\})
+    #   fields: [prio,version,ts,host,process,application,tags,deployment,index,instance_id,ip,job,origin,process_id,process_instance_id,process_type,source_id,source_type,message]
+    #   dateFormat: iso
+    #   transform: !!js/function >
+    #     function (p) {
+    #       const SEVERITY = [
+    #         'emerg',
+    #         'alert',
+    #         'crit',
+    #         'err',
+    #         'warning',
+    #         'notice',
+    #         'info',
+    #         'debug'
+    #       ]
+    #       const FACILITY = [
+    #         'kern',
+    #         'user',
+    #         'mail',
+    #         'daemon',
+    #         'auth',
+    #         'syslog',
+    #         'lpr',
+    #         'news',
+    #         'uucp',
+    #         'cron',
+    #         'authpriv',
+    #         'ftp',
+    #         'ntp',
+    #         'logaudit',
+    #         'logalert',
+    #         'clock',
+    #         'local0',
+    #         'local1',
+    #         'local2',
+    #         'local3',
+    #         'local4',
+    #         'local5',
+    #         'local6',
+    #         'local7'
+    #       ]
+    #       p.facility = FACILITY[p.prio>>3] || String(p.prio>>3)
+    #       p.severity = SEVERITY[p.prio&7] || String(p.prio&7)
+    #       delete p.prio
+    #       p.os = {host: p.host}
+    #     }
+
     - 
       type: cloudfoundry
-      regex: !!js/regexp ^<(\d+)>(\d)\s(\d+-\d+-\d+T\d+:\d+:\d+\.\d*\+\d+:\d+)\s([a-zA-Z0-9\-\.\_]+)\s([a-zA-Z0-9\-]+)\s([\[\]a-zA-Z0-9\-\.\/\_]+)\s\-\s\[([a-zA-Z0-9\@]+)\s\_\_v1\_type="(.*)"\scomponent="(.*)"\sdeployment="([a-zA-Z0-9\-\.\_]+)"\sindex="([a-zA-Z0-9\-]+)"\sinstance_id="(\d+)"\sip="(\d+\.\d+\.\d+\.\d+)"\sjob="([a-zA-Z0-9\-\.\_]+)"\sorigin="([a-zA-Z0-9\-\.\_]+)"\sprocess_id="([a-zA-Z0-9\-]+)"\sprocess_instance_id="([a-zA-Z0-9\-]+)"\sprocess_type="([a-zA-Z0-9\-\.\_]+)"\ssource_type="([\[\]a-zA-Z0-9\-\.\/\_]+)"\]\s(.*)\s\-\s\[\d*\-\d*-\d*T\d*:\d*:\d*\.\d*Z\]\s.*"(\S+)\s(\S+)\s(\S+)\"\s(\d+)\s(\d+|\"-\"|-)\s(\d+|\"-\"|-)\s(\d+|\"-\"|-)\s\"([^\"]+)\"\s\"(\d+\.\d+\.\d+\.\d+\:\d*)\"\s\"(\d+\.\d+\.\d+\.\d+\:\d*)\"\sx_forwarded_for:\"([^\"]+)\"\sx_forwarded_proto:\"([^\"]+)\"\svcap_request_id:\"([^\"]+)\"\sresponse_time:([\d\.]+)\sgorouter_time:([\d\.]+)\sapp_id:\"([^\"]+)\"\sapp_index:\"([^\"]+)\"\sx_b3_traceid:\"([^\"]+)\"\sx_b3_spanid:\"([^\"]+)\"\sx_b3_parentspanid:\"([^\"]+)\"\sb3:\"([^\"]+)\"
-      fields: [prio,version,ts,host,process,application,tags,v1_type,component,deployment,index,instance_id,ip,job,origin,process_id,process_instance_id,process_type,source_type,domain,method,path,http_version,status_code,bytes_out,bytes_in,referrer,user_agent,ip_1,ip_2,x_forwarded_for,x_forwarded_proto,vcap_request_id,response_time,gorouter_time,app_id,app_index,x_b3_traceid,x_b3_spanid,x_b3_parentspanid,b3]
-      dateFormat: iso
-      transform: !!js/function >
-        function (p) {
-          const SEVERITY = [
-            'emerg',
-            'alert',
-            'crit',
-            'err',
-            'warning',
-            'notice',
-            'info',
-            'debug'
-          ]
-          const FACILITY = [
-            'kern',
-            'user',
-            'mail',
-            'daemon',
-            'auth',
-            'syslog',
-            'lpr',
-            'news',
-            'uucp',
-            'cron',
-            'authpriv',
-            'ftp',
-            'ntp',
-            'logaudit',
-            'logalert',
-            'clock',
-            'local0',
-            'local1',
-            'local2',
-            'local3',
-            'local4',
-            'local5',
-            'local6',
-            'local7'
-          ]
-          p.facility = FACILITY[p.prio>>3] || String(p.prio>>3)
-          p.severity = SEVERITY[p.prio&7] || String(p.prio&7)
-          delete p.prio
-          p.os = {host: p.host}
-        }
-    - 
-      type: cloudfoundry
-      regex: !!js/regexp ^<(\d+)>(\d)\s(\d+-\d+-\d+T\d+:\d+:\d+\.\d*\+\d+:\d+)\s([a-zA-Z0-9\-\.\_]+)\s([a-zA-Z0-9\-]+)\s([\[\]a-zA-Z0-9\-\.\/\_]+)\s\-\s\[([a-zA-Z0-9\@]+)\s\_\_v1\_type="(.*)"\scomponent="(.*)"\sdeployment="([a-zA-Z0-9\-\.\_]+)"\sindex="([a-zA-Z0-9\-]+)"\sinstance_id="(\d+)"\sip="(\d+\.\d+\.\d+\.\d+)"\sjob="([a-zA-Z0-9\-\.\_]+)"\sorigin="([a-zA-Z0-9\-\.\_]+)"\sprocess_id="([a-zA-Z0-9\-]+)"\sprocess_instance_id="([a-zA-Z0-9\-]+)"\sprocess_type="([a-zA-Z0-9\-\.\_]+)"\ssource_type="([\[\]a-zA-Z0-9\-\.\/\_]+)"\]\s(.*)\s\-\s\[\d*\-\d*-\d*T\d*:\d*:\d*\.\d*Z\]\s(.*)
-      fields: [prio,version,ts,host,process,application,tags,v1_type,component,deployment,index,instance_id,ip,job,origin,process_id,process_instance_id,process_type,source_type,domain,message]
-      dateFormat: iso
-      transform: !!js/function >
-        function (p) {
-          const SEVERITY = [
-            'emerg',
-            'alert',
-            'crit',
-            'err',
-            'warning',
-            'notice',
-            'info',
-            'debug'
-          ]
-          const FACILITY = [
-            'kern',
-            'user',
-            'mail',
-            'daemon',
-            'auth',
-            'syslog',
-            'lpr',
-            'news',
-            'uucp',
-            'cron',
-            'authpriv',
-            'ftp',
-            'ntp',
-            'logaudit',
-            'logalert',
-            'clock',
-            'local0',
-            'local1',
-            'local2',
-            'local3',
-            'local4',
-            'local5',
-            'local6',
-            'local7'
-          ]
-          p.facility = FACILITY[p.prio>>3] || String(p.prio>>3)
-          p.severity = SEVERITY[p.prio&7] || String(p.prio&7)
-          delete p.prio
-          p.os = {host: p.host}
-        }
-    - 
-      type: cloudfoundry
-      regex: !!js/regexp ^<(\d+)>(\d)\s(\d+-\d+-\d+T\d+:\d+:\d+\.\d*\+\d+:\d+)\s([a-zA-Z0-9\-\.\_]+)\s([a-zA-Z0-9\-]+)\s([\[\]a-zA-Z0-9\-\.\/\_]+)\s\-\s\[([a-zA-Z0-9\@]+)\sdeployment="([a-zA-Z0-9\-\.\_]+)"\sindex="([a-zA-Z0-9\-]+)"\sinstance_id="(\d+)"\sip="(\d+\.\d+\.\d+\.\d+)"\sjob="([a-zA-Z0-9\-\.\_]+)"\sorigin="([a-zA-Z0-9\-\.\_]+)"\sprocess_id="([a-zA-Z0-9\-]+)"\sprocess_instance_id="([a-zA-Z0-9\-]+)"\sprocess_type="([a-zA-Z0-9\-\.\_]+)"\ssource_id="([a-zA-Z0-9\-]+)"\ssource_type="([\[\]a-zA-Z0-9\-\.\/\_]+)"\]\s(\{.*\})
-      fields: [prio,version,ts,host,process,application,tags,deployment,index,instance_id,ip,job,origin,process_id,process_instance_id,process_type,source_id,source_type,message]
+      regex: !!js/regexp ^\d*\s{0,1}<(\d+)>(\d+)\s([\d|-]+T[\d|\:|.|\+]+)\s([a-zA-Z0-9\-\.\_\s]+)\s(.+?)\s\[(.+)\]\s-\s\[(.*)\]\s(.*)
+      fields: [prio,version,ts,host,processID,applicationID,tags,message]
       dateFormat: iso
       transform: !!js/function >
         function (p) {

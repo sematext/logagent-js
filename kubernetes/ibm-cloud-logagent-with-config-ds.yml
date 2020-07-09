@@ -47,8 +47,8 @@ metadata:
   name: st-logagent
 spec:
   selector:
-    matchLabels:
-      app: st-logagent
+   matchLabels:
+     app: st-logagent
   template:
     metadata:
       labels:
@@ -60,18 +60,12 @@ spec:
       dnsPolicy: "ClusterFirst"
       restartPolicy: "Always"
       containers:
-      - name: st-logagent
+      - name: sematext-logagent
         image: sematext/logagent
         imagePullPolicy: "Always"
         env:
-          - name: LOG_GLOB
-            value: "/var/log/containers/*.log;/var/log/*.log"
-          - name: LOGAGENT_ARGS
-            value: "--k8sContainerd"
-          - name: LOGS_TOKEN
-            value: "YOUR_SEMATEXT_LOGS_TOKEN"
-          - name: REGION
-            value: "US"
+          - name: LA_CONFIG_OVERRIDE
+            value: "true"
         volumeMounts:
           - mountPath: /var/log
             name: var-log
@@ -79,6 +73,8 @@ spec:
             name: kubeletlogs
           - mountPath: /etc/localtime
             name: localtime
+          - mountPath: /etc/sematext
+            name: logagent-config
         securityContext:
           privileged: true
       volumes:
@@ -91,3 +87,9 @@ spec:
         - name: localtime
           hostPath:
             path: /etc/localtime
+        - name: logagent-config
+          configMap:
+            name: logagent-config
+            items:
+            - key: logagent.conf
+              path: logagent.conf

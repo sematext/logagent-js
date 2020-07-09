@@ -692,23 +692,6 @@ outputFilter:
 #      service:
 #        exclude: !!js/regexp snmpd
 
-
-##########################################
-# DROP EVENTS FILTER
-# This plugin drops events. 
-# Documentation: https://sematext.com/docs/logagent/
-########################################## 
-#
-#  dropEventsFilter:
-#    module: drop-events-filter
-#    debug: false
-#    filters:
-#      severity:
-#        # include: !!js/regexp /error|warn/i
-#        exclude: !!js/regexp /debug/i
-#      service:
-#        exclude: !!js/regexp snmpd
-
 ##########################################
 # AES ENCRYPT FIELDS 
 # This plugin encrypts field values with AES  

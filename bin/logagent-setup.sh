@@ -8,10 +8,10 @@ e=$'\e'
 COLORblue="$e[0;36m"
 COLORred="$e[0;31m"
 COLORreset="$e[0m"
-#nodeExecutable=`$(which node)||$(which nodejs)`
+#nodeExecutable=`$(command -v node)||$(command -v nodejs)`
 PATTERN="'/var/log/**/*.log'"
 TOKEN=$1
-while getopts ":i:u:g:" opt; do
+while getopts ":i:u:g:j" opt; do
   case $opt in
     u)
       export LOGSENE_RECEIVER_URL=$OPTARG
@@ -19,6 +19,34 @@ while getopts ":i:u:g:" opt; do
       ;;
     i)
       export TOKEN=$OPTARG
+      ;;
+    j)
+      export JOURNALD=yes
+      if [ ! -f /lib/systemd/system/systemd-journal-upload.service ]; then
+        echo
+        echo "journal-upload service not found. Attempting to install it..."
+        echo
+        if [ -x "$(command -v apt-get)" ]; then
+          apt-get update
+          apt-get -y install systemd-journal-remote
+          if [ ! $? eq 0 ]; then
+            echo "Failed to install the systemd-journal-remote. We need this package in order to continue."
+            exit 1
+          fi
+        else
+          if [  -x "$(command -v yum)" ]; then
+            yum clean all
+            yum -y install systemd-journal-gateway
+            if [ ! $? -eq 0 ]; then
+              echo "Failed to install the systemd-journal-remote. We need this package in order to continue."
+              exit 1
+            fi
+          else
+            echo "Can't find yum or apt. Please install journal-upload manually and try again."
+            exit 1
+          fi
+        fi
+      fi
       ;;
     g)
       export PATTERN="$OPTARG"
@@ -67,8 +95,11 @@ runCommand "systemctl enable $SERVICE_NAME" 1
 runCommand "systemctl stop $SERVICE_NAME " 2
 runCommand "systemctl start $SERVICE_NAME" 3
 sleep 1
-runCommand "systemctl status $SERVICE_NAME" 4
-runCommand "journalctl -n 10 -u $SERVICE_NAME" 5
+runCommand "systemctl status $SERVICE_NAME --no-pager" 4
+runCommand "journalctl -n 10 -u $SERVICE_NAME --no-pager" 5
+if [ ! -z "$JOURNALD" ]; then
+  runCommand "systemctl restart systemd-journal-upload.service" 6
+fi
 }
 
 function generate_initd() 
@@ -159,6 +190,71 @@ if [ -e "$3" ]; then
   mv  "$3" "${3}.bak"
 fi
 
+if [ ! -z "$JOURNALD" ]; then
+
+echo -e \
+"
+# Global options
+options:
+  # print stats every 60 seconds 
+  printStats: 60
+  # don't write parsed logs to stdout
+  suppress: true
+  # Enable/disable GeoIP lookups
+  # Startup of logagent might be slower, when downloading the GeoIP database
+  geoipEnabled: false
+  # Directory to store Logagent status and temporary files
+  # this is equals to LOGS_TMP_DIR env variable 
+  diskBufferDir: /tmp/sematext-logagent
+  # the original line will duplicate everything, so we'll exclude it
+  includeOriginalLine: false
+
+# journald input listens on localhost:5731
+input:
+  journald-upload:
+    module: input-journald-upload
+    port: 5731
+    bindAddress: localhost
+    useIndexFromUrlPath: true
+    systemdUnitFilter:
+      include: !!js/regexp /.*/i
+
+# here we parse journald logs and remove extra fields
+outputFilter:
+  journald-format:
+    module: journald-format
+    # Run Logagent parser for the message field
+    parseMessageField: true
+
+  removeFields:
+    module: remove-fields
+    # JS regular expression to match log source name
+    matchSource: !!js/regexp .*
+    # Note: journald format converts to lower case
+    fields:
+      - __cursor
+      - __monotonic_timestamp
+      - _transport
+
+output:
+  # index logs in Elasticsearch or Sematext Logs
+  elasticsearch: 
+    module: elasticsearch
+    url: $LOGSENE_RECEIVER_URL
+" > $SPM_AGENT_CONFIG_FILE
+
+
+  JOURNALD_CONF=/etc/systemd/journal-upload.conf
+
+  if [ -e "$JOURNALD_CONF" ]; then  
+    echo Config file $JOURNALD_CONF exists already, creating backup file "${JOURNALD_CONF}.bak"
+    mv  "$JOURNALD_CONF" "${JOURNALD_CONF}.bak"
+  fi
+
+  echo '[Upload]' > $JOURNALD_CONF
+  echo "URL=http://localhost:5731/$TOKEN" >> $JOURNALD_CONF
+
+else
 echo -e \
 "
 # Global options
@@ -187,6 +283,7 @@ output:
     # default index (Logs token) to use:
     index: $TOKEN
 " > $SPM_AGENT_CONFIG_FILE
+fi
 }
 
 function generate_launchctl() 
@@ -262,18 +359,20 @@ function install_script ()
     return
   fi
 }
-command=$(which logagent)
-echo $command
+LOGAGENT_COMMAND=$(command -v logagent)
+echo $LOGAGENT_COMMAND
 if [ -n "$TOKEN" ] ; then
-  install_script $command $TOKEN "${PATTERN}";
+  install_script $LOGAGENT_COMMAND $TOKEN "${PATTERN}";
 else 
   echo "${COLORred}Missing paramaters. Usage:"
   echo `basename $0` "-i LOGS_TOKEN -g '/var/log/**/*.log' -u https://logsene-receiver.sematext.com"
   echo "Please obtain your Logs App token for US region from https://apps.sematext.com/"
   echo "Please obtain your Logs App token for EU region from https://apps.eu.sematext.com/"
   echo "For EU region use -u https://logsene-receiver.eu.sematext.com/$COLORreset"
+  echo "To set up Logagent as a local receiver for journald-upload, add -j"
   read -p "${COLORblue}Logs Token: $COLORreset" TOKEN
   TOKEN=${TOKEN:-none}
-  install_script $command $TOKEN $PATTERN;
-fi 
+  install_script $LOGAGENT_COMMAND $TOKEN $PATTERN;
+fi
+echo
 echo "Logagent documentation: https://sematext.com/docs/logagent" 

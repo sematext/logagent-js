@@ -688,16 +688,41 @@ patterns:
 
  - # Postgres
   sourceName: !!js/regexp /postgres/
+  blockStart: !!js/regexp /^(\S+\s\S+)\s(\S+)\s\[(\d+)\]/
   match:
-   - type: postgres
-     regex: !!js/regexp /^(\S+\s\S+\s\S+)\s\[\d+\]\s(\S+):\s+([\S|\s]+)/
-     fields: 
-      # todo handle issue with postgres UTC time format
-      # moment.js date format does not handle UTC string
-      - server_time:string
+   - type: postgres_slowlog
+     regex: !!js/regexp /^(\S+\s\S+)\s(\S+)\s\[(\d+)\]\s(\S+)@(\S+)\s(\S+):\s+duration:\s(\S+)\sms\s+(\S+).*:\s+([\S|\s]+)/
+     fields:
+      - ts
+      - timezone:string
+      - pid:number
+      - user:string
+      - database:string
+      - severity:string
+      - duration_ms:number
+      - operation:string
+      - statement:string
+     dateFormat: yyyy-MM-dd hh:mm:ss.SSS
+   - type: postgres_with_user
+     regex: !!js/regexp /^(\S+\s\S+)\s(\S+)\s\[(\d+)\]\s(\S+)@(\S+)\s(\S+):\s+([\S|\s]+)/
+     fields:
+      - ts
+      - timezone:string # assuming timezone is always "UTC", but parsing it just in case
+      - pid:number
+      - user:string
+      - database:string
       - severity:string
       - message
-     dateFormat: yyyy-MM-dd hh:mm:ss.X
+     dateFormat: yyyy-MM-dd hh:mm:ss.SSS
+   - type: postgres
+     regex: !!js/regexp /^(\S+\s\S+)\s(\S+)\s\[(\d+)\]\s(\S+):\s+([\S|\s]+)/
+     fields:
+      - ts
+      - timezone:string # assuming timezone is always "UTC", but parsing it just in case
+      - pid:number
+      - severity:string
+      - message
+     dateFormat: yyyy-MM-dd hh:mm:ss.SSS
 
 
  - # CouchDB

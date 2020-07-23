@@ -16,10 +16,16 @@ inputFilter:
 #       include: !!js/regexp /failed|error|exception/i # include errors
 #       exclude: !!js/regexp /super noisy error messages/i # exclude noise
 
+outputFilter:
+  kubernetesEnrichment: 
+    module: kuberntes-enrichment
+
 output:
+  # stdout: ldjson
   elasticsearch:
     module: elasticsearch
     url: https://logsene-receiver.sematext.com
+    # index: de1135be-xxxx-xxxx-xxxx-365c63d5aff2
     indices: 
       c332463a-xxxx-xxxx-xxxx-535d18521418: 
         - app.*\.log

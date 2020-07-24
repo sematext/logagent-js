@@ -15,7 +15,7 @@ def label = "worker-${UUID.randomUUID().toString()}"
 
 podTemplate(label: label, serviceAccount: 'jenkins', namespace: 'jenkins', containers: [
   containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine', args: '${computer.jnlpmac} ${computer.name}'),
-  containerTemplate(name: 'docker', image: 'docker:19.03.4', command: 'cat', ttyEnabled: true, alwaysPullImage: true),
+  containerTemplate(name: 'docker', image: 'docker:19.03.11', command: 'cat', ttyEnabled: true, alwaysPullImage: true),
 ],
 volumes: [
     hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
@@ -48,7 +48,7 @@ podRetention: never()) {
                 env.DOCKER_CLI_EXPERIMENTAL = 'enabled'
                 sh """
                   docker login -u ${DOCKER_HUB_USER} -p ${DOCKER_HUB_PASSWORD}
-                  docker build --rm -t sematext/logagent:${gitCommit}-amd64 -f build/docker/Dockerfile.amd64 .
+                  docker build --rm --network=host -t sematext/logagent:${gitCommit}-amd64 -f build/docker/Dockerfile.amd64 .
                 """
                 if (gitBranch == 'master') {
                   sh """
@@ -91,7 +91,7 @@ podRetention: never()) {
                 env.DOCKER_CLI_EXPERIMENTAL = 'enabled'
                 sh """
                   docker login -u ${DOCKER_HUB_USER} -p ${DOCKER_HUB_PASSWORD}
-                  docker build --rm -t sematext/logagent:${gitCommit}-arm64 -f build/docker/Dockerfile.arm64 .
+                  docker build --rm --network=host -t sematext/logagent:${gitCommit}-arm64 -f build/docker/Dockerfile.arm64 .
                 """
                 if (gitBranch == 'master') {
                   sh """

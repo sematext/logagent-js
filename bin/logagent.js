@@ -80,6 +80,7 @@ var moduleAlias = {
   'aes-encrypt-fields': '../lib/plugins/output-filter/aes-encrypt-fields.js',
   'ip-truncate-fields': '../lib/plugins/output-filter/ip-truncate-fields.js',
   'remove-fields': '../lib/plugins/output-filter/remove-fields.js',
+  'rename-fields': '../lib/plugins/output-filter/rename-fields.js',
   'drop-events': '../lib/plugins/output-filter/dropEventsFilter.js',
   'docker-enrichment': '../lib/plugins/output-filter/docker-log-enrichment.js',
   'kubernetes-enrichment':

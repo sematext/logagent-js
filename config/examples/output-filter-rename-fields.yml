@@ -1,0 +1,13 @@
+outputFilter:
+  rename-fields:
+    module: rename-fields
+    # JS regular expression to match log source name
+    matchSource: !!js/regexp .*
+    fields:
+      - fieldName: user
+        renameTo: user_object
+
+# Exmple, input: 
+# {"user": "{ name: root }", "message": "Client connect: root", "originalLine": "INFO Client connect: root"}
+# Example, output
+# {"user_object": "{ name: root }", "message": "Client connect: root", "originalLine": "INFO Client connect: root"}

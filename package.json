@@ -100,7 +100,7 @@
     "js-yaml": "^3.14.0",
     "json-influx": "^0.3.0",
     "kubernetes-client": "^8.3.7",
-    "logsene-js": "^1.1.68",
+    "logsene-js": "^1.1.71",
     "lru-cache": "^5.1.1",
     "maxmind": "^3.1.2",
     "maxmind-geolite-mirror": "^1.1.3",
@@ -111,7 +111,6 @@
     "moment-timezone": "^0.5.31",
     "mqtt": "^2.18.8",
     "mysql": "^2.16.0",
-    "npm": "^6.14.5",
     "pg": "^7.18.2",
     "prettyjson": "^1.2.1",
     "query-string": "^6.12.1",
@@ -141,7 +140,7 @@
     "eslint-plugin-jest": "^23.13.2",
     "mocha": "^7.2.0",
     "prettier-standard": "^16.3.0",
-    "release-it": "^13.6.2",
+    "release-it": "^13.6.6",
     "standard": "^14.3.4"
   },
   "pkg": {

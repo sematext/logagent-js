@@ -11,7 +11,7 @@ COLORreset="$e[0m"
 #nodeExecutable=`$(command -v node)||$(command -v nodejs)`
 PATTERN="'/var/log/**/*.log'"
 TOKEN=$1
-while getopts ":i:u:g:j" opt; do
+while getopts ":i:u:g:j:l" opt; do
   case $opt in
     u)
       export LOGSENE_RECEIVER_URL=$OPTARG
@@ -47,6 +47,9 @@ while getopts ":i:u:g:j" opt; do
           fi
         fi
       fi
+      ;;
+    l)  # stands for Linux :)
+      export JOURNALCTL=yes
       ;;
     g)
       export PATTERN="$OPTARG"
@@ -255,6 +258,82 @@ output:
   echo "URL=http://localhost:5731/$TOKEN" >> $JOURNALD_CONF
 
 else
+
+if [ ! -z "$JOURNALCTL" ]; then
+
+ONE_WEEK_AGO=$(date --date='1 week ago' +"%Y-%m-%d %H:%M:%S")
+
+echo -e \
+"
+# Global options
+options:
+  # print stats every 60 seconds 
+  printStats: 60
+  # don't write parsed logs to stdout
+  suppress: true
+  # Enable/disable GeoIP lookups
+  # Startup of logagent might be slower, when downloading the GeoIP database
+  geoipEnabled: false
+  # Directory to store Logagent status and temporary files
+  # this is equals to LOGS_TMP_DIR env variable 
+  diskBufferDir: /tmp/sematext-logagent
+
+input:
+  journald-json:
+    module: command
+    # note journalctl -u unitName can filter logs for systemd-units
+    command: journalctl -o json --since=\"\$QUERY_TIME\"
+    sourceName: journald
+
+    dateFormat: YYYY-MM-DD HH:mm:ss # date format for $QUERY_TIME and $NOW
+    restart: 1 # seconds to wait between runs
+    # where to persist last $QUERY_TIME
+    lastQueryTimeFile: /var/run/logagentLastQueryTimeFile
+
+    # pull logs from one week ago initially
+    initialQueryTime: \"$ONE_WEEK_AGO\"
+    # 100MB pipe buffer
+    maxBuffer: 100000000
+
+# lowercasing field names
+parser:
+  json:
+    enabled: true
+    transform: !!js/function >
+      function (sourceName, parsed) {
+        var keys = Object.keys(parsed)
+        keys.forEach(function(key) {
+          parsed[key.toLowerCase()] = parsed[key]
+          delete parsed[key]
+        })
+      }
+
+# here we parse journald logs and remove extra fields
+outputFilter:
+  journald-format:
+    module: journald-format
+    # Run Logagent parser for the message field
+    parseMessageField: true
+
+  removeFields:
+    module: remove-fields
+    # JS regular expression to match log source name
+    matchSource: !!js/regexp .*
+    # Note: journald format converts to lower case
+    fields:
+      - __cursor
+      - __monotonic_timestamp
+      - _transport
+
+output:
+  # index logs in Elasticsearch or Sematext Logs
+  elasticsearch: 
+    module: elasticsearch
+    url: $LOGSENE_RECEIVER_URL
+    # default index (Logs token) to use:
+    index: $TOKEN
+" > $SPM_AGENT_CONFIG_FILE
+else
 echo -e \
 "
 # Global options
@@ -276,13 +355,14 @@ input:
     - $PATTERN
 
 output:
-  # index logs in Elasticsearch or Logsene
+  # index logs in Elasticsearch or Sematext Logs
   elasticsearch: 
     module: elasticsearch
     url: $LOGSENE_RECEIVER_URL
     # default index (Logs token) to use:
     index: $TOKEN
 " > $SPM_AGENT_CONFIG_FILE
+fi
 fi
 }
 
@@ -369,6 +449,7 @@ else
   echo "Please obtain your Logs App token for US region from https://apps.sematext.com/"
   echo "Please obtain your Logs App token for EU region from https://apps.eu.sematext.com/"
   echo "For EU region use -u https://logsene-receiver.eu.sematext.com/$COLORreset"
+  echo "To set up Logagent to pull journal entries via journalctl, add -l"
   echo "To set up Logagent as a local receiver for journald-upload, add -j"
   read -p "${COLORblue}Logs Token: $COLORreset" TOKEN
   TOKEN=${TOKEN:-none}

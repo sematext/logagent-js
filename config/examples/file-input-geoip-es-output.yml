@@ -1,0 +1,32 @@
+# Global options
+options:
+  debug: true
+
+input: 
+  files: 
+    - some/nginx/log
+
+parser:
+  patterns:
+    - 
+      sourceName: !!js/regexp /.*/
+      match: 
+        - type: web
+          regex: !!js/regexp ^([0-9a-f.:]+)\s[-|\S+]\s(.*)
+          fields: 
+            - client_ip:string
+            - message:string
+
+outputFilter:
+  geoip:
+    module: geoip
+    field: client_ip
+    debug: true
+
+output:
+  # stdout: yaml
+
+  elasticsearch:
+    module: elasticsearch
+    url: https://logsene-receiver.sematext.com
+    index: token

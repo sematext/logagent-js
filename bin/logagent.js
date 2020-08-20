@@ -458,7 +458,7 @@ LaCli.prototype.loadPlugins = function (configFile) {
   ) {
     outputFilter.push({
       module: 'geoip',
-      fields: this.argv.geoIPFields || ['client_ip'],
+      fields: this.argv.geoIPField || null,
       debug: false
     })
   }

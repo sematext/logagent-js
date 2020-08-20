@@ -1,10 +1,12 @@
 # Global options
 options:
   debug: true
+  # geoipEnabled: true
+  # geoipField: client_ip
 
 input: 
   files: 
-    - some/nginx/log
+    - /var/log/nginx
 
 parser:
   patterns:
@@ -17,11 +19,11 @@ parser:
             - client_ip:string
             - message:string
 
-outputFilter:
-  geoip:
-    module: geoip
-    field: client_ip
-    debug: true
+# outputFilter:
+#   geoip:
+#     module: geoip
+#     field: client_ip
+#     debug: true
 
 output:
   # stdout: yaml
@@ -29,4 +31,4 @@ output:
   elasticsearch:
     module: elasticsearch
     url: https://logsene-receiver.sematext.com
-    index: token
+    index: 3f225858-9eee-4b21-ac48-3749f7688152

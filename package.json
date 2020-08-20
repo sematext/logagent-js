@@ -100,7 +100,7 @@
     "js-yaml": "^3.14.0",
     "json-influx": "^0.3.0",
     "kubernetes-client": "^8.3.7",
-    "logsene-js": "^1.1.71",
+    "logsene-js": "^1.1.72",
     "lru-cache": "^5.1.1",
     "maxmind": "^3.1.2",
     "maxmind-geolite-mirror": "^1.1.3",

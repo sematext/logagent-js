@@ -462,6 +462,13 @@ LaCli.prototype.loadPlugins = function (configFile) {
       debug: false
     })
   }
+  if (this.argv.geoipEnabled) {
+    outputFilter.push({
+      module: 'geoip',
+      fields: this.argv.geoIPField || null,
+      debug: false
+    })
+  }
   if (this.argv.cfhttp) {
     outputFilter.push({
       module: 'cloudfoundry-format'

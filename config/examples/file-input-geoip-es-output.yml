@@ -31,4 +31,4 @@ output:
   elasticsearch:
     module: elasticsearch
     url: https://logsene-receiver.sematext.com
-    index: 3f225858-9eee-4b21-ac48-3749f7688152
+    index: token

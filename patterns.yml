@@ -712,7 +712,7 @@ patterns:
       - vhost:string
      dateFormat: yyyy-MM-dd HH:mm:ss.SSS
    - type: rabbitmq_connections_vhost_user
-     regex: !!js/regexp /^(\S+\s\S+)\s\[(\S+)\]\s<(\S+)>\s(accepting|closing)\sAMQP\sconnection\s<\S+>\s\((\S+):(\d+)\s->\s(\S+):(\d+),\svhost:\s'(.+)',\suser:\s'(.+)'\)([\s\S]*)/
+     regex: !!js/regexp /^(\S+\s\S+)\s\[(\S+)\]\s<(\S+)>\s(accepting|closing)\sAMQP\sconnection\s<\S+>\s\((\S+):(\d+)\s->\s(\S+):(\d+),\svhost:\s'(.+)',\suser:\s'(.+)'\):?([\s\S]*)/
      fields:
       - ts
       - severity

@@ -633,6 +633,23 @@ patterns:
       type: apache_mpm
       dateformat: ddd MMM dd hh:mm:ss.SSS yyyy
 
+ - # Apache Flink jobmanager and taskmanager
+  sourceName: !!js/regexp /flink/
+  blockStart: !!js/regexp /^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2},\d{3}\s/
+  match:
+    - type: flink[job|task]manager
+      regex: !!js/regexp /(\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2},\d{3})\s(INFO|info|WARN|ERROR|FATAL)\s+([\S]+)\s+-\s([\S|\s|\n]+)/
+      fields: [ts, severity, processid, message]
+      dateFormat: YYYY-MM-DD HH:mm:ss:l
+ - # Apache Flink jobmanager and taskmanager
+  sourceName: !!js/regexp /flink/
+  blockStart: !!js/regexp /^\w{3}\s[\d|,|\s|\:]+/
+  match:
+    - type: flink[job|task]manager
+      regex: !!js/regexp /^(\w{3}\s[\d|,|\s|\:]+\w{3}\s[\d|,|\s|\:]+[AP]M)\s([\S|\s]+)\s(INFO|WARN|ERROR|SEVERE|FATAL):\s([\S|\s|\n]+)/
+      fields: [ts, processid, severity, message]
+      dateFormat: MMM dd, yyyy H:mm:ss
+
  - # Traefik access_log
   sourceName: !!js/regexp /traefik/
   match:

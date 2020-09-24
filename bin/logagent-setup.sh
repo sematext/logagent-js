@@ -295,25 +295,18 @@ input:
     # 100MB pipe buffer
     maxBuffer: 100000000
 
-# lowercasing field names
-parser:
-  json:
-    enabled: true
-    transform: !!js/function >
-      function (sourceName, parsed) {
-        var keys = Object.keys(parsed)
-        keys.forEach(function(key) {
-          parsed[key.toLowerCase()] = parsed[key]
-          delete parsed[key]
-        })
-      }
-
 # here we parse journald logs and remove extra fields
 outputFilter:
   journald-format:
     module: journald-format
     # Run Logagent parser for the message field
     parseMessageField: true
+
+  lowercase-fields:
+    module: lowercase-fields
+    # JS regular expression to match log source name
+    matchSource: !!js/regexp .*
+    allFields: true
 
   removeFields:
     module: remove-fields

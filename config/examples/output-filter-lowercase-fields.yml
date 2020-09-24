@@ -1,0 +1,13 @@
+outputFilter:
+  lowercase-fields:
+    module: lowercase-fields
+    # JS regular expression to match log source name
+    matchSource: !!js/regexp .*
+    allFields: true # this will lowercase all fields
+    fields:
+      - fieldName: SELINUX_CONTEXT # this will lowercase only certain fields, this is an array and you can specify multiple fields
+
+# Exmple, input: 
+# {"user": "{ name: root }", "message": "Client connect: root", "originalLine": "INFO Client connect: root"}
+# Example, output
+# {"user_object": "{ name: root }", "message": "Client connect: root", "originalLine": "INFO Client connect: root"}

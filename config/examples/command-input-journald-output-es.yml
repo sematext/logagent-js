@@ -1,30 +1,62 @@
+options:
+  # print stats every 60 seconds 
+  printStats: 60
+  # Enable/disable GeoIP lookups
+  geoipEnabled: false
+  # Directory to store Logagent status and temporary files
+  # this is equals to LOGS_TMP_DIR env variable 
+  diskBufferDir: /tmp/sematext-logagent
+  debug: true
+  suppress: false
+
 input:
-  journald-json: 
+  journald-json:
     module: command
+    # note journalctl -u unitName can filter logs for systemd-units
     command: journalctl -o json --since="$QUERY_TIME"
     sourceName: journald
 
-    # date format for replacing $QUERY_TIME and $NOW
-    # the following works for journalctl, the default is ISO 8601
-    dateFormat: YYYY-MM-DD HH:mm:ss
-
+    dateFormat: YYYY-MM-DD HH:mm:ss # date format for $QUERY_TIME and $NOW
+    restart: 1 # seconds to wait between runs
     # where to persist last $QUERY_TIME
-    # defaults to os.tmpdir()+'logagentLastQueryTimeFile'
-    # lastQueryTimeFile: /tmp/logagentLastQueryTimeFile
+    lastQueryTimeFile: /var/run/logagentLastQueryTimeFile
 
-    # value for $QUERY_TIME if nothing was persisted. Default below
-    # initialQueryTime: "2001-01-01 00:00:00"
+    # pull logs from one week ago initially
+    initialQueryTime: "$ONE_WEEK_AGO"
+    # 100MB pipe buffer
+    maxBuffer: 100000000
 
-    # memory for the pipe between the command and Logagent
-    # it should fit the maximum size of the command's stdout/stderr
-    # size in bytes. Default below
-    # maxBuffer: 50000000
+# here we parse journald logs and remove extra fields
+outputFilter:
+  journald-format:
+    module: journald-format
+    # Run Logagent parser for the message field
+    parseMessageField: true
 
-    # after finishing the command, wait for N seconds then run it again
-    restart: 1
+  lowercase-fields:
+    module: lowercase-fields
+    # JS regular expression to match log source name
+    matchSource: !!js/regexp .*
+    allFields: true # this will lowercase all fields
+    # fields:
+    #   - fieldName: SELINUX_CONTEXT # this will lowercase only certain fields, this is an array and you can specify multiple fields
+
+  removeFields:
+    module: remove-fields
+    # JS regular expression to match log source name
+    matchSource: !!js/regexp .*
+    # Note: journald format converts to lower case
+    fields:
+      - __cursor
+      - __monotonic_timestamp
+      - _transport
 
 output:
-  es-local:
+  stdout: yaml
+
+  # index logs in Elasticsearch or Sematext Logs
+  elasticsearch: 
     module: elasticsearch
-    url: http://localhost:9200
-    index: journald_logs
+    url: url
+    # default index (Logs token) to use:
+    index: token

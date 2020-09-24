@@ -640,7 +640,7 @@ patterns:
     - type: flink[job|task]manager
       regex: !!js/regexp /^(\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2},\d{3})\s(INFO|info|WARN|ERROR|FATAL)\s+([\S]+)\s+-\s([\S|\s|\n]+)/
       fields: [ts, severity, processid, message]
-      dateFormat: YYYY-MM-DD HH:mm:ss:l
+      dateFormat: yyyy-MM-dd HH:mm:ss:l
  - # Apache Flink jobmanager and taskmanager
   sourceName: !!js/regexp /flink/
   blockStart: !!js/regexp /^\w{3}\s[\d|,|\s|\:]+/

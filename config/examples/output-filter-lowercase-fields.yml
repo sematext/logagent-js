@@ -8,6 +8,9 @@ outputFilter:
       - fieldName: SELINUX_CONTEXT # this will lowercase only certain fields, this is an array and you can specify multiple fields
 
 # Exmple, input: 
-# {"user": "{ name: root }", "message": "Client connect: root", "originalLine": "INFO Client connect: root"}
+# {"USER": "{ name: root }", "SELINUX_CONTEXT": "unconfined", "message": "Client connect: root", "originalLine": "INFO Client connect: root"}
 # Example, output
-# {"user_object": "{ name: root }", "message": "Client connect: root", "originalLine": "INFO Client connect: root"}
+# {"user": "{ name: root }", "selinux_context": "unconfined", "message": "Client connect: root", "originalLine": "INFO Client connect: root"}
+
+# Note:
+# This filter will only lowercase root fields, not any nested field names!

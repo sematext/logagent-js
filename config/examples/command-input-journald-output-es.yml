@@ -34,12 +34,12 @@ outputFilter:
     parseMessageField: true
 
   lowercase-fields:
-    module: lowercase-fields
+    module: lowercase-fields # this fliter only lowercases root fields, not nested fields
     # JS regular expression to match log source name
     matchSource: !!js/regexp .*
-    allFields: true # this will lowercase all fields
+    allFields: true # this will lowercase all root fields
     # fields:
-    #   - fieldName: SELINUX_CONTEXT # this will lowercase only certain fields, this is an array and you can specify multiple fields
+    #   - fieldName: SELINUX_CONTEXT # this will lowercase only certain root fields, this is an array and you can specify multiple fields
 
   removeFields:
     module: remove-fields

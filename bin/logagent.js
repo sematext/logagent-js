@@ -81,6 +81,7 @@ var moduleAlias = {
   'ip-truncate-fields': '../lib/plugins/output-filter/ip-truncate-fields.js',
   'remove-fields': '../lib/plugins/output-filter/remove-fields.js',
   'rename-fields': '../lib/plugins/output-filter/rename-fields.js',
+  'lowercase-fields': '../lib/plugins/output-filter/lowercase-fields.js',
   'drop-events': '../lib/plugins/output-filter/dropEventsFilter.js',
   'docker-enrichment': '../lib/plugins/output-filter/docker-log-enrichment.js',
   'kubernetes-enrichment':

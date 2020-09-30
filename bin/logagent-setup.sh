@@ -305,13 +305,13 @@ outputFilter:
   lowercase-fields:
     module: lowercase-fields
     # JS regular expression to match log source name
-    matchSource: !!js/regexp .*
+    matchSource: !!js/regexp journald
     allFields: true
 
   removeFields:
     module: remove-fields
     # JS regular expression to match log source name
-    matchSource: !!js/regexp .*
+    matchSource: !!js/regexp journald
     # Note: journald format converts to lower case
     fields:
       - __cursor
@@ -323,8 +323,10 @@ output:
   elasticsearch: 
     module: elasticsearch
     url: $LOGSENE_RECEIVER_URL
-    # default index (Logs token) to use:
-    index: $TOKEN
+    # default index (Logs token) to use for journald logs:
+    indices:
+      $TOKEN:
+        - journald
 " > $SPM_AGENT_CONFIG_FILE
 else
 echo -e \

@@ -11,7 +11,7 @@ COLORreset="$e[0m"
 #nodeExecutable=`$(command -v node)||$(command -v nodejs)`
 PATTERN="'/var/log/**/*.log'"
 TOKEN=$1
-while getopts ":i:u:g:j:l:c:" opt; do
+while getopts ":i:u:g:j:c:l" opt; do
   case $opt in
     u)
       export LOGSENE_RECEIVER_URL=$OPTARG
@@ -458,7 +458,7 @@ else
     echo "Please obtain your Logs App token for EU region from https://apps.eu.sematext.com/"
     echo "For EU region use -u https://logsene-receiver.eu.sematext.com/"
     echo "To set up Logagent to pull journal entries via journalctl, add -l"
-    echo "To set up Logagent as a local receiver for journald-upload, add -j"
+    echo "To set up Logagent as a local receiver for journald-upload, add -j true"
     echo
     echo "If you already have Logagent config and you want to install the service, use:"
     echo "  " `basename $0` "-c /PATH/TO/CONFIG_FILE $COLORreset"

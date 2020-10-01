@@ -11,11 +11,14 @@ COLORreset="$e[0m"
 #nodeExecutable=`$(command -v node)||$(command -v nodejs)`
 PATTERN="'/var/log/**/*.log'"
 TOKEN=$1
-while getopts ":i:u:g:j:l" opt; do
+while getopts ":i:u:g:j:c:l" opt; do
   case $opt in
     u)
       export LOGSENE_RECEIVER_URL=$OPTARG
       #shift $((OPTIND-1))
+      ;;
+    c)
+      export CONFIG_FILE=${OPTARG}
       ;;
     i)
       export TOKEN=$OPTARG
@@ -193,6 +196,11 @@ if [ -e "$3" ]; then
   mv  "$3" "${3}.bak"
 fi
 
+if [ -n "$CONFIG_FILE" ]; then
+  echo "Copying $CONFIG_FILE to $SPM_AGENT_CONFIG_FILE"
+  cp $CONFIG_FILE $SPM_AGENT_CONFIG_FILE
+else
+
 if [ ! -z "$JOURNALD" ]; then
 
 echo -e \
@@ -328,6 +336,7 @@ output:
       $TOKEN:
         - journald
 " > $SPM_AGENT_CONFIG_FILE
+
 else
 echo -e \
 "
@@ -357,6 +366,7 @@ output:
     # default index (Logs token) to use:
     index: $TOKEN
 " > $SPM_AGENT_CONFIG_FILE
+fi
 fi
 fi
 }
@@ -438,17 +448,21 @@ LOGAGENT_COMMAND=$(command -v logagent)
 echo $LOGAGENT_COMMAND
 if [ -n "$TOKEN" ] ; then
   install_script $LOGAGENT_COMMAND $TOKEN "${PATTERN}";
-else 
-  echo "${COLORred}Missing paramaters. Usage:"
-  echo `basename $0` "-i LOGS_TOKEN -g '/var/log/**/*.log' -u https://logsene-receiver.sematext.com"
-  echo "Please obtain your Logs App token for US region from https://apps.sematext.com/"
-  echo "Please obtain your Logs App token for EU region from https://apps.eu.sematext.com/"
-  echo "For EU region use -u https://logsene-receiver.eu.sematext.com/$COLORreset"
-  echo "To set up Logagent to pull journal entries via journalctl, add -l"
-  echo "To set up Logagent as a local receiver for journald-upload, add -j"
-  read -p "${COLORblue}Logs Token: $COLORreset" TOKEN
-  TOKEN=${TOKEN:-none}
-  install_script $LOGAGENT_COMMAND $TOKEN $PATTERN;
+else
+  if [ -n "$CONFIG_FILE" ]; then
+    install_script $LOGAGENT_COMMAND "NO_TOKEN_PROVIDED_JUST_CONFIG"
+  else 
+    echo "${COLORred}Missing paramaters. Usage:"
+    echo `basename $0` "-i LOGS_TOKEN -g '/var/log/**/*.log' -u https://logsene-receiver.sematext.com"
+    echo "Please obtain your Logs App token for US region from https://apps.sematext.com/"
+    echo "Please obtain your Logs App token for EU region from https://apps.eu.sematext.com/"
+    echo "For EU region use -u https://logsene-receiver.eu.sematext.com/"
+    echo "To set up Logagent to pull journal entries via journalctl, add -l"
+    echo "To set up Logagent as a local receiver for journald-upload, add -j true"
+    echo
+    echo "If you already have Logagent config and you want to install the service, use:"
+    echo "  " `basename $0` "-c /PATH/TO/CONFIG_FILE $COLORreset"
+  fi
 fi
 echo
 echo "Logagent documentation: https://sematext.com/docs/logagent" 

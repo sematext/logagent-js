@@ -695,75 +695,88 @@ patterns:
   sourceName: !!js/regexp /rabbitmq/
   blockStart: !!js/regexp /^\d\d\d\d-\d\d-\d\d\s\d\d:\d\d:\d\d/
   match:
-   - type: rabbitmq_wal_recovery
-     regex: !!js/regexp /^(\S+\s\S+)\s\[(\S+)\]\s<(\S+)>\s(WAL:\srecovering\s\[(.*)\])/
-     fields:
-      - ts
-      - severity
-      - connection:string
-      - message
-      - wal_path:string
-     dateFormat: yyyy-MM-dd HH:mm:ss.SSS
-   - type: rabbitmq_access_denied
-     regex: !!js/regexp /^(\S+\s\S+)\s\[(\S+)\]\s<(\S+)>\s(.+access\sdenied:\suser\s'(\S+)'\s-\s(.+))/
-     fields:
-      - ts
-      - severity
-      - connection:string
-      - message
-      - user:string
-      - reason:string
-     dateFormat: yyyy-MM-dd HH:mm:ss.SSS
-   - type: rabbitmq_connections_authenticated
-     regex: !!js/regexp /^(\S+\s\S+)\s\[(\S+)\]\s<(\S+)>\sconnection\s<\S+>\s\((\S+):(\d+)\s->\s(\S+):(\d+)\):\s(user\s'(\S+)'\sauthenticated\sand\sgranted\saccess\sto\svhost\s'(\S+)\')/
-     fields:
-      - ts
-      - severity
-      - connection:string
-      - source_address:string
-      - source_port:number
-      - destination_address:string
-      - destination_port:number
-      - message
-      - user:string
-      - vhost:string
-     dateFormat: yyyy-MM-dd HH:mm:ss.SSS
-   - type: rabbitmq_connections_vhost_user
-     regex: !!js/regexp /^(\S+\s\S+)\s\[(\S+)\]\s<(\S+)>\s(accepting|closing)\sAMQP\sconnection\s<\S+>\s\((\S+):(\d+)\s->\s(\S+):(\d+),\svhost:\s'(.+)',\suser:\s'(.+)'\):?([\s\S]*)/
-     fields:
-      - ts
-      - severity
-      - connection:string
-      - connection_event
-      - source_address:string
-      - source_port:number
-      - destination_address:string
-      - destination_port:number
-      - vhost:string
-      - user:string
-      - message
-     dateFormat: yyyy-MM-dd HH:mm:ss.SSS
-   - type: rabbitmq_connections
-     regex: !!js/regexp /^(\S+\s\S+)\s\[(\S+)\]\s<(\S+)>\s(accepting|closing)\sAMQP\sconnection\s<\S+>\s\((\S+):(\d+)\s->\s(\S+):(\d+)\)([\s\S]*)/
-     fields:
-      - ts
-      - severity
-      - connection:string
-      - connection_event
-      - source_address:string
-      - source_port:number
-      - destination_address:string
-      - destination_port:number
-      - message
-     dateFormat: yyyy-MM-dd HH:mm:ss.SSS
-   - type: rabbitmq_generic
-     regex: !!js/regexp /^(\S+\s\S+)\s\[(\S+)\]\s\<(\S+)\>\s([\s\S]+)/
-     fields:
-      - ts
-      - severity
-      - connection:string
-      - message
-     dateFormat: yyyy-MM-dd HH:mm:ss.SSS
+    - type: rabbitmq_startup
+      # regex: !!js/regexp /^(\S+\s\S+)\s\[(\S+)\]\s<(\S+)>\s*\n\s*(Starting\sRabbitMQ\s(\S+)\son\sErlang\s(.+)\n[\s\S]*)/
+      regex: !!js/regexp /^(\S+\s\S+)\s\[(\S+)\]\s<(\S+)>\s*\n\s*(Starting\sRabbitMQ\s(\S+)\son\sErlang\s(.+)\s*\n\s*(Copyright\s\(c\)\s\d{4}-\d{4}\s[^\n]*)\s*\n\s*Licensed\sunder\sthe\s(\S*\s?\d*\.?\d?)[\s\S]*)/
+      fields:
+        - ts
+        - severity
+        - connection:string
+        - message
+        - rabbitmq_version
+        - erlang_version
+        - copyright
+        - license
+      dateFormat: yyyy-MM-dd HH:mm:ss.SSS
+    - type: rabbitmq_wal_recovery
+      regex: !!js/regexp /^(\S+\s\S+)\s\[(\S+)\]\s<(\S+)>\s(WAL:\srecovering\s\[(.*)\])/
+      fields:
+       - ts
+       - severity
+       - connection:string
+       - message
+       - wal_path:string
+      dateFormat: yyyy-MM-dd HH:mm:ss.SSS
+    - type: rabbitmq_access_denied
+      regex: !!js/regexp /^(\S+\s\S+)\s\[(\S+)\]\s<(\S+)>\s(.+access\sdenied:\suser\s'(\S+)'\s-\s(.+))/
+      fields:
+       - ts
+       - severity
+       - connection:string
+       - message
+       - user:string
+       - reason:string
+      dateFormat: yyyy-MM-dd HH:mm:ss.SSS
+    - type: rabbitmq_connections_authenticated
+      regex: !!js/regexp /^(\S+\s\S+)\s\[(\S+)\]\s<(\S+)>\sconnection\s<\S+>\s\((\S+):(\d+)\s->\s(\S+):(\d+)\):\s(user\s'(\S+) '\sauthenticated\sand\sgranted\saccess\sto\svhost\s'(\S+)\')/
+      fields:
+       - ts
+       - severity
+       - connection:string
+       - source_address:string
+       - source_port:number
+       - destination_address:string
+       - destination_port:number
+       - message
+       - user:string
+       - vhost:string
+      dateFormat: yyyy-MM-dd HH:mm:ss.SSS
+    - type: rabbitmq_connections_vhost_user
+      regex: !!js/regexp /^(\S+\s\S+)\s\[(\S+)\]\s<(\S+)>\s(accepting|closing)\sAMQP\sconnection\s<\S+>\s\((\S+):(\d+)\s->\s(\S+):(\d +),\svhost:\s'(.+)',\suser:\s'(.+)'\):?([\s\S]*)/
+      fields:
+       - ts
+       - severity
+       - connection:string
+       - connection_event
+       - source_address:string
+       - source_port:number
+       - destination_address:string
+       - destination_port:number
+       - vhost:string
+       - user:string
+       - message
+      dateFormat: yyyy-MM-dd HH:mm:ss.SSS
+    - type: rabbitmq_connections
+      regex: !!js/regexp /^(\S+\s\S+)\s\[(\S+)\]\s<(\S+)>\s(accepting|closing)\sAMQP\sconnection\s<\S+>\s\((\S+):(\d+)\s->\s(\S+):(\d +)\)([\s\S]*)/
+      fields:
+       - ts
+       - severity
+       - connection:string
+       - connection_event
+       - source_address:string
+       - source_port:number
+       - destination_address:string
+       - destination_port:number
+       - message
+      dateFormat: yyyy-MM-dd HH:mm:ss.SSS
+    - type: rabbitmq
+      regex: !!js/regexp /^(\S+\s\S+)\s\[(\S+)\]\s\<(\S+)\>\s([\s\S]+)/
+      fields:
+       - ts
+       - severity
+       - connection:string
+       - message
+      dateFormat: yyyy-MM-dd HH:mm:ss.SSS
 
  - # Postgres
   sourceName: !!js/regexp /postgres/

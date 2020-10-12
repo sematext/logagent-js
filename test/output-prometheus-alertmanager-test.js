@@ -22,7 +22,7 @@ describe('OutputPrometheusAlertmanager', function () {
   describe('#buildAlert', function () {
     it('return alert', function () {
       var output = new OutputPrometheusAlertmanager({ url: 'foo' })
-      assert.deepEqual(output.buildAlert(), {
+      assert.deepStrictEqual(output.buildAlert(), {
         labels: {},
         annotations: {}
       })
@@ -41,7 +41,7 @@ describe('OutputPrometheusAlertmanager', function () {
           }
         }
       })
-      assert.deepEqual(
+      assert.deepStrictEqual(
         output.buildAlert({
           myVarA: 'valOfMyVarA',
           myVarB: 'valOfMyVarB'

@@ -38,3 +38,6 @@ spmdb
 # npm config
 .npmrc
 .npmignore
+
+# Prettier Standard
+.editorconfig

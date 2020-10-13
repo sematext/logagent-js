@@ -31,3 +31,17 @@ output:
     maxFiles: 2
     interval: 1d
     compress: true
+
+  #  config format example:
+  #   output:
+  #     files:
+  #         module: file-output
+  #         format: template #  or ldjson, pretty, yaml
+  #         template: '{fieldA} {fieldB}'
+  #         sourceName: .*
+  #         filename: /tmp/${fieldName}.txt
+  #         size: 10M
+  #         maxFiles: 2
+  #         interval: 1d
+  #         compress: true
+  

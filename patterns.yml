@@ -269,7 +269,7 @@ patterns:
           }
         }
     - type: apache_solr_audit_log
-      regex: !!js/regexp ^\S*\s*(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3})\s(.+?)\s*\((.+?)\)\s\[(.+?)]\s(.+?)\stype="(.*?)"\smessage="(.*?)"\smethod="(.*?)"\sstatus="(.*?)"\srequestType="(.*?)"\susername="(.*?)"\sresource="(.*?)"\squeryString="(.*?)"\scollections=\[?(.*?)\]?.*
+      regex: !!js/regexp ^\S*\s*(\d{4}-\d{2}-\d{2}\s[\d|\:+,\d]+\.\d{0,3})\s(.+?)\s*\((.+?)\)\s\[(.+?)]\s(.+?)\stype="(.*?)"\smessage="(.*?)"\smethod="(.*?)"\sstatus="(.*?)"\srequestType="(.*?)"\susername="(.*?)"\sresource="(.*?)"\squeryString="(.*?)"\scollections=(.*)
       fields: 
         - ts
         - severity:string

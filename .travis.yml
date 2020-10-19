@@ -7,6 +7,8 @@ node_js:
   - "10"
   - "12"
   - "13"
+  - "14"
+  - "15"
 install: 
   - npm i -g mocha
   - npm i

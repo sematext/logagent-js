@@ -1,0 +1,20 @@
+# Global options
+options:
+  # includeOriginalLine: true
+  # debug: true
+
+input:
+  cloudFoundry:
+    module: input-heroku
+    port: 9999
+
+outputFilter:
+  heroku-format:
+    module: heroku-format
+
+output:
+  elasticsearch:
+    module: elasticsearch
+    url: https://logsene-receiver.sematext.com
+    # debug: true
+  

@@ -1,0 +1,20 @@
+debug: false
+
+input:
+  vercel:
+    module: input-aws-ecs
+    port: 6666
+    useIndexFromUrlPath: true
+    # workers: 4
+
+      
+outputFilter: 
+  aws-ecs-format: 
+    module: aws-ecs-format
+
+output: 
+  stdout: yaml
+    
+  # sematext-cloud:
+  #   module: elasticsearch
+  #   url: https://logsene-receiver.sematext.com

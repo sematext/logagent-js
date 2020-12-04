@@ -1,0 +1,23 @@
+debug: true
+
+input:
+  input-aws-ecs:
+    module: input-aws-ecs
+    port: 6666
+    useIndexFromUrlPath: true
+    # debug: true
+    # workers: 4
+      
+outputFilter: 
+  aws-ecs-format: 
+    module: aws-ecs-format
+    parseMessageField: true
+    # debug: true
+
+output: 
+  # debug: true
+  # stdout: yaml
+    
+  sematext-cloud:
+    module: elasticsearch
+    url: https://logsene-receiver.sematext.com

@@ -65,6 +65,7 @@ var moduleAlias = {
   'docker-logs': '../lib/plugins/input/docker/docker.js',
   'input-github-webhook': '../lib/plugins/input/webhooks/github.js',
   'input-vercel': '../lib/plugins/input/vercel.js',
+  'input-aws-ecs': '../lib/plugins/input/aws-ecs.js',
   'azure-event-hub': '../lib/plugins/input/azure-event-hub.js',
   'unix-socket-reader': '../lib/plugins/input/unixSocketReader.js',
   // input filters
@@ -94,6 +95,7 @@ var moduleAlias = {
     '../lib/plugins/output-filter/github-events-format.js',
   'github-logs-format': '../lib/plugins/output-filter/github-logs-format.js',
   'vercel-format': '../lib/plugins/output-filter/vercel-format.js',
+  'aws-ecs-format': '../lib/plugins/output-filter/aws-ecs-format.js',
   // output plugins
   elasticsearch: '../lib/plugins/output/elasticsearch.js',
   'slack-webhook': '../lib/plugins/output/slack-webhook.js',

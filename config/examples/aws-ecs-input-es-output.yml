@@ -5,7 +5,7 @@ input:
     module: input-aws-ecs
     port: 6666
     useIndexFromUrlPath: true
-    workers: 4
+    # workers: 4
       
 outputFilter: 
   aws-ecs-format: 
@@ -16,3 +16,4 @@ output:
   sematext-cloud:
     module: elasticsearch
     url: https://logsene-receiver.sematext.com
+    # debug: true

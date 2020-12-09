@@ -1,0 +1,17 @@
+options:
+  includeOriginalLine: false
+
+input:
+  files:
+    - '/var/log'
+
+# this parses the message when it is a structured JSON
+parser:
+  json: 
+    enabled: true
+
+output:
+  sematext:
+    module: elasticsearch
+    url: https://logsene-receiver.sematext.com
+    index: <add your logs token>

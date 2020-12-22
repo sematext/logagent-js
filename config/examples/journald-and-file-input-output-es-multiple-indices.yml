@@ -1,0 +1,72 @@
+options:
+  # print stats every 60 seconds 
+  printStats: 60
+  # Enable/disable GeoIP lookups
+  geoipEnabled: false
+  # Directory to store Logagent status and temporary files
+  # this is equals to LOGS_TMP_DIR env variable 
+  diskBufferDir: /tmp/sematext-logagent
+  debug: true
+  suppress: false
+
+input:
+  files:
+    - '/var/log/nginx/**/*'
+
+  journald-json:
+    module: command
+    # note journalctl -u unitName can filter logs for systemd-units
+    command: journalctl -o json --since="$QUERY_TIME"
+    sourceName: journald
+
+    dateFormat: YYYY-MM-DD HH:mm:ss # date format for $QUERY_TIME and $NOW
+    restart: 1 # seconds to wait between runs
+    # where to persist last $QUERY_TIME
+    lastQueryTimeFile: /var/run/logagentLastQueryTimeFile
+
+    # pull logs from one week ago initially
+    initialQueryTime: "$ONE_WEEK_AGO"
+    # 100MB pipe buffer
+    maxBuffer: 100000000
+
+# here we parse journald logs and remove extra fields
+outputFilter:
+  journald-format:
+    module: journald-format
+    # Run Logagent parser for the message field
+    parseMessageField: true
+    # JS regular expression to match log source name
+    matchSource: !!js/regexp journald
+
+  lowercase-fields:
+    module: lowercase-fields # this fliter only lowercases root fields, not nested fields
+    # JS regular expression to match log source name
+    matchSource: !!js/regexp journald
+    allFields: true # this will lowercase all root fields
+    # fields:
+    #   - fieldName: SELINUX_CONTEXT # this will lowercase only certain root fields, this is an array and you can specify multiple fields
+
+  removeFields:
+    module: remove-fields
+    # JS regular expression to match log source name
+    matchSource: !!js/regexp journald
+    # Note: journald format converts to lower case
+    fields:
+      - __cursor
+      - __monotonic_timestamp
+      - _transport
+
+output:
+  # stdout: yaml
+
+  # index logs in Elasticsearch or Sematext Logs
+  elasticsearch: 
+    module: elasticsearch
+    url: https://logsene-receiver.sematext.com
+    # default index (Logs token) to use:
+    # index: c85ef1c3-xxxx-xxxx-xxxx-39e6944f2733
+    indices:
+      c85ef1c3-xxxx-xxxx-xxxx-39e6944f2733:
+        - journald
+      a1fcc208-xxxx-xxxx-xxxx-18f213fe2158:
+        - nginx

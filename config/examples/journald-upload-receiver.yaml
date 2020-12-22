@@ -29,6 +29,8 @@ outputFilter:
     module: journald-format
     # Run Logagent parser for the message field. This will use patterns from patterns.yml file.
     parseMessageField: true
+    # JS regular expression to match log source name
+    matchSource: !!js/regexp .*
   
   removeFields:
     module: remove-fields

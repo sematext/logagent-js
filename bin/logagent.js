@@ -438,7 +438,8 @@ LaCli.prototype.loadPlugins = function (configFile) {
     })
     outputFilter.push({
       module: 'journald-format',
-      parseMessageField: true
+      parseMessageField: true,
+      matchSource: new RegExp('journald', 'i')
     })
   }
 

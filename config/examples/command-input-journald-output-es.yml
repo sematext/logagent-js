@@ -32,6 +32,8 @@ outputFilter:
     module: journald-format
     # Run Logagent parser for the message field
     parseMessageField: true
+    # JS regular expression to match log source name
+    matchSource: !!js/regexp .*
 
   lowercase-fields:
     module: lowercase-fields # this fliter only lowercases root fields, not nested fields

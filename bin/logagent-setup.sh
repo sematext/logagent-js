@@ -236,11 +236,13 @@ outputFilter:
     module: journald-format
     # Run Logagent parser for the message field
     parseMessageField: true
+    # JS regular expression to match log source name
+    matchSource: !!js/regexp journald
 
   removeFields:
     module: remove-fields
     # JS regular expression to match log source name
-    matchSource: !!js/regexp .*
+    matchSource: !!js/regexp journald
     # Note: journald format converts to lower case
     fields:
       - __cursor
@@ -309,6 +311,8 @@ outputFilter:
     module: journald-format
     # Run Logagent parser for the message field
     parseMessageField: true
+    # JS regular expression to match log source name
+    matchSource: !!js/regexp journald
 
   lowercase-fields:
     module: lowercase-fields

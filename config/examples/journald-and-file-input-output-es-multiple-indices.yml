@@ -10,6 +10,9 @@ options:
   suppress: false
 
 input:
+  files:
+    - '/var/log/nginx/**/*'
+
   journald-json:
     module: command
     # note journalctl -u unitName can filter logs for systemd-units
@@ -33,12 +36,12 @@ outputFilter:
     # Run Logagent parser for the message field
     parseMessageField: true
     # JS regular expression to match log source name
-    matchSource: !!js/regexp .*
+    matchSource: !!js/regexp journald
 
   lowercase-fields:
     module: lowercase-fields # this fliter only lowercases root fields, not nested fields
     # JS regular expression to match log source name
-    matchSource: !!js/regexp .*
+    matchSource: !!js/regexp journald
     allFields: true # this will lowercase all root fields
     # fields:
     #   - fieldName: SELINUX_CONTEXT # this will lowercase only certain root fields, this is an array and you can specify multiple fields
@@ -46,7 +49,7 @@ outputFilter:
   removeFields:
     module: remove-fields
     # JS regular expression to match log source name
-    matchSource: !!js/regexp .*
+    matchSource: !!js/regexp journald
     # Note: journald format converts to lower case
     fields:
       - __cursor
@@ -54,11 +57,16 @@ outputFilter:
       - _transport
 
 output:
-  stdout: yaml
+  # stdout: yaml
 
   # index logs in Elasticsearch or Sematext Logs
   elasticsearch: 
     module: elasticsearch
-    url: url
+    url: https://logsene-receiver.sematext.com
     # default index (Logs token) to use:
-    index: token
+    # index: c85ef1c3-xxxx-xxxx-xxxx-39e6944f2733
+    indices:
+      c85ef1c3-xxxx-xxxx-xxxx-39e6944f2733:
+        - journald
+      a1fcc208-xxxx-xxxx-xxxx-18f213fe2158:
+        - nginx

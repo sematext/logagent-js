@@ -18,20 +18,24 @@ input:
       # exclude: !!js/regexp /docker|containerd/i
     tags:
       receiver: journald
-    # removeFields:
-    #   - __MONOTONIC_TIMESTAMP
 
 outputFilter:
   journald-format:
     module: journald-format
     # Run Logagent parser for the message field
     parseMessageField: true
-    matchSource: !!js/regexp journald
+    matchSource: !!js/regexp .*
+
+  lowercase-fields:
+    module: lowercase-fields # this fliter only lowercases root fields, not nested fields
+    # JS regular expression to match log source name
+    matchSource: !!js/regexp .*
+    allFields: true # this will lowercase all root fields
 
   removeFields:
     module: remove-fields
     # JS regular expression to match log source name
-    matchSource: !!js/regexp journald
+    matchSource: !!js/regexp .*
     # Note: journald format converts to lower case
     fields:
       - __cursor

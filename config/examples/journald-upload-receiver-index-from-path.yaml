@@ -1,0 +1,50 @@
+options:
+  includeOriginalLine: false
+  geoipEnabled: false
+  diskBufferDir: /tmp/logagent/
+  # suppress: true
+  debug: true
+  printStats: 5
+  # maxInputRate: 1m
+
+input:
+  journald-upload:
+    module: input-journald-upload
+    port: 8080
+    worker: 1
+    useIndexFromUrlPath: true
+    systemdUnitFilter:
+      include: !!js/regexp /.*/i
+      # exclude: !!js/regexp /docker|containerd/i
+    tags:
+      receiver: journald
+
+outputFilter:
+  journald-format:
+    module: journald-format
+    # Run Logagent parser for the message field
+    parseMessageField: true
+    matchSource: !!js/regexp .*
+
+  lowercase-fields:
+    module: lowercase-fields # this fliter only lowercases root fields, not nested fields
+    # JS regular expression to match log source name
+    matchSource: !!js/regexp .*
+    allFields: true # this will lowercase all root fields
+
+  removeFields:
+    module: remove-fields
+    # JS regular expression to match log source name
+    matchSource: !!js/regexp .*
+    # Note: journald format converts to lower case
+    fields:
+      - __cursor
+      - __monotonic_timestamp
+      - _transport
+
+output:
+  # stdout: yaml
+
+  sematext-logs:
+    module: elasticsearch
+    url: https://logsene-receiver.sematext.com

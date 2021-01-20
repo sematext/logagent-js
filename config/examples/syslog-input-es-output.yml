@@ -1,0 +1,28 @@
+options:
+  # print stats every 60 seconds 
+  printStats: 5
+  # Enable/disable GeoIP lookups
+  geoipEnabled: false
+  # Directory to store Logagent status and temporary files
+  # this is equals to LOGS_TMP_DIR env variable 
+  diskBufferDir: /tmp/sematext-logagent
+  debug: true
+  suppress: false
+
+input:
+  syslog: 
+    module: input-syslog
+    port: 1514
+    address: 127.0.0.1
+    sourceName: syslog
+    tags:
+      - infra:cisco
+
+output:
+  # stdout: yaml
+
+  # index logs in Elasticsearch or Sematext Logs
+  elasticsearch: 
+    module: elasticsearch
+    url: https://logs-token-receiver.apps.test.sematext.com
+    index: f8f2e476-8e18-46f9-9ce2-7cfa31e52396

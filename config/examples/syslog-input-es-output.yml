@@ -16,10 +16,11 @@ input:
     address: 127.0.0.1
     sourceName: syslog
     tags:
-      - infra:cisco
+      infra: cisco
+      service: cisco-backend
 
 output:
-  # stdout: yaml
+  stdout: yaml
 
   # index logs in Elasticsearch or Sematext Logs
   elasticsearch: 

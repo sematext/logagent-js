@@ -1,6 +1,6 @@
 options:
   # print stats every 60 seconds 
-  printStats: 5
+  printStats: 60
   # Enable/disable GeoIP lookups
   geoipEnabled: false
   # Directory to store Logagent status and temporary files
@@ -16,14 +16,11 @@ input:
     address: 127.0.0.1
     sourceName: syslog
     tags:
-      infra: cisco
-      service: cisco-backend
+      key: value
 
 output:
-  stdout: yaml
-
   # index logs in Elasticsearch or Sematext Logs
   elasticsearch: 
     module: elasticsearch
-    url: https://logs-token-receiver.apps.test.sematext.com
-    index: f8f2e476-8e18-46f9-9ce2-7cfa31e52396
+    url: https://logsene-receiver.sematext.com
+    index: LOGS_TOKEN

@@ -727,8 +727,25 @@ patterns:
        - user:string
        - reason:string
       dateFormat: yyyy-MM-dd HH:mm:ss.SSS
+    - type: rabbitmq_login_refused
+      regex: !!js/regexp /^(\S+\s\S+)\s\[(\S+)\]\s<(\S+)>\sError\son\sAMQP\sconnection\s<(\S+)>\s\((\S+):(\d+)\s->\s(\S+):(\d+),\sstate:\s(\S+)\):\n((\S+)\slogin\srefused:\suser\s'(\S+)'\s-\s(.+))/
+      fields:
+       - ts
+       - severity
+       - connection:string
+       - refused_connection:string
+       - source_address:string
+       - source_port:number
+       - destination_address:string
+       - destination_port:number
+       - state:string
+       - message
+       - auth_method:string
+       - user:string
+       - reason:string
+      dateFormat: yyyy-MM-dd HH:mm:ss.SSS
     - type: rabbitmq_connections_authenticated
-      regex: !!js/regexp /^(\S+\s\S+)\s\[(\S+)\]\s<(\S+)>\sconnection\s<\S+>\s\((\S+):(\d+)\s->\s(\S+):(\d+)\):\s(user\s'(\S+) '\sauthenticated\sand\sgranted\saccess\sto\svhost\s'(\S+)\')/
+      regex: !!js/regexp /^(\S+\s\S+)\s\[(\S+)\]\s<(\S+)>\sconnection\s<\S+>\s\((\S+):(\d+)\s->\s(\S+):(\d+)\):\s(user\s'(\S+)'\sauthenticated\sand\sgranted\saccess\sto\svhost\s'(\S+)\')/
       fields:
        - ts
        - severity
@@ -742,7 +759,7 @@ patterns:
        - vhost:string
       dateFormat: yyyy-MM-dd HH:mm:ss.SSS
     - type: rabbitmq_connections_vhost_user
-      regex: !!js/regexp /^(\S+\s\S+)\s\[(\S+)\]\s<(\S+)>\s(accepting|closing)\sAMQP\sconnection\s<\S+>\s\((\S+):(\d+)\s->\s(\S+):(\d +),\svhost:\s'(.+)',\suser:\s'(.+)'\):?([\s\S]*)/
+      regex: !!js/regexp /^(\S+\s\S+)\s\[(\S+)\]\s<(\S+)>\s(accepting|closing)\sAMQP\sconnection\s<\S+>\s\((\S+):(\d+)\s->\s(\S+):(\d+),\svhost:\s'(.+)',\suser:\s'(.+)'\):?([\s\S]*)/
       fields:
        - ts
        - severity
@@ -757,7 +774,7 @@ patterns:
        - message
       dateFormat: yyyy-MM-dd HH:mm:ss.SSS
     - type: rabbitmq_connections
-      regex: !!js/regexp /^(\S+\s\S+)\s\[(\S+)\]\s<(\S+)>\s(accepting|closing)\sAMQP\sconnection\s<\S+>\s\((\S+):(\d+)\s->\s(\S+):(\d +)\)([\s\S]*)/
+      regex: !!js/regexp /^(\S+\s\S+)\s\[(\S+)\]\s<(\S+)>\s(accepting|closing)\sAMQP\sconnection\s<\S+>\s\((\S+):(\d+)\s->\s(\S+):(\d+)\)([\s\S]*)/
       fields:
        - ts
        - severity

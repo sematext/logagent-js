@@ -10,34 +10,26 @@ input:
 
 inputFilter:
   inputFilterK8sContainerd:
-    module: input-filter-k8s-containerd # Only needed when running in K8s env with Containerd/CRI-O container runtime 
-
-  grep:
-    module: grep
-    config:
-      matchSource: !!js/regexp /.*log/ # match log files
-      include: !!js/regexp /.*/i # include errors
-      exclude: !!js/regexp /ping/i # exclude noise
+    module: input-filter-k8s-containerd # Only needed when running in K8s env with Containerd/CRI-O container runtime
 
 outputFilter:
   kubernetesEnrichment: 
     module: kubernetes-enrichment
-
   dropEvents:
     module: drop-events
+    debug: true
     filters:
-      message:
-        exclude: !!js/regexp /health/i
+      req:
+        exclude: !!js/regexp /debug|ping|health/i
 
 output:
-  stdout: yaml
-
-  # elasticsearch:
-  #   module: elasticsearch
-  #   url: https://logsene-receiver.sematext.com
-  #   # index: de1135be-xxxx-xxxx-xxxx-365c63d5aff2
-  #   indices: 
-  #     c332463a-xxxx-xxxx-xxxx-535d18521418: 
-  #       - app.*\.log
-  #     c1590c8b-xxxx-xxxx-xxxx-10f8f8281b3d: 
-  #       - kube-apiserver.*\.log
+  # stdout: yaml
+  elasticsearch:
+    module: elasticsearch
+    url: https://logsene-receiver.sematext.com
+    # index: de1135be-xxxx-xxxx-xxxx-365c63d5aff2
+    indices: 
+      c332463a-xxxx-xxxx-xxxx-535d18521418: 
+        - app.*\.log
+      c1590c8b-xxxx-xxxx-xxxx-10f8f8281b3d: 
+        - kube-apiserver.*\.log

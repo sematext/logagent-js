@@ -131,7 +131,7 @@
     "unset-value": "^1.0.0"
   },
   "optionalDependencies": {
-    "aedes": "^0.36.0",
+    "aedes": "^0.42.1",
     "date-fns": "^2.9.0",
     "websocket-stream": "^5.1.1"
   },

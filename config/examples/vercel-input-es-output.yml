@@ -5,8 +5,10 @@ input:
     module: input-vercel
     port: 8400
     useIndexFromUrlPath: true
-    clientSecret: <CLIENT_SECRET>
     # workers: 4
+    clientSecrets:
+      - <CLIENT_SECRET>
+      - <CLIENT_SECRET>
 
       
 outputFilter: 

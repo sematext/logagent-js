@@ -23,6 +23,9 @@ const configWithArrayWithTwoClientSecrets = {
 const configWithArrayWithOneClientSecret = {
   clientSecrets: [sampleClientSecret]
 }
+const configWithArrayWithManyClientSecretsOfWhichOnlyOneIsValid = {
+  clientSecrets: [sampleClientSecret, 'kjsdfakslf', 'aslsadslkjdkld']
+}
 const EventEmitter = require('events')
 const evem = new EventEmitter()
 
@@ -32,6 +35,7 @@ const evem = new EventEmitter()
 const Vercel = require('../../lib/plugins/input/vercel')
 const vercelWithArrayWithTwoSecrets = new Vercel(configWithArrayWithTwoClientSecrets, evem)
 const vercelWithArrayWithOneSecret = new Vercel(configWithArrayWithOneClientSecret, evem)
+const vercelWithArrayWithOnlyOneValidSecret = new Vercel(configWithArrayWithManyClientSecretsOfWhichOnlyOneIsValid, evem)
 
 describe('verifySignature should', function () {
   it('return true for an array with 2 secrets', function (done) {
@@ -41,6 +45,11 @@ describe('verifySignature should', function () {
   })
   it('return true for an array with 1 secret', function (done) {
     const signature = vercelWithArrayWithOneSecret.verifySignature(sampleReq, sampleBodyBuf)
+    assert.strictEqual(signature, true)
+    done()
+  })
+  it('return true for an array with only 1 valid secret', function (done) {
+    const signature = vercelWithArrayWithOnlyOneValidSecret.verifySignature(sampleReq, sampleBodyBuf)
     assert.strictEqual(signature, true)
     done()
   })

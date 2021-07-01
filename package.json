@@ -127,6 +127,7 @@
     "tail-forever": "^0.3.16",
     "tedious": "^3.0.1",
     "throng": "^4.0.0",
+    "through2": "^4.0.2",
     "try-call": "0.0.2",
     "unset-value": "^1.0.0"
   },

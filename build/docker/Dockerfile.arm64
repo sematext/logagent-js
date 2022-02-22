@@ -11,7 +11,7 @@ WORKDIR /
 COPY . .
 
 RUN \
-  apk add --no-cache --virtual .build-deps alpine-sdk python && \
+  apk add --no-cache --virtual .build-deps alpine-sdk python3 && \
   npm install --unsafe-perm --production && \
   npm install --unsafe-perm --production @sematext/logagent-nodejs-monitor && \
   mkdir -p /etc/sematext && \

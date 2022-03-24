@@ -35,7 +35,7 @@ var LogAnalyzer = require('../lib/parser/parser.js')
 var mkpath = require('mkpath')
 process.setMaxListeners(0)
 var co = require('co')
-const fs = require('fs')
+const fs = require('graceful-fs')
 const request = require('request')
 const PATTERN_DIR = process.env.PATTERN_DIR || '/etc/logagent'
 var moduleAlias = {

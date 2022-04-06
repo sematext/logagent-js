@@ -114,7 +114,6 @@
     "moment-timezone": "^0.5.31",
     "mqtt": "^4.2.8",
     "mysql": "^2.16.0",
-    "node-windows": "^1.0.0-beta.7",
     "pg": "^7.18.2",
     "prettyjson": "^1.2.1",
     "public-ip": "^4.0.2",

@@ -658,7 +658,7 @@ LaCli.prototype.initState = function () {
     var context = contextObj
     var trimmedLine = line
     if (line && Buffer.byteLength(line, 'utf8') > self.argv.maxLogSize) {
-      var cutMsg = new Buffer(self.argv.maxLogSize)
+      var cutMsg = Buffer.alloc(self.argv.maxLogSize)
       cutMsg.write(line)
       trimmedLine = cutMsg.toString()
     }
@@ -770,7 +770,7 @@ LaCli.prototype.parseLine = function (line, sourceName, cbf) {
   var trimmedLine = line
   var bufLength = Buffer.byteLength(line, 'utf8')
   if (line && bufLength > this.argv.maxLogSize) {
-    var cutMsg = new Buffer(this.argv.maxLogSize)
+    var cutMsg = Buffer.alloc(this.argv.maxLogSize)
     cutMsg.write(line)
     trimmedLine = cutMsg.toString()
     cutMsg = null

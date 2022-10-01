@@ -1,0 +1,24 @@
+name: Trigger jenkins job
+
+on:
+  push:
+    branches: [ "master" ]
+#  pull_request:
+#    branches: [ "master" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run
+        uses: appleboy/jenkins-action@master
+        with:
+          url: "https://jenkins.new.test.sematext.com"
+          user: "marko.bonaci@sematext.com"
+          token: ${{secrets.JENKINS_TOKEN}}
+          job: "sematext-logagent"

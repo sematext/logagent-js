@@ -19,6 +19,6 @@ jobs:
         uses: appleboy/jenkins-action@master
         with:
           url: "https://jenkins.new.test.sematext.com"
-          user: "marko.bonaci@sematext.com"
+          user: "machine@sematext.com"
           token: ${{secrets.JENKINS_TOKEN}}
           job: "sematext-logagent"

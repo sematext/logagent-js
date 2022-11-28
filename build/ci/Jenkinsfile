@@ -14,7 +14,7 @@ properties(
 def label = "worker-${UUID.randomUUID().toString()}"
 
 podTemplate(label: label, serviceAccount: 'jenkins', namespace: 'jenkins', containers: [
-  containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine', args: '${computer.jnlpmac} ${computer.name}'),
+  containerTemplate(name: 'jnlp', image: 'sematext/jenkins-inbound-agent-with-curl:latest', args: '${computer.jnlpmac} ${computer.name}'),
   containerTemplate(name: 'docker', image: 'docker:19.03.11', command: 'cat', ttyEnabled: true, alwaysPullImage: false),
 ],
 volumes: [

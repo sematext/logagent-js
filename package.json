@@ -92,7 +92,7 @@
     "elasticsearch": "^15.2.0",
     "eventemitter3": "^3.1.0",
     "fast-safe-stringify": "^2.0.6",
-    "flat": "^4.1.0",
+    "flat": "^5.0.1",
     "flatstr": "^1.0.8",
     "get-value": "^3.0.1",
     "glob": "^7.1.3",

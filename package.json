@@ -146,7 +146,7 @@
     "eslint-plugin-jest": "^23.13.2",
     "graygelf": "^2.0.0",
     "mocha": "10.1.0",
-    "release-it": "^15.4.2",
+    "release-it": "^16.2.0",
     "standard": "^14.3.4",
     "trim": "^1.0.1"
   },

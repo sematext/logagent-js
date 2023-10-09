@@ -68,6 +68,7 @@ var moduleAlias = {
   'input-aws-ecs': '../lib/plugins/input/aws-ecs.js',
   'azure-event-hub': '../lib/plugins/input/azure-event-hub.js',
   'unix-socket-reader': '../lib/plugins/input/unixSocketReader.js',
+  'netflow-udp': '../lib/plugins/input/netflow-udp.js',
   // input filters
   'input-filter-k8s-containerd':
     '../lib/plugins/input-filter/kubernetesContainerd.js',

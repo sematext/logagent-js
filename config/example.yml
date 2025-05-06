@@ -149,7 +149,7 @@ input:
   #  url: mqtt://test.mosquitto.org
   #  # see connect options: https://www.npmjs.com/package/mqtt#connect
   #  connectOptions: 
-  #    userName: nobody 
+  #    username: nobody
   #    password: secret
   #  topics: 
   #    - log-messages
@@ -824,6 +824,8 @@ output:
   #  module: output-mqtt
   #  url: mqtt://test.mosquitto.org
   #  topic: sensor-data
+  #  qos: 2
+  #  retain: false
   #  debug: false
   #  # optional filter settings matching data field with regular expressions
   #  filter: 
@@ -833,6 +835,8 @@ output:
   #  module: output-mqtt
   #  url: mqtt://test.mosquitto.org
   #  topic: log-data
+  #  qos: 2
+  #  retain: false
   #  debug: false
   #  filter: 
   #    field: logSource
